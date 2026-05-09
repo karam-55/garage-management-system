@@ -776,7 +776,7 @@ model Payment {
   status          PaymentStatus @default(PENDING)
   paymentDate     DateTime      @default(now()) @map("payment_date") @db.Timestamptz
   referenceNumber String?       @map("reference_number") @db.VarChar(100)
-  processedBy     String?       @map("processed_by") @db.VarChar(255)
+  processedBy     String?       @map("processed_by") @db.Uuid
   processedByUser User?         @relation("ProcessedPayments", fields: [processedBy], references: [id], onDelete: SetNull)
   notes           String?       @db.Text
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz
