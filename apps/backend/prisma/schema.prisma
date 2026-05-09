@@ -471,8 +471,8 @@ model AdditionalService {
   description      String?                 @db.Text
   price            Decimal                 @db.Decimal(10, 2)
   status           AdditionalServiceStatus @default(PENDING)
-  requestedBy      String?                 @map("requested_by") @db.VarChar(255)
-  approvedBy       String?                 @map("approved_by") @db.VarChar(255)
+  requestedBy      String?                 @map("requested_by") @db.Uuid
+  approvedBy       String?                 @map("approved_by") @db.Uuid
   approvedAt       DateTime?               @map("approved_at") @db.Timestamptz
   approvalDeadline DateTime?               @map("approval_deadline") @db.Timestamptz
   createdAt        DateTime                @default(now()) @map("created_at") @db.Timestamptz
@@ -661,7 +661,7 @@ model StockMovement {
   referenceType   String?           @map("reference_type") @db.VarChar(50)
   referenceId     String?           @map("reference_id") @db.VarChar(255)
   notes           String?           @db.Text
-  performedBy     String?           @map("performed_by") @db.VarChar(255)
+  performedBy     String?           @map("performed_by") @db.Uuid
   performedByUser User?             @relation("PerformedStockMovements", fields: [performedBy], references: [id], onDelete: SetNull)
   performedAt     DateTime          @default(now()) @map("performed_at") @db.Timestamptz
   createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz
@@ -685,9 +685,9 @@ model PartsRequest {
   quantity        Decimal            @db.Decimal(10, 2)
   urgency         String?            @default("NORMAL") @db.VarChar(50)
   status          PartsRequestStatus @default(PENDING)
-  requestedBy     String?            @map("requested_by") @db.VarChar(255)
+  requestedBy     String?            @map("requested_by") @db.Uuid
   requestedByUser User?              @relation("RequestedPartsRequests", fields: [requestedBy], references: [id], onDelete: SetNull)
-  approvedBy      String?            @map("approved_by") @db.VarChar(255)
+  approvedBy      String?            @map("approved_by") @db.Uuid
   approvedAt      DateTime?          @map("approved_at") @db.Timestamptz
   orderedAt       DateTime?          @map("ordered_at") @db.Timestamptz
   receivedAt      DateTime?          @map("received_at") @db.Timestamptz
