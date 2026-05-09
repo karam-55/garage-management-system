@@ -300,8 +300,8 @@ model Customer {
   // Relations
   vehicles        Vehicle[]
   bookings        Booking[]
+  bookingCustomer Booking[] @relation("BookingCustomer")
   invoices        Invoice[]
-  invoiceCustomer Invoice[] @relation("InvoiceCustomer")
   payments        Payment[]
   paymentCustomer Payment[] @relation("PaymentCustomer")
   customerApprovals CustomerApproval[]
@@ -422,7 +422,7 @@ model ServiceItem {
 model Booking {
   id                       String        @id @default(uuid()) @db.Uuid
   customerId               String        @map("customer_id") @db.Uuid
-  customer                 Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customer                 Customer      @relation("BookingCustomer", fields: [customerId], references: [id], onDelete: Cascade)
   garageId                 String        @map("garage_id") @db.Uuid
   garage                   Garage        @relation(fields: [garageId], references: [id], onDelete: Cascade)
   vehicleId                String        @map("vehicle_id") @db.Uuid
@@ -447,7 +447,7 @@ model Booking {
   customerApprovals  CustomerApproval[]
   handovers          MechanicHandover[]
   invoice            Invoice?
-  payments           Payment[]
+  bookingPayments    Payment[] @relation("BookingPayment")
   customerUser       User?    @relation("CustomerBookings", fields: [customerId], references: [id])
   vehicleStatusHistory VehicleStatusHistory[] @relation("VehicleStatusBooking")
 
@@ -681,7 +681,6 @@ model Invoice {
   bookingId       String       @unique @map("booking_id") @db.Uuid
   booking         Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   customerId      String       @map("customer_id") @db.Uuid
-  customer        Customer     @relation("InvoiceCustomer", fields: [customerId], references: [id])
   garageId        String       @map("garage_id") @db.Uuid
   garage          Garage       @relation(fields: [garageId], references: [id])
   invoiceNumber   String       @unique @map("invoice_number") @db.VarChar(50)
@@ -700,9 +699,8 @@ model Invoice {
 
   // Relations
   items        InvoiceItem[]
-  payments     Payment[]
+  payments     Payment[] @relation("PaymentInvoice")
   customerUser User?        @relation("CustomerInvoices", fields: [customerId], references: [id])
-  invoicePayment Payment[] @relation("PaymentInvoice")
 
   @@index([bookingId])
   @@index([customerId])
@@ -736,7 +734,7 @@ model InvoiceItem {
 model Payment {
   id              String        @id @default(uuid()) @db.Uuid
   invoiceId       String        @map("invoice_id") @db.Uuid
-  invoice         Invoice       @relation("PaymentInvoice", fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoice         Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   customerId      String        @map("customer_id") @db.Uuid
   customer        Customer      @relation("PaymentCustomer", fields: [customerId], references: [id])
   garageId        String        @map("garage_id") @db.Uuid
@@ -755,6 +753,7 @@ model Payment {
 
   // Relations
   history   PaymentHistory[]
+  booking   Booking?    @relation("BookingPayment")
 
   @@index([invoiceId])
   @@index([customerId])
