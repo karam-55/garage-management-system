@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام Garage Go - تقرير المشروع الشامل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles_enhanced.css">
+</head>
+<body>
+    <!-- شريط التقدم المتقدم -->
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="reading-time" id="readingTime">
+        <i class="far fa-clock"></i>
+        <span>وقت القراءة: 8 دقائق</span>
+    </div>
+
+    <!-- القائمة العلوية المحسنة -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-3d">
+                    <i class="fas fa-wrench"></i>
+                    <div class="logo-glow"></div>
+                </div>
+                <span class="logo-text">نظام <span class="highlight">الكراج</span> الذكي</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#intro" class="nav-link"><i class="fas fa-home"></i> الرئيسية</a></li>
+                <li><a href="#modules" class="nav-link"><i class="fas fa-cubes"></i> الأقسام</a></li>
+                <li><a href="#flow" class="nav-link"><i class="fas fa-project-diagram"></i> الخطوات</a></li>
+                <li><a href="#tech" class="nav-link"><i class="fas fa-microchip"></i> التقنيات</a></li>
+                <li><a href="#features" class="nav-link"><i class="fas fa-star"></i> المميزات</a></li>
+                <li><a href="#demo" class="nav-link"><i class="fas fa-play"></i> تجربة</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="nav-toggle" id="navToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- الصفحة الرئيسية المحسنة -->
+    <section id="intro" class="hero">
+        <div class="hero-bg">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="particles" id="particles"></div>
+            <div class="floating-icons">
+                <i class="fas fa-car"></i>
+                <i class="fas fa-tools"></i>
+                <i class="fas fa-cog"></i>
+                <i class="fas fa-wrench"></i>
+            </div>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-pulse"></span>
+                    <span>تقرير مشروع 2026 - الإصدار المتقدم</span>
+                </div>
+                <h1 class="hero-title">
+                    نظام إدارة الورش
+                    <span class="gradient-text">الذكي المتكامل</span>
+                    <div class="title-underline"></div>
+                </h1>
+                <p class="hero-desc">
+                    دراسة تحليلية شاملة لبناء نظام متكامل لإدارة الورش والكراجات، 
+                    من الحجز إلى تسليم السيارة، كل شيء في منظومة واحدة ذكية تعمل بالذكاء الاصطناعي.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat" data-count="12">
+                        <span class="stat-num">0</span>
+                        <span class="stat-label">قسم رئيسي</span>
+                        <div class="stat-progress"></div>
+                    </div>
+                    <div class="stat" data-count="9">
+                        <span class="stat-num">0</span>
+                        <span class="stat-label">خطوة أساسية</span>
+                        <div class="stat-progress"></div>
+                    </div>
+                    <div class="stat" data-count="100">
+                        <span class="stat-num">0%</span>
+                        <span class="stat-label">عربي ومبسط</span>
+                        <div class="stat-progress"></div>
+                    </div>
+                </div>
+                <div class="hero-actions">
+                    <button class="btn-primary" onclick="scrollToSection('modules')">
+                        <i class="fas fa-rocket"></i>
+                        استكشف النظام
+                    </button>
+                    <button class="btn-secondary" onclick="openDemo()">
+                        <i class="fas fa-play"></i>
+                        تجربة تفاعلية
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-down">
+            <span>اكمل القراءة</span>
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- مقدمة المشروع المحسنة -->
+    <section class="intro-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge">مقدمة المشروع</span>
+                <h2>لماذا نظام Garage Go؟</h2>
+                <p>نحول ورشتك إلى عمل ذكي ومنظم بالكامل</p>
+            </div>
+            <div class="intro-grid">
+                <div class="intro-card" data-aos="fade-up">
+                    <div class="card-icon" style="--bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-bullseye"></i>
+                        <div class="icon-ripple"></div>
+                    </div>
+                    <h3>الهدف من المشروع</h3>
+                    <p>بناء نظام احترافي لإدارة الورش يغطي كل مراحل العمل من استلام السيارة حتى تسليمها للعميل</p>
+                    <div class="card-features">
+                        <span><i class="fas fa-check"></i> تنظيم كامل</span>
+                        <span><i class="fas fa-check"></i> توفير الوقت</span>
+                        <span><i class="fas fa-check"></i> زيادة الأرباح</span>
+                    </div>
+                </div>
+                <div class="intro-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card-icon" style="--bg: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-chart-line"></i>
+                        <div class="icon-ripple"></div>
+                    </div>
+                    <h3>منهجية العمل</h3>
+                    <p>تحليل كل قسم بالتفصيل: ماذا يفعل، كيف يعمل، ما البيانات المطلوبة، وكيف يتصل بالأقسام الأخرى</p>
+                    <div class="card-features">
+                        <span><i class="fas fa-check"></i> تحليل دقيق</span>
+                        <span><i class="fas fa-check"></i> ربط الأقسام</span>
+                        <span><i class="fas fa-check"></i> سهولة الاستخدام</span>
+                    </div>
+                </div>
+                <div class="intro-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card-icon" style="--bg: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-trophy"></i>
+                        <div class="icon-ripple"></div>
+                    </div>
+                    <h3>النتيجة المتوقعة</h3>
+                    <p>نظام متكامل يسهل عمل الورشة ويرضي العملاء ويزيد الأرباح من خلال التنظيم والذكاء الاصطناعي</p>
+                    <div class="card-features">
+                        <span><i class="fas fa-check"></i> عملاء سعداء</span>
+                        <span><i class="fas fa-check"></i> أرباح أعلى</span>
+                        <span><i class="fas fa-check"></i> سمعة ممتازة</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- الأقسام الرئيسية المحسنة -->
+    <section id="modules" class="modules-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge">الأقسام الرئيسية</span>
+                <h2>12 قسم يشكلون النظام الكامل</h2>
+                <p>كل قسم مفصل بما يحتاجه من بيانات وخطوات عمل</p>
+            </div>
+
+            <!-- القسم 1: الحجز -->
+            <div class="module-card" data-aos="fade-up">
+                <div class="module-header">
+                    <div class="module-num">01</div>
+                    <div class="module-title">
+                        <h3>نظام الحجز والمواعيد</h3>
+                        <span>بداية رحلة العميل</span>
+                    </div>
+                    <div class="module-icon-large">
+                        <i class="far fa-calendar-check"></i>
+                    </div>
+                </div>
+                <div class="module-body">
+                    <div class="content-block">
+                        <h4><i class="fas fa-lightbulb"></i> ما يفعله هذا القسم؟</h4>
+                        <p>هنا يبدأ كل شيء. العميل يحجز موعد لصيانة سيارته، والنظام ينظم المواعيد ويؤكد الحجز ويرسل التذكيرات.</p>
+                    </div>
+                    
+                    <div class="content-block">
+                        <h4><i class="fas fa-list"></i> أنواع الحجوزات التي يدعمها النظام:</h4>
+                        <div class="booking-types">
+                            <div class="booking-type">
+                                <i class="fas fa-home"></i>
+                                <span>حجز عادي في الورشة</span>
+                            </div>
+                            <div class="booking-type">
+                                <i class="fas fa-truck"></i>
+                                <span>حجز مع خدمة التوصيل</span>
+                            </div>
+                            <div class="booking-type">
+                                <i class="fas fa-car"></i>
+                                <span>حجز للأساطيل (Fleet)</span>
+                            </div>
+                            <div class="booking-type">
+                                <i class="fas fa-box"></i>
+                                <span>حجز لباقة خدمات</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-block">
+                        <h4><i class="fas fa-database"></i> البيانات التي يتم حفظها:</h4>
+                        <div class="data-grid">
+                            <div class="data-item">
+                                <i class="fas fa-user"></i>
+                                <div>
+                                    <strong>بيانات العميل</strong>
+                                    <span>الاسم، الجوال، التواصل</span>
+                                </div>
+                            </div>
+                            <div class="data-item">
+                                <i class="fas fa-car"></i>
+                                <div>
+                                    <strong>بيانات السيارة</strong>
+                                    <span>اللوحة، الموديل، VIN</span>
+                                </div>
+                            </div>
+                            <div class="data-item">
+                                <i class="fas fa-tools"></i>
+                                <div>
+                                    <strong>الخدمة المطلوبة</strong>
+                                    <span>تغيير زيت، فحص، إصلاح</span>
+                                </div>
+                            </div>
+                            <div class="data-item">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <strong>الموعد والوقت</strong>
+                                    <span>التاريخ والساعة المحددة</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-block">
+                        <h4><i class="fas fa-cogs"></i> خطوات إنشاء الحجز:</h4>
+                        <div class="steps">
+                            <div class="step">
+                                <div class="step-num">1</div>
+                                <div class="step-text">
+                                    <strong>فتح نموذج الحجز</strong>
+                                    <span>اختيار الورشة والسيارة والخدمة</span>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-num">2</div>
+                                <div class="step-text">
+                                    <strong>عرض المواعيد المتاحة</strong>
+                                    <span>تحقق من الفنيين والأماكن المتاحة</span>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-num">3</div>
+                                <div class="step-text">
+                                    <strong>تأكيد الحجز</strong>
+                                    <span>إنشاء سجل الحجز بالحالة المناسبة</span>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-num">4</div>
+                                <div class="step-text">
+                                    <strong>إرسال التأكيد</strong>
+                                    <span>رسالة مع تفاصيل الموعد والروابط</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-block">
+                        <h4><i class="fas fa-chart-line"></i> حالات الحجز الممكنة:</h4>
+                        <div class="status-flow">
+                            <div class="status-box pending">
+                                <i class="fas fa-clock"></i>
+                                <span>معلق</span>
+                                <small>لم يتم التأكيد</small>
+                            </div>
+                            <i class="fas fa-arrow-left"></i>
+                            <div class="status-box confirmed">
+                                <i class="fas fa-check"></i>
+                                <span>مؤكد</span>
+                                <small>الورشة وافقت</small>
+                            </div>
+                            <i class="fas fa-arrow-left"></i>
+                            <div class="status-box progress">
+                                <i class="fas fa-spinner"></i>
+                                <span>قيد التنفيذ</span>
+                                <small>السيارة في الورشة</small>
+                            </div>
+                            <i class="fas fa-arrow-left"></i>
+                            <div class="status-box completed">
+                                <i class="fas fa-flag"></i>
+                                <span>مكتمل</span>
+                                <small>تم التسليم</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- القسم 2: بطاقات العمل -->
+            <div class="module-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="module-header">
+                    <div class="module-num">02</div>
+                    <div class="module-title">
+                        <h3>بطاقات العمل (Job Cards)</h3>
+                        <span>عمود النظام الفقري</span>
+                    </div>
+                    <div class="module-icon-large">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                </div>
+                <div class="module-body">
+                    <div class="content-block">
+                        <h4><i class="fas fa-info-circle"></i> ما هي بطاقة العمل؟</h4>
+                        <p>كل سيارة تدخل الورشة تحصل على "بطاقة عمل" - وهي ملف العملية الكامل من البداية للنهاية.</p>
+                    </div>
+
+                    <div class="content-block">
+                        <h4><i class="fas fa-list-ul"></i> ما يحتويه ملف بطاقة العمل:</h4>
+                        <div class="job-card-preview">
+                            <div class="job-card-header">
+                                <i class="fas fa-car"></i>
+                                <span>بطاقة عمل #1234</span>
+                            </div>
+                            <div class="job-card-content">
+                                <div class="job-item"><i class="fas fa-user"></i> بيانات العميل والسيارة</div>
+                                <div class="job-item"><i class="fas fa-comment"></i> الشكوى أو المشكلة</div>
+                                <div class="job-item"><i class="fas fa-tasks"></i> قائمة الأعمال المطلوبة</div>
+                                <div class="job-item"><i class="fas fa-cogs"></i> قطع الغيار المطلوبة</div>
+                                <div class="job-item"><i class="fas fa-user-tie"></i> الفنيين المسؤولين</div>
+                                <div class="job-item"><i class="fas fa-clock"></i> الوقت المقدر والفعلي</div>
+                                <div class="job-item"><i class="fas fa-camera"></i> صور وفيديو وملاحظات</div>
+                                <div class="job-item"><i class="fas fa-chart-line"></i> حالة العمل</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-block">
+                        <h4><i class="fas fa-plus-circle"></i> كيف يتم إنشاء بطاقة العمل؟</h4>
+                        <div class="creation-methods">
+                            <div class="method">
+                                <div class="method-icon auto">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <div>
+                                    <strong>تلقائياً</strong>
+                                    <p>عند تأكيد الحجز، النظام ينشئ بطاقة عمل مرتبطة بالحجز مباشرة</p>
+                                </div>
+                            </div>
+                            <div class="method">
+                                <div class="method-icon manual">
+                                    <i class="fas fa-hand-paper"></i>
+                                </div>
+                                <div>
+                                    <strong>يدوياً (زيارة مباشرة)</strong>
+                                    <p>لو العميل جاء بدون حجز مسبق، موظف الاستقبال ينشئ البطاقة مباشرة</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- القسم 3: تقارير الفحص -->
+            <div class="module-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="module-header">
+                    <div class="module-num">03</div>
+                    <div class="module-title">
+                        <h3>تقارير الفحص التفصيلية</h3>
+                        <span>فحص رقمي شامل</span>
+                    </div>
+                    <div class="module-icon-large">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+                <div class="module-body">
+                    <div class="content-block">
+                        <h4><i class="fas fa-microscope"></i> ما يقدمه هذا القسم؟</h4>
+                        <p>بدل الورق والأوراق، فحص رقمي كامل مع صور وفيديو وحالة كل جزء في السيارة.</p>
+                    </div>
+
+                    <div class="content-block">
+                        <h4><i class="fas fa-clipboard-check"></i> عناصر تقرير الفحص:</h4>
+                        <div class="inspection-grid">
+                            <div class="inspect-box good">
+                                <i class="fas fa-check-circle"></i>
+                                <span>الفرامل</span>
+                                <small>جيد</small>
+                            </div>
+                            <div class="inspect-box attention">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>الإطارات</span>
+                                <small>يحتاج انتباه</small>
+                            </div>
+                            <div class="inspect-box good">
+                                <i class="fas fa-check-circle"></i>
+                                <span>الزيت</span>
+                                <small>جيد</small>
+                            </div>
+                            <div class="inspect-box critical">
+                                <i class="fas fa-times-circle"></i>
+                                <span>السوائل</span>
+                                <small>حرج - يحتاج إصلاح</small>
+                            </div>
+                            <div class="inspect-box good">
+                                <i class="fas fa-check-circle"></i>
+                                <span>الكهرباء</span>
+                                <small>جيد</small>
+                            </div>
+                            <div class="inspect-box attention">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>الهيكل</span>
+                                <small>يحتاج انتباه</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- القسم 4: المخزون -->
+            <div class="module-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="module-header">
+                    <div class="module-num">04</div>
+                    <div class="module-title">
+                        <h3>إدارة المخزون وقطع الغيار</h3>
+                        <span>تتبع ذكي للمخزون</span>
+                    </div>
+                    <div class="module-icon-large">
+                        <i class="fas fa-warehouse"></i>
+                    </div>
+                </div>
+                <div class="module-body">
+                    <div class="content-block">
+                        <h4><i class="fas fa-boxes"></i> ما يفعله هذا القسم؟</h4>
+                        <p>إدارة كاملة لمخزون قطع الغيار: شراء، تخزين، استهلاك، تتبع، وتنبيهات.</p>
+                    </div>
+
+                    <div class="content-block">
+                        <h4><i class="fas fa-info"></i> معلومات كل قطعة في النظام:</h4>
+                        <div class="part-card">
+                            <div class="part-header">
+                                <i class="fas fa-cog"></i>
+                                <span>معلومات القطعة</span>
+                            </div>
+                            <div class="part-details">
+                                <div class="part-row">
+                                    <span class="label">رمز القطعة:</span>
+                                    <span class="value">BRK-001-FRONT</span>
+                                </div>
+                                <div class="part-row">
+                                    <span class="label">الاسم:</span>
+                                    <span class="value">فحمات فرامل - أمامي</span>
+                                </div>
+                                <div class="part-row">
+                                    <span class="label">النوع:</span>
+                                    <span class="value">نظام الفرامل</span>
+                                </div>
+                                <div class="part-row">
+                                    <span class="label">سعر الشراء:</span>
+                                    <span class="value">45 دينار</span>
+                                </div>
+                                <div class="part-row">
+                                    <span class="label">سعر البيع:</span>
+                                    <span class="value">90 دينار</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم التقنيات المحسن -->
+    <section id="tech" class="tech-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge">التقنيات المستخدمة</span>
+                <h2>أحدث التقنيات في خدمتك</h2>
+                <p>نظام مبني على أحدث التقنيات لضمان الأداء والموثوقية</p>
+            </div>
+            <div class="tech-grid">
+                <div class="tech-card" data-aos="zoom-in">
+                    <div class="tech-icon">
+                        <i class="fab fa-node-js"></i>
+                    </div>
+                    <h3>Node.js + TypeScript</h3>
+                    <p>Backend قوي وموثوق مع TypeScript للأمان</p>
+                </div>
+                <div class="tech-card" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="tech-icon">
+                        <i class="fab fa-react"></i>
+                    </div>
+                    <h3>React + Next.js</h3>
+                    <p>واجهة مستخدم حديثة وسريعة</p>
+                </div>
+                <div class="tech-card" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="tech-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3>PostgreSQL + Prisma</h3>
+                    <p>قاعدة بيانات قوية مع ORM حديث</p>
+                </div>
+                <div class="tech-card" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="tech-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Flutter + Firebase</h3>
+                    <p>تطبيق موبايل عالي الأداء</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم المميزات الجديدة -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge">مميزات حصرية</span>
+                <h2>لماذا نحن الأفضل؟</h2>
+                <p>مميزات تجعلنا نتميز عن المنافسين</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card" data-aos="fade-up">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>ذكاء اصطناعي</h3>
+                    <p>تحليل البيانات وتقديم توصيات ذكية لتحسين الأداء</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>تحليلات متقدمة</h3>
+                    <p>تقارير مفصلة ورؤى تجارية قيمة</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>إشعارات ذكية</h3>
+                    <p>تنبيهات فورية لكل الأحداث المهمة</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>أمان عالي</h3>
+                    <p>تشفير البيانات وحماية كاملة للمعلومات</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم التجربة التفاعلية -->
+    <section id="demo" class="demo-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="badge">تجربة تفاعلية</span>
+                <h2>جرب النظام بنفسك</h2>
+                <p>تجربة عملية توضح كيف يعمل النظام</p>
+            </div>
+            <div class="demo-container">
+                <div class="demo-phone">
+                    <div class="phone-screen">
+                        <div class="app-header">
+                            <i class="fas fa-wrench"></i>
+                            <span>Garage Go</span>
+                        </div>
+                        <div class="app-content">
+                            <div class="demo-step" id="demoStep1">
+                                <h4>1. اختر الخدمة</h4>
+                                <div class="service-options">
+                                    <div class="service-option">
+                                        <i class="fas fa-oil-can"></i>
+                                        <span>تغيير زيت</span>
+                                    </div>
+                                    <div class="service-option">
+                                        <i class="fas fa-car"></i>
+                                        <span>فحص شامل</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="demo-step" id="demoStep2" style="display: none;">
+                                <h4>2. اختر الموعد</h4>
+                                <div class="time-slots">
+                                    <div class="time-slot">9:00 ص</div>
+                                    <div class="time-slot">11:00 ص</div>
+                                    <div class="time-slot">2:00 م</div>
+                                </div>
+                            </div>
+                            <div class="demo-step" id="demoStep3" style="display: none;">
+                                <h4>3. تأكيد الحجز</h4>
+                                <div class="booking-summary">
+                                    <p>خدمة: تغيير زيت</p>
+                                    <p>موعد: 9:00 ص</p>
+                                    <p>السيارة: Toyota Camry 2020</p>
+                                </div>
+                                <button class="confirm-btn">تأكيد الحجز</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="demo-controls">
+                    <button class="demo-btn" onclick="prevDemoStep()">
+                        <i class="fas fa-arrow-right"></i>
+                        السابق
+                    </button>
+                    <button class="demo-btn" onclick="nextDemoStep()">
+                        التالي
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- الفوتر المحسن -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-wrench"></i>
+                        <span>Garage Go</span>
+                    </div>
+                    <p>نظام إدارة الورش الذكي المتكامل</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="#intro">الرئيسية</a></li>
+                        <li><a href="#modules">الأقسام</a></li>
+                        <li><a href="#tech">التقنيات</a></li>
+                        <li><a href="#features">المميزات</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>تواصل معنا</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> info@garage-go.com</li>
+                        <li><i class="fas fa-phone"></i> +962 7 1234 5678</li>
+                        <li><i class="fas fa-map-marker-alt"></i> عمان، الأردن</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Garage Go. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- زر العودة للأعلى -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="script_enhanced.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+</body>
+</html>

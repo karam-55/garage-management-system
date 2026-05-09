@@ -1,0 +1,972 @@
+// ============================================================================
+// نظام إدارة الكراج - Prisma Schema الكامل (PostgreSQL 15+)
+// Garage Management System - Complete Prisma Schema
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+enum UserRole {
+  ADMIN
+  GARAGE_OWNER
+  GARAGE_MANAGER
+  MECHANIC
+  RECEPTIONIST
+  CASHIER
+  CUSTOMER
+  INVENTORY_MANAGER
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+  DELAYED
+  WAITING_PARTS
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum NotificationType {
+  BOOKING_CREATED
+  BOOKING_UPDATED
+  BOOKING_CANCELLED
+  BOOKING_CONFIRMED
+  WORK_STARTED
+  WORK_COMPLETED
+  PAYMENT_RECEIVED
+  INVOICE_ISSUED
+  INVOICE_OVERDUE
+  MAINTENANCE_DUE
+  GARAGE_UPDATE
+  SYSTEM_NOTIFICATION
+  VEHICLE_ENTRY
+  VEHICLE_EXIT
+  PARTS_REQUESTED
+  PARTS_RECEIVED
+}
+
+enum NotificationChannel {
+  WHATSAPP
+  SMS
+  EMAIL
+  IN_APP
+  PUSH
+}
+
+enum NotificationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+  RETRYING
+}
+
+enum AdditionalServiceStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+enum TaxType {
+  VAT
+  SALES
+  SERVICE
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BANK_TRANSFER
+  APPLE_PAY
+  MADA
+  STC_PAY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PartsRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ORDERED
+  RECEIVED
+  CANCELLED
+}
+
+enum StockMovementType {
+  IN
+  OUT
+  ADJUSTMENT
+  TRANSFER
+  RETURN
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  EXPERT
+  MASTER
+}
+
+enum AvailabilityStatus {
+  AVAILABLE
+  BUSY
+  ON_LEAVE
+  UNAVAILABLE
+}
+
+enum AuditAction {
+  INSERT
+  UPDATE
+  DELETE
+  SELECT
+  LOGIN
+  LOGOUT
+  FAILED_LOGIN
+}
+
+// ============================================================================
+// Models
+// ============================================================================
+
+model User {
+  id                  String             @id @default(uuid()) @db.Uuid
+  email               String             @unique @db.VarChar(255)
+  passwordHash        String             @map("password_hash") @db.VarChar(255)
+  fullName            String             @map("full_name") @db.VarChar(255)
+  phone               String?            @db.VarChar(20)
+  role                UserRole           @default(CUSTOMER)
+  garageId            String?            @map("garage_id") @db.Uuid
+  garage              Garage?            @relation("GarageMechanic", fields: [garageId], references: [id], onDelete: SetNull)
+  isActive            Boolean            @default(true) @map("is_active")
+  phoneVerified       Boolean            @default(false) @map("phone_verified")
+  emailVerified       Boolean            @default(false) @map("email_verified")
+  availabilityStatus  AvailabilityStatus @default(AVAILABLE) @map("availability_status")
+  failedLoginAttempts Int                @default(0) @map("failed_login_attempts")
+  lockedUntil         DateTime?          @map("locked_until") @db.Timestamptz
+  avatarUrl           String?            @map("avatar_url") @db.Text
+  lastLoginAt         DateTime?          @map("last_login_at") @db.Timestamptz
+  createdAt           DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt           DateTime           @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt           DateTime?          @map("deleted_at") @db.Timestamptz
+
+  // Relations
+  ownedGarages            Garage[]                  @relation("GarageOwner")
+  customers               Customer[]
+  vehicles                Vehicle[]
+  bookings                Booking[]
+  invoices                Invoice[]
+  mechanicSpecializations MechanicSpecialization[]
+  mechanicWorkSessions    MechanicWorkSession[]
+  mechanicRatings         MechanicRating[]          @relation("RatedMechanic")
+  mechanicHandoversFrom   MechanicHandover[]        @relation("HandoverFrom")
+  mechanicHandoversTo     MechanicHandover[]        @relation("HandoverTo")
+  inAppNotifications      InAppNotification[]
+  auditLogs               AuditLog[]
+  vehicleStatusChanges    VehicleStatusHistory[]     @relation("VehicleStatusChanges")
+  processedPayments       Payment[]                 @relation("ProcessedPayments")
+  recipientNotifications  NotificationsQueue[]      @relation("RecipientNotifications")
+  customerInvoices        Invoice[]                 @relation("CustomerInvoices")
+  assignedMechanicBookings Booking[]                 @relation("BookingMechanic")
+  customerBookings        Booking[]                 @relation("CustomerBookings")
+  vehicleStatusUser       VehicleStatusHistory[]     @relation("VehicleStatusUser")
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+  @@index([garageId])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model Garage {
+  id            String    @id @default(uuid()) @db.Uuid
+  ownerId       String    @map("owner_id") @db.Uuid
+  owner         User      @relation("GarageOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  name          String    @db.VarChar(255)
+  description   String?   @db.Text
+  address       String    @db.Text
+  city          String    @db.VarChar(100)
+  state         String?   @db.VarChar(100)
+  postalCode    String?   @map("postal_code") @db.VarChar(20)
+  country       String    @default("Saudi Arabia") @db.VarChar(100)
+  phone         String    @db.VarChar(20)
+  email         String?   @db.VarChar(255)
+  website       String?   @db.Text
+  latitude      Decimal?  @db.Decimal(10, 8)
+  longitude     Decimal?  @db.Decimal(11, 8)
+  workingHours  Json      @default("{\"sunday\": {\"open\": \"08:00\", \"close\": \"20:00\"}, \"monday\": {\"open\": \"08:00\", \"close\": \"20:00\"}, \"tuesday\": {\"open\": \"08:00\", \"close\": \"20:00\"}, \"wednesday\": {\"open\": \"08:00\", \"close\": \"20:00\"}, \"thursday\": {\"open\": \"08:00\", \"close\": \"20:00\"}, \"friday\": {\"open\": \"14:00\", \"close\": \"20:00\"}, \"saturday\": {\"open\": \"08:00\", \"close\": \"20:00\"}}") @map("working_hours") @db.JsonB
+  rating        Decimal   @default(0) @db.Decimal(3, 2)
+  totalReviews  Int       @default(0) @map("total_reviews")
+  isActive      Boolean   @default(true) @map("is_active")
+  isVerified    Boolean   @default(false) @map("is_verified")
+  logoUrl       String?   @map("logo_url") @db.Text
+  coverImageUrl String?   @map("cover_image_url") @db.Text
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz
+
+  // Relations
+  users                   User[]                   @relation("GarageMechanic")
+  customers               Customer[]
+  vehicles                Vehicle[]
+  bookings                Booking[]
+  services                Service[]
+  partsInventory          PartsInventory[]
+  invoices                Invoice[]
+  payments                Payment[]
+  maintenanceRecords      MaintenanceRecord[]
+  mechanicSpecializations MechanicSpecialization[]
+  mechanicWorkSessions    MechanicWorkSession[]
+  cancellationPolicies    CancellationPolicy[]
+  taxRates                TaxRate[]
+
+  @@index([ownerId])
+  @@index([city])
+  @@index([isActive])
+  @@index([isVerified])
+  @@index([deletedAt])
+  @@map("garages")
+}
+
+model Customer {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String?  @map("user_id") @db.Uuid
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  firstName       String   @db.VarChar(100)
+  lastName        String   @db.VarChar(100)
+  fullName        String   @map("full_name") @db.VarChar(255)
+  phone           String   @unique @db.VarChar(20)
+  email           String?  @unique @db.VarChar(255)
+  address         String?  @db.Text
+  city            String?  @db.VarChar(100)
+  state           String?  @db.VarChar(100)
+  postalCode      String?  @map("postal_code") @db.VarChar(20)
+  country         String   @default("Saudi Arabia") @db.VarChar(100)
+  loyaltyPoints   Int      @default(0) @map("loyalty_points")
+  totalBookings   Int      @default(0) @map("total_bookings")
+  totalSpent      Decimal  @default(0) @map("total_spent") @db.Decimal(15, 2)
+  preferredGarageId String? @map("preferred_garage_id") @db.Uuid
+  notes           String?  @db.Text
+  garageId        String?  @map("garage_id") @db.Uuid
+  garage          Garage?  @relation(fields: [garageId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz
+
+  // Relations
+  vehicles        Vehicle[]
+  bookings        Booking[]
+  invoices        Invoice[]
+  payments        Payment[]
+  customerApprovals CustomerApproval[]
+
+  @@index([userId])
+  @@index([phone])
+  @@index([email])
+  @@index([garageId])
+  @@index([deletedAt])
+  @@map("customers")
+}
+
+model Vehicle {
+  id           String    @id @default(uuid()) @db.Uuid
+  customerId   String    @map("customer_id") @db.Uuid
+  customer     Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  plate        String    @db.VarChar(20)
+  make         String    @db.VarChar(100)
+  model        String    @db.VarChar(100)
+  year         Int?
+  vin          String?   @unique @db.VarChar(17)
+  color        String?   @db.VarChar(50)
+  mileage      Int?
+  fuelType     String?   @map("fuel_type") @db.VarChar(50)
+  transmission String?   @db.VarChar(50)
+  engineSize   String?   @map("engine_size") @db.VarChar(20)
+  bodyType     String?   @map("body_type") @db.VarChar(50)
+  notes        String?   @db.Text
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz
+
+  // Relations
+  bookings           Booking[]
+  statusHistory      VehicleStatusHistory[]
+  maintenanceRecords MaintenanceRecord[]
+  User               User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId             String?   @map("user_id") @db.Uuid
+  Garage             Garage?   @relation(fields: [garageId], references: [id], onDelete: SetNull)
+  garageId           String?   @map("garage_id") @db.Uuid
+
+  @@unique([customerId, plate])
+  @@index([customerId])
+  @@index([plate])
+  @@index([vin])
+  @@index([deletedAt])
+  @@map("vehicles")
+}
+
+model ServiceCategory {
+  id          String            @id @default(uuid()) @db.Uuid
+  name        String            @db.VarChar(100)
+  nameAr      String?           @map("name_ar") @db.VarChar(100)
+  description String?           @db.Text
+  parentId    String?           @map("parent_id") @db.Uuid
+  parent      ServiceCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    ServiceCategory[] @relation("CategoryHierarchy")
+  icon        String?           @db.Text
+  sortOrder   Int               @default(0) @map("sort_order")
+  isActive    Boolean           @default(true) @map("is_active")
+  createdAt   DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+  Service     Service[]
+
+  @@index([parentId])
+  @@index([isActive])
+  @@map("service_categories")
+}
+
+model Service {
+  id              String           @id @default(uuid()) @db.Uuid
+  garageId        String           @map("garage_id") @db.Uuid
+  garage          Garage           @relation(fields: [garageId], references: [id], onDelete: Cascade)
+  categoryId      String?          @map("category_id") @db.Uuid
+  category        ServiceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  name            String           @db.VarChar(255)
+  nameAr          String?          @map("name_ar") @db.VarChar(255)
+  description     String?          @db.Text
+  descriptionAr   String?          @map("description_ar") @db.Text
+  price           Decimal          @db.Decimal(10, 2)
+  durationMinutes Int              @map("duration_minutes")
+  isActive        Boolean          @default(true) @map("is_active")
+  isPopular       Boolean          @default(false) @map("is_popular")
+  imageUrl        String?          @map("image_url") @db.Text
+  sortOrder       Int              @default(0) @map("sort_order")
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime         @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt       DateTime?        @map("deleted_at") @db.Timestamptz
+
+  // Relations
+  items           ServiceItem[]
+  bookings        Booking[]
+  specializations MechanicSpecialization[]
+
+  @@index([garageId])
+  @@index([categoryId])
+  @@index([price])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("services")
+}
+
+model ServiceItem {
+  id               String  @id @default(uuid()) @db.Uuid
+  serviceId        String  @map("service_id") @db.Uuid
+  service          Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  name             String  @db.VarChar(255)
+  description      String? @db.Text
+  quantityRequired Decimal @default(1) @map("quantity_required") @db.Decimal(10, 2)
+  unit             String  @default("piece") @db.VarChar(50)
+  isOptional       Boolean @default(false) @map("is_optional")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([serviceId])
+  @@map("service_items")
+}
+
+model Booking {
+  id                       String        @id @default(uuid()) @db.Uuid
+  customerId               String        @map("customer_id") @db.Uuid
+  customer                 Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  garageId                 String        @map("garage_id") @db.Uuid
+  garage                   Garage        @relation(fields: [garageId], references: [id], onDelete: Cascade)
+  vehicleId                String        @map("vehicle_id") @db.Uuid
+  vehicle                  Vehicle       @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  serviceId                String?       @map("service_id") @db.Uuid
+  service                  Service?      @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  assignedMechanicId       String?       @map("assigned_mechanic_id") @db.Uuid
+  assignedMechanic         User?         @relation("BookingMechanic", fields: [assignedMechanicId], references: [id], onDelete: SetNull)
+  scheduledAt              DateTime      @map("scheduled_at") @db.Timestamptz
+  estimatedDurationMinutes Int           @map("estimated_duration_minutes")
+  actualDurationMinutes    Int?          @map("actual_duration_minutes")
+  status                   BookingStatus @default(PENDING)
+  qrToken                  String        @unique @map("qr_token") @db.VarChar(255)
+  qrExpiresAt              DateTime?     @map("qr_expires_at") @db.Timestamptz
+  notes                    String?       @db.Text
+  createdAt                DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt                DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt                DateTime?     @map("deleted_at") @db.Timestamptz
+
+  // Relations
+  additionalServices  AdditionalService[]
+  customerApprovals  CustomerApproval[]
+  handovers          MechanicHandover[]
+  invoice            Invoice?
+  payments           Payment[]
+  mechanic           User?    @relation("BookingMechanic")
+  customerUser       User?    @relation("CustomerBookings", fields: [customerId], references: [id])
+
+  @@index([customerId])
+  @@index([garageId])
+  @@index([vehicleId])
+  @@index([assignedMechanicId])
+  @@index([scheduledAt])
+  @@index([status])
+  @@index([qrToken])
+  @@index([deletedAt])
+  @@map("bookings")
+}
+
+model AdditionalService {
+  id          String                @id @default(uuid()) @db.Uuid
+  bookingId   String                @map("booking_id") @db.Uuid
+  booking     Booking               @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  name        String                @db.VarChar(255)
+  nameAr      String?               @map("name_ar") @db.VarChar(255)
+  description String?               @db.Text
+  price       Decimal               @db.Decimal(10, 2)
+  status      AdditionalServiceStatus @default(PENDING)
+  requestedBy String?               @map("requested_by") @db.VarChar(255)
+  approvedBy  String?               @map("approved_by") @db.VarChar(255)
+  approvedAt  DateTime?             @map("approved_at") @db.Timestamptz
+  createdAt   DateTime              @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime              @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  options     ServiceOption[]
+
+  @@index([bookingId])
+  @@index([status])
+  @@map("additional_services")
+}
+
+model ServiceOption {
+  id                String           @id @default(uuid()) @db.Uuid
+  additionalServiceId String         @map("additional_service_id") @db.Uuid
+  additionalService  AdditionalService @relation(fields: [additionalServiceId], references: [id], onDelete: Cascade)
+  name              String           @db.VarChar(255)
+  description       String?          @db.Text
+  price             Decimal          @db.Decimal(10, 2)
+  isRecommended     Boolean          @default(false) @map("is_recommended")
+  stockAvailable    Boolean          @default(true) @map("stock_available")
+  imageUrl          String?          @map("image_url") @db.Text
+  estimatedDays     Int?             @map("estimated_days")
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime         @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([additionalServiceId])
+  @@index([isRecommended])
+  @@map("service_options")
+}
+
+model CustomerApproval {
+  id            String   @id @default(uuid()) @db.Uuid
+  bookingId     String   @map("booking_id") @db.Uuid
+  booking       Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  customerId    String?  @map("customer_id") @db.Uuid
+  customer      Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  approvalType String   @map("approval_type") @db.VarChar(50)
+  status        String   @default("PENDING") @db.VarChar(50)
+  details       Json     @default("{}") @db.JsonB
+  expiresAt     DateTime @map("expires_at") @db.Timestamptz
+  respondedAt   DateTime? @map("responded_at") @db.Timestamptz
+  responseNotes String?  @map("response_notes") @db.Text
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([bookingId])
+  @@index([customerId])
+  @@index([expiresAt])
+  @@index([status])
+  @@map("customer_approvals")
+}
+
+model MechanicHandover {
+  id              String   @id @default(uuid()) @db.Uuid
+  bookingId       String   @map("booking_id") @db.Uuid
+  booking         Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  fromMechanicId  String?  @map("from_mechanic_id") @db.Uuid
+  fromMechanic    User?    @relation("HandoverFrom", fields: [fromMechanicId], references: [id], onDelete: SetNull)
+  toMechanicId    String?  @map("to_mechanic_id") @db.Uuid
+  toMechanic      User?    @relation("HandoverTo", fields: [toMechanicId], references: [id], onDelete: SetNull)
+  handedOverAt    DateTime @default(now()) @map("handed_over_at") @db.Timestamptz
+  notes           String?  @db.Text
+  status          String   @default("PENDING") @db.VarChar(50)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([bookingId])
+  @@index([fromMechanicId])
+  @@index([toMechanicId])
+  @@index([handedOverAt])
+  @@map("mechanic_handovers")
+}
+
+model MechanicSpecialization {
+  id         String   @id @default(uuid()) @db.Uuid
+  mechanicId String   @map("mechanic_id") @db.Uuid
+  mechanic   User     @relation(fields: [mechanicId], references: [id], onDelete: Cascade)
+  serviceId  String   @map("service_id") @db.Uuid
+  service    Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  garageId   String?  @map("garage_id") @db.Uuid
+  garage     Garage?  @relation(fields: [garageId], references: [id], onDelete: SetNull)
+  skillLevel SkillLevel
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@unique([mechanicId, serviceId])
+  @@index([mechanicId])
+  @@index([serviceId])
+  @@index([garageId])
+  @@map("mechanic_specializations")
+}
+
+model MechanicWorkSession {
+  id          String   @id @default(uuid()) @db.Uuid
+  mechanicId  String   @map("mechanic_id") @db.Uuid
+  mechanic    User     @relation(fields: [mechanicId], references: [id], onDelete: Cascade)
+  garageId    String   @map("garage_id") @db.Uuid
+  garage      Garage   @relation(fields: [garageId], references: [id], onDelete: Cascade)
+  bookingId   String?  @map("booking_id") @db.Uuid
+  startTime   DateTime @default(now()) @map("start_time") @db.Timestamptz
+  endTime     DateTime? @map("end_time") @db.Timestamptz
+  breakMinutes Int      @default(0) @map("break_minutes")
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([mechanicId])
+  @@index([garageId])
+  @@index([bookingId])
+  @@index([startTime])
+  @@map("mechanic_work_sessions")
+}
+
+model MechanicRating {
+  id          String   @id @default(uuid()) @db.Uuid
+  mechanicId  String   @map("mechanic_id") @db.Uuid
+  mechanic    User     @relation("RatedMechanic", fields: [mechanicId], references: [id], onDelete: Cascade)
+  customerId  String?  @map("customer_id") @db.Uuid
+  bookingId   String?  @map("booking_id") @db.Uuid
+  rating      Int
+  comment     String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([mechanicId])
+  @@index([customerId])
+  @@index([bookingId])
+  @@map("mechanic_ratings")
+}
+
+model PartsInventory {
+  id              String   @id @default(uuid()) @db.Uuid
+  garageId        String   @map("garage_id") @db.Uuid
+  garage          Garage   @relation(fields: [garageId], references: [id], onDelete: Cascade)
+  partNumber      String   @unique @map("part_number") @db.VarChar(100)
+  name            String   @db.VarChar(255)
+  nameAr          String?  @map("name_ar") @db.VarChar(255)
+  description     String?  @db.Text
+  category        String?  @db.VarChar(100)
+  quantity        Float    @default(0) @db.Decimal(10, 2)
+  unit            String   @default("piece") @db.VarChar(50)
+  reorderPoint    Float    @default(10) @map("reorder_point") @db.Decimal(10, 2)
+  costPrice       Decimal  @map("cost_price") @db.Decimal(10, 2)
+  sellingPrice    Decimal  @map("selling_price") @db.Decimal(10, 2)
+  supplier        String?  @db.VarChar(255)
+  location        String?  @db.VarChar(100)
+  imageUrl        String?  @map("image_url") @db.Text
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz
+
+  // Relations
+  stockMovements  StockMovement[]
+  partsRequests   PartsRequest[]
+  invoiceItems    InvoiceItem[]
+
+  @@index([garageId])
+  @@index([category])
+  @@index([quantity])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@map("parts_inventory")
+}
+
+model StockMovement {
+  id          String            @id @default(uuid()) @db.Uuid
+  inventoryId String            @map("inventory_id") @db.Uuid
+  inventory   PartsInventory    @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  type        StockMovementType
+  quantity    Float             @db.Decimal(10, 2)
+  unitPrice   Decimal?          @db.Decimal(10, 2)
+  reference   String?           @db.VarChar(255)
+  notes       String?           @db.Text
+  performedBy String?           @map("performed_by") @db.VarChar(255)
+  performedAt DateTime          @default(now()) @map("performed_at") @db.Timestamptz
+  createdAt   DateTime          @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([inventoryId])
+  @@index([type])
+  @@index([performedAt])
+  @@map("stock_movements")
+}
+
+model PartsRequest {
+  id          String             @id @default(uuid()) @db.Uuid
+  inventoryId String             @map("inventory_id") @db.Uuid
+  inventory   PartsInventory     @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  bookingId   String?            @map("booking_id") @db.Uuid
+  quantity    Float              @db.Decimal(10, 2)
+  status      PartsRequestStatus @default(PENDING)
+  requestedBy String?            @map("requested_by") @db.VarChar(255)
+  approvedBy  String?            @map("approved_by") @db.VarChar(255)
+  approvedAt  DateTime?          @map("approved_at") @db.Timestamptz
+  createdAt   DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime           @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([inventoryId])
+  @@index([bookingId])
+  @@index([status])
+  @@map("parts_requests")
+}
+
+model Invoice {
+  id              String       @id @default(uuid()) @db.Uuid
+  bookingId       String       @unique @map("booking_id") @db.Uuid
+  booking         Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  customerId      String       @map("customer_id") @db.Uuid
+  customer        Customer     @relation(fields: [customerId], references: [id])
+  garageId        String       @map("garage_id") @db.Uuid
+  garage          Garage       @relation(fields: [garageId], references: [id])
+  invoiceNumber   String       @unique @map("invoice_number") @db.VarChar(50)
+  subtotal        Decimal      @db.Decimal(15, 2)
+  discountAmount  Decimal      @default(0) @map("discount_amount") @db.Decimal(15, 2)
+  discountType    DiscountType?
+  taxAmount       Decimal      @default(0) @map("tax_amount") @db.Decimal(15, 2)
+  totalAmount     Decimal      @map("total_amount") @db.Decimal(15, 2)
+  status          InvoiceStatus @default(DRAFT)
+  dueDate         DateTime?    @map("due_date") @db.Timestamptz
+  paidAt          DateTime?    @map("paid_at") @db.Timestamptz
+  notes           String?      @db.Text
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt       DateTime?    @map("deleted_at") @db.Timestamptz
+
+  // Relations
+  items        InvoiceItem[]
+  payments     Payment[]
+  customerUser User?        @relation("CustomerInvoices", fields: [customerId], references: [id])
+
+  @@index([bookingId])
+  @@index([customerId])
+  @@index([garageId])
+  @@index([invoiceNumber])
+  @@index([status])
+  @@index([dueDate])
+  @@index([deletedAt])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          String   @id @default(uuid()) @db.Uuid
+  invoiceId   String   @map("invoice_id") @db.Uuid
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description String   @db.VarChar(500)
+  quantity    Float    @db.Decimal(10, 2)
+  unitPrice   Decimal  @map("unit_price") @db.Decimal(10, 2)
+  discount    Float    @default(0) @db.Decimal(10, 2)
+  tax         Float    @default(0) @db.Decimal(10, 2)
+  total       Decimal  @db.Decimal(15, 2)
+  inventoryId String?  @map("inventory_id") @db.Uuid
+  inventory   PartsInventory? @relation(fields: [inventoryId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([invoiceId])
+  @@index([inventoryId])
+  @@map("invoice_items")
+}
+
+model Payment {
+  id              String        @id @default(uuid()) @db.Uuid
+  invoiceId       String        @map("invoice_id") @db.Uuid
+  invoice         Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  customerId      String        @map("customer_id") @db.Uuid
+  customer        Customer      @relation(fields: [customerId], references: [id])
+  garageId        String        @map("garage_id") @db.Uuid
+  garage          Garage        @relation(fields: [garageId], references: [id])
+  amount          Decimal       @db.Decimal(15, 2)
+  paymentMethod   PaymentMethod @default(CASH)
+  status          PaymentStatus @default(PENDING)
+  paymentDate     DateTime      @default(now()) @map("payment_date") @db.Timestamptz
+  referenceNumber String?       @map("reference_number") @db.VarChar(100)
+  processedBy     String?       @map("processed_by") @db.VarChar(255)
+  processedByUser User?         @relation("ProcessedPayments", fields: [processedBy], references: [id], onDelete: SetNull)
+  notes           String?       @db.Text
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt       DateTime?     @map("deleted_at") @db.Timestamptz
+
+  // Relations
+  history   PaymentHistory[]
+  booking   Booking?    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@index([customerId])
+  @@index([garageId])
+  @@index([paymentDate])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("payments")
+}
+
+model PaymentHistory {
+  id          String   @id @default(uuid()) @db.Uuid
+  paymentId   String   @map("payment_id") @db.Uuid
+  payment     Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  amount      Decimal  @db.Decimal(15, 2)
+  status      PaymentStatus
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([paymentId])
+  @@index([createdAt])
+  @@map("payment_history")
+}
+
+model VehicleStatusHistory {
+  id        String   @id @default(uuid()) @db.Uuid
+  vehicleId String   @map("vehicle_id") @db.Uuid
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  status    String   @db.VarChar(50)
+  changedBy String?  @map("changed_by") @db.Uuid
+  changedByUser User? @relation("VehicleStatusChanges", fields: [changedBy], references: [id], onDelete: SetNull)
+  changedAt DateTime @default(now()) @map("changed_at") @db.Timestamptz
+  notes     String?  @db.Text
+  userId    String?  @map("user_id") @db.Uuid
+  User      User?    @relation("VehicleStatusUser", fields: [userId], references: [id], onDelete: SetNull)
+  Booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  bookingId String?  @map("booking_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([vehicleId])
+  @@index([changedAt(sort: Desc)])
+  @@map("vehicle_status_history")
+}
+
+model MaintenanceRecord {
+  id          String   @id @default(uuid()) @db.Uuid
+  vehicleId   String   @map("vehicle_id") @db.Uuid
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  serviceDate DateTime @default(now()) @map("service_date") @db.Timestamptz
+  mileage     Int?     @map("odometer_reading")
+  service     String   @map("service_performed") @db.Text
+  notes       String?  @db.Text
+  cost        Decimal? @db.Decimal(15, 2)
+  garageId    String?  @map("garage_id") @db.Uuid
+  garage      Garage?  @relation(fields: [garageId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([vehicleId])
+  @@index([serviceDate])
+  @@map("maintenance_records")
+}
+
+model InAppNotification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String           @db.VarChar(255)
+  message   String           @db.Text
+  type      NotificationType
+  data      Json             @default("{}") @db.JsonB
+  isRead    Boolean          @default(false) @map("is_read")
+  readAt    DateTime?        @map("read_at") @db.Timestamptz
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt(sort: Desc)])
+  @@map("in_app_notifications")
+}
+
+model NotificationsQueue {
+  id              String              @id @default(uuid()) @db.Uuid
+  recipientId     String              @map("recipient_id") @db.Uuid
+  recipient       User                @relation("RecipientNotifications", fields: [recipientId], references: [id], onDelete: Cascade)
+  type            NotificationType
+  title           String              @db.VarChar(255)
+  message         String              @db.Text
+  channel         NotificationChannel @default(IN_APP)
+  priority        NotificationPriority @default(MEDIUM)
+  data            Json                @default("{}") @db.JsonB
+  status          NotificationStatus  @default(PENDING)
+  scheduledAt     DateTime            @default(now()) @map("scheduled_at") @db.Timestamptz
+  sentAt          DateTime?           @map("sent_at") @db.Timestamptz
+  deliveredAt     DateTime?           @map("delivered_at") @db.Timestamptz
+  readAt          DateTime?           @map("read_at") @db.Timestamptz
+  errorMessage    String?             @map("error_message") @db.Text
+  retryCount      Int                 @default(0) @map("retry_count")
+  maxRetries      Int                 @default(3) @map("max_retries")
+  nextRetryAt     DateTime?           @map("next_retry_at") @db.Timestamptz
+  failedAt        DateTime?           @map("failed_at") @db.Timestamptz
+  createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime            @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([recipientId])
+  @@index([status])
+  @@index([priority])
+  @@index([scheduledAt])
+  @@index([nextRetryAt])
+  @@map("notifications_queue")
+}
+
+model WhatsAppLog {
+  id             String   @id @default(uuid()) @db.Uuid
+  notificationId String?  @map("notification_id") @db.Uuid
+  phoneNumber    String   @map("phone_number") @db.VarChar(20)
+  message        String   @db.Text
+  status         String   @default("QUEUED") @db.VarChar(50)
+  messageId      String?  @map("message_id") @db.VarChar(255)
+  sentAt         DateTime? @map("sent_at") @db.Timestamptz
+  deliveredAt    DateTime? @map("delivered_at") @db.Timestamptz
+  readAt         DateTime? @map("read_at") @db.Timestamptz
+  errorMessage   String?  @map("error_message") @db.Text
+  errorCode      String?  @map("error_code") @db.VarChar(50)
+  templateUsed   String?  @map("template_used") @db.VarChar(100)
+  templateVariables String? @map("template_variables") @db.Text
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([notificationId])
+  @@index([phoneNumber])
+  @@index([status])
+  @@index([messageId])
+  @@map("whatsapp_logs")
+}
+
+model AuditLog {
+  id          String     @id @default(uuid()) @db.Uuid
+  userId      String?    @map("user_id") @db.Uuid
+  user        User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      AuditAction
+  resource    String?    @db.VarChar(255)
+  resourceId  String?    @map("resource_id") @db.VarChar(255)
+  ipAddress   String?    @map("ip_address") @db.VarChar(45)
+  userAgent   String?    @map("user_agent") @db.Text
+  details     Json       @default("{}") @db.JsonB
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+
+model NotificationPreferences {
+  id              String   @id @default(uuid()) @db.Uuid
+  userId          String   @unique @map("user_id") @db.Uuid
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailEnabled    Boolean @default(true) @map("email_enabled")
+  smsEnabled      Boolean @default(true) @map("sms_enabled")
+  whatsappEnabled Boolean @default(true) @map("whatsapp_enabled")
+  pushEnabled     Boolean @default(true) @map("push_enabled")
+  inAppEnabled   Boolean @default(true) @map("in_app_enabled")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("notification_preferences")
+}
+
+model NotificationTemplates {
+  id          String   @id @default(uuid()) @db.Uuid
+  type        NotificationType
+  language    String   @default("ar") @db.VarChar(10)
+  title       String   @db.VarChar(255)
+  template    String   @db.Text
+  variables   Json     @default("[]") @db.JsonB
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@unique([type, language])
+  @@index([type])
+  @@index([isActive])
+  @@map("notification_templates")
+}
+
+model CancellationPolicy {
+  id          String   @id @default(uuid()) @db.Uuid
+  garageId    String   @map("garage_id") @db.Uuid
+  garage      Garage   @relation(fields: [garageId], references: [id], onDelete: Cascade)
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  hoursBefore Int      @map("hours_before")
+  refundPercentage Int @map("refund_percentage")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([garageId])
+  @@index([isActive])
+  @@map("cancellation_policies")
+}
+
+model TaxRate {
+  id          String   @id @default(uuid()) @db.Uuid
+  garageId    String   @map("garage_id") @db.Uuid
+  garage      Garage   @relation(fields: [garageId], references: [id], onDelete: Cascade)
+  name        String   @db.VarChar(100)
+  type        TaxType
+  rate        Decimal  @db.Decimal(5, 4)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([garageId])
+  @@index([type])
+  @@index([isActive])
+  @@map("tax_rates")
+}

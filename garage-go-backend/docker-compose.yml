@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:password@db:5432/garage_go
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - garage-network
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=garage_go
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./prisma/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - garage-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - garage-network
+
+  prisma-studio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: npx prisma studio --browser none
+    ports:
+      - "5555:5555"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/garage_go
+    depends_on:
+      - db
+    networks:
+      - garage-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  garage-network:
+    driver: bridge

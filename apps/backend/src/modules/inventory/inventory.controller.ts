@@ -1,0 +1,65 @@
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { InventoryService } from './inventory.service';
+
+@ApiTags('Inventory')
+@Controller('inventory')
+export class InventoryController {
+  constructor(private readonly inventoryService: InventoryService) {}
+
+  @Get()
+  @UseGuards()
+  @ApiBearerAuth()
+  async findAll() {
+    return this.inventoryService.findAll();
+  }
+
+  @Get('low-stock')
+  @UseGuards()
+  @ApiBearerAuth()
+  async findLowStock() {
+    return this.inventoryService.findLowStock();
+  }
+
+  @Get('movements')
+  @UseGuards()
+  @ApiBearerAuth()
+  async getMovements() {
+    return this.inventoryService.getMovements();
+  }
+
+  @Get(':id')
+  @UseGuards()
+  @ApiBearerAuth()
+  async findOne(@Param('id') id: string) {
+    return this.inventoryService.findOne(id);
+  }
+
+  @Post()
+  @UseGuards()
+  @ApiBearerAuth()
+  async create(@Body() createInventoryDto: any) {
+    return this.inventoryService.create(createInventoryDto);
+  }
+
+  @Post(':id/request')
+  @UseGuards()
+  @ApiBearerAuth()
+  async requestPart(@Param('id') id: string, @Body() requestDto: any) {
+    return this.inventoryService.requestPart(id, requestDto);
+  }
+
+  @Put(':id')
+  @UseGuards()
+  @ApiBearerAuth()
+  async update(@Param('id') id: string, @Body() updateInventoryDto: any) {
+    return this.inventoryService.update(id, updateInventoryDto);
+  }
+
+  @Delete(':id')
+  @UseGuards()
+  @ApiBearerAuth()
+  async remove(@Param('id') id: string) {
+    return this.inventoryService.remove(id);
+  }
+}
