@@ -3,39 +3,31 @@
 ## 📋 Overview
 This guide will help you deploy the Garage Management System as an online demo using:
 - **Backend**: Render.com (Free tier)
-- **Web Panel**: Vercel (Free tier)
-- **Database**: Neon.tech (Free tier)
+- **Web Panel**: Cloudflare Pages (Free tier)
+- **Database**: Render PostgreSQL (Free tier)
 
 ---
 
-## 🚀 Part 1: Database Setup (Neon.tech)
+## 🚀 Part 1: Database Setup (Render PostgreSQL)
 
-### Step 1: Create Neon Account
-1. Go to https://neon.tech
-2. Sign up for a free account
-3. Click **"Create a project"**
+### Step 1: Create Database on Render
+1. In Render dashboard, click **"New +"**
+2. Select **"PostgreSQL"**
+3. **Name**: `garage-db`
+4. **Database**: `garage_db`
+5. **User**: `garage_user`
+6. Click **"Create Database"**
 
-### Step 2: Create Database
-1. **Project name**: `garage-demo`
-2. **Database name**: `garage_db`
-3. **Region**: Choose nearest region
-4. Click **"Create project"**
-
-### Step 3: Get Connection String
+### Step 2: Get Connection String
 1. After creation, go to **"Connection Details"**
 2. Copy the **Connection string** (PostgreSQL URL)
 3. It should look like:
    ```
-   postgresql://user:password@ep-cool-name.us-east-2.aws.neon.tech/garage_db?sslmode=require
+   postgresql://garage_user:password@dpg-xxx/garage_db
    ```
 
-### Step 4: Run Prisma Migrations
-On your local machine:
-```bash
-cd apps/backend
-# Update DATABASE_URL in .env with Neon connection string
-npx prisma migrate deploy
-```
+### Step 3: Use in Backend
+The database will be linked automatically in the Backend deployment step.
 
 ---
 
@@ -84,9 +76,9 @@ JWT_REFRESH_EXPIRES_IN=7d
 NODE_ENV=production
 PORT=3001
 
-# CORS (For Vercel Web Panel)
-CORS_ORIGIN=https://your-vercel-app.vercel.app,http://localhost:3000
-SOCKET_CORS_ORIGIN=https://your-vercel-app.vercel.app,http://localhost:3000
+# CORS (For Cloudflare Pages Web Panel)
+CORS_ORIGIN=https://your-pages.pages.dev,http://localhost:3000
+SOCKET_CORS_ORIGIN=https://your-pages.pages.dev,http://localhost:3000
 
 # File Upload
 MAX_FILE_SIZE=5242880
@@ -111,23 +103,28 @@ SMTP_FROM=
 
 ---
 
-## 🌐 Part 3: Web Panel Deployment (Vercel)
+## 🌐 Part 3: Web Panel Deployment (Cloudflare Pages)
 
-### Step 1: Create Vercel Account
-1. Go to https://vercel.com
+### Step 1: Create Cloudflare Account
+1. Go to https://dash.cloudflare.com
 2. Sign up for a free account
 
-### Step 2: Import Project
-1. Click **"Add New..."** → **"Project"**
-2. Import from GitHub: `karam-55/garage-management-system`
-3. Select directory: `apps/web-panel`
-4. Click **"Import"**
+### Step 2: Connect GitHub
+1. Go to **Workers & Pages**
+2. Click **"Create application"**
+3. Select **"Pages"**
+4. Click **"Connect to Git"**
+5. Select GitHub and authorize
+6. Select repository: `karam-55/garage-management-system`
+7. Click **"Begin setup"**
 
 ### Step 3: Configure Project
-- **Framework Preset**: Next.js
-- **Root Directory**: `apps/web-panel`
-- **Build Command**: `npm run build`
-- **Output Directory**: `.next`
+- **Project name**: `garage-web-panel`
+- **Production branch**: `main`
+- **Root directory**: `apps/web-panel`
+- **Build command**: `npm run build`
+- **Build output directory**: `.next`
+- **Framework preset**: `Next.js`
 
 ### Step 4: Configure Environment Variables
 Add these environment variables:
@@ -141,9 +138,9 @@ NODE_ENV=production
 ```
 
 ### Step 5: Deploy
-1. Click **"Deploy"**
+1. Click **"Save and Deploy"**
 2. Wait for deployment to complete (2-3 minutes)
-3. Copy the web panel URL: `https://your-app.vercel.app`
+3. Copy the web panel URL: `https://garage-web-panel.pages.dev`
 
 ---
 
@@ -153,7 +150,7 @@ NODE_ENV=production
 The QR Session Page is already integrated in the Web Panel at `/qr/:token`
 
 ### Step 2: Test QR Page
-1. Access: `https://your-vercel-app.vercel.app/qr/test-token`
+1. Access: `https://garage-web-panel.pages.dev/qr/test-token`
 2. Should work without authentication
 3. Connects to backend for validation
 
@@ -162,12 +159,12 @@ The QR Session Page is already integrated in the Web Panel at `/qr/:token`
 ## 🔧 Part 5: Post-Deployment Configuration
 
 ### Update Backend CORS
-After deploying Web Panel on Vercel:
+After deploying Web Panel on Cloudflare Pages:
 1. Go to Render Dashboard
 2. Edit Web Service environment variables
-3. Update `CORS_ORIGIN` with actual Vercel URL:
+3. Update `CORS_ORIGIN` with actual Cloudflare Pages URL:
    ```bash
-   CORS_ORIGIN=https://your-actual-vercel-app.vercel.app,http://localhost:3000
+   CORS_ORIGIN=https://your-actual-app.pages.dev,http://localhost:3000
    ```
 4. Redeploy backend
 
@@ -179,15 +176,15 @@ After deploying Web Panel on Vercel:
 - [ ] Backend is deployed and accessible
 - [ ] Health check works: `https://garage-backend.onrender.com/health`
 - [ ] Database migrations ran successfully
-- [ ] CORS is configured for Vercel domain
+- [ ] CORS is configured for Cloudflare Pages domain
 
-### Web Panel (Vercel)
+### Web Panel (Cloudflare Pages)
 - [ ] Web Panel is deployed and accessible
 - [ ] API URL is correctly set to backend URL
 - [ ] All pages load without errors
 - [ ] Authentication works
 
-### Database (Neon/Render)
+### Database (Render)
 - [ ] Database is accessible
 - [ ] All tables are created
 - [ ] Connection string is correct
@@ -209,13 +206,13 @@ JWT_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=7d
 NODE_ENV=production
 PORT=3001
-CORS_ORIGIN=https://your-vercel-app.vercel.app,http://localhost:3000
-SOCKET_CORS_ORIGIN=https://your-vercel-app.vercel.app,http://localhost:3000
+CORS_ORIGIN=https://your-app.pages.dev,http://localhost:3000
+SOCKET_CORS_ORIGIN=https://your-app.pages.dev,http://localhost:3000
 MAX_FILE_SIZE=5242880
 UPLOAD_DIR=./uploads
 ```
 
-### Web Panel (Vercel)
+### Web Panel (Cloudflare Pages)
 ```bash
 NEXT_PUBLIC_API_URL=https://garage-backend.onrender.com
 NODE_ENV=production
@@ -234,7 +231,8 @@ NODE_ENV=production
 - `apps/backend/src/app.module.ts` - Added HealthModule
 
 ### Web Panel
-- `apps/web-panel/vercel.json` - Vercel configuration
+- `apps/web-panel/_headers` - Cloudflare Pages security headers
+- `apps/web-panel/_redirects` - Cloudflare Pages redirects
 - `apps/web-panel/.env.example` - Environment variables template
 - `apps/web-panel/src/lib/api-client.ts` - Already configured for NEXT_PUBLIC_API_URL
 
@@ -259,7 +257,7 @@ npm run start:prod
 npm run build
 npm run start
 
-# Vercel
+# Cloudflare Pages
 npm run build
 ```
 
@@ -269,17 +267,17 @@ npm run build
 
 Replace with your actual URLs:
 - **Backend**: `https://garage-backend.onrender.com`
-- **Web Panel**: `https://garage-management.vercel.app`
-- **Database**: Render PostgreSQL or Neon PostgreSQL
-- **QR Page**: `https://garage-management.vercel.app/qr/:token`
+- **Web Panel**: `https://garage-web-panel.pages.dev`
+- **Database**: Render PostgreSQL
+- **QR Page**: `https://garage-web-panel.pages.dev/qr/:token`
 
 ---
 
 ## 💰 Cost Summary (Free Tier)
 
 - **Render.com**: $0/month (Free tier includes 750 hours/month)
-- **Vercel**: $0/month (Free tier includes 100GB bandwidth)
-- **Neon.tech**: $0/month (Free tier includes 0.5GB storage)
+- **Cloudflare Pages**: $0/month (Free tier includes unlimited bandwidth)
+- **Render PostgreSQL**: $0/month (Free tier includes 90 days)
 
 **Total Monthly Cost**: $0
 
@@ -293,7 +291,7 @@ Replace with your actual URLs:
 
 ### To update web panel:
 1. Push changes to GitHub
-2. Vercel auto-deploys on push
+2. Cloudflare Pages auto-deploys on push
 
 ### To run database migrations:
 ```bash
@@ -311,12 +309,12 @@ npx prisma migrate deploy
 - Ensure Prisma migrations ran successfully
 
 ### Web Panel Issues
-- Check Vercel logs
+- Check Cloudflare Pages logs
 - Verify NEXT_PUBLIC_API_URL is correct
 - Check browser console for errors
 
 ### CORS Issues
-- Ensure backend CORS_ORIGIN includes Vercel domain
+- Ensure backend CORS_ORIGIN includes Cloudflare Pages domain
 - Check both frontend and backend logs
 
 ---
@@ -325,8 +323,8 @@ npx prisma migrate deploy
 
 For issues with:
 - **Render**: https://render.com/docs
-- **Vercel**: https://vercel.com/docs
-- **Neon**: https://neon.tech/docs
+- **Cloudflare Pages**: https://developers.cloudflare.com/pages
+- **Cloudflare Workers**: https://developers.cloudflare.com/workers
 
 ---
 
