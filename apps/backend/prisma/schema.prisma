@@ -462,21 +462,21 @@ model Booking {
 }
 
 model AdditionalService {
-  id          String                  @id @default(uuid()) @db.Uuid
-  bookingId   String                  @map("booking_id") @db.Uuid
-  booking     Booking                 @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  name        String?                 @db.VarChar(255)
-  serviceName String?                 @map("service_name") @db.VarChar(255)
-  nameAr      String?                 @map("name_ar") @db.VarChar(255)
-  description String?                 @db.Text
-  price       Decimal                 @db.Decimal(10, 2)
-  status      AdditionalServiceStatus @default(PENDING)
-  requestedBy String?                 @map("requested_by") @db.VarChar(255)
-  approvedBy     String?                 @map("approved_by") @db.VarChar(255)
-  approvedAt     DateTime?               @map("approved_at") @db.Timestamptz
-  approvalDeadline DateTime?             @map("approval_deadline") @db.Timestamptz
-  createdAt      DateTime                @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt   DateTime                @updatedAt @map("updated_at") @db.Timestamptz
+  id               String                  @id @default(uuid()) @db.Uuid
+  bookingId        String                  @map("booking_id") @db.Uuid
+  booking          Booking                 @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  name             String?                 @db.VarChar(255)
+  serviceName      String?                 @map("service_name") @db.VarChar(255)
+  nameAr           String?                 @map("name_ar") @db.VarChar(255)
+  description      String?                 @db.Text
+  price            Decimal                 @db.Decimal(10, 2)
+  status           AdditionalServiceStatus @default(PENDING)
+  requestedBy      String?                 @map("requested_by") @db.VarChar(255)
+  approvedBy       String?                 @map("approved_by") @db.VarChar(255)
+  approvedAt       DateTime?               @map("approved_at") @db.Timestamptz
+  approvalDeadline DateTime?               @map("approval_deadline") @db.Timestamptz
+  createdAt        DateTime                @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime                @updatedAt @map("updated_at") @db.Timestamptz
 
   // Relations
   options ServiceOption[]
@@ -605,19 +605,19 @@ model MechanicRating {
 }
 
 model PartsInventory {
-  id           String    @id @default(uuid()) @db.Uuid
-  garageId     String    @map("garage_id") @db.Uuid
-  garage       Garage    @relation(fields: [garageId], references: [id], onDelete: Cascade)
-  partNumber   String    @unique @map("part_number") @db.VarChar(100)
-  barcode      String?   @unique @db.VarChar(100)
-  name         String    @db.VarChar(255)
-  nameAr       String?   @map("name_ar") @db.VarChar(255)
-  description  String?   @db.Text
-  category     String?   @db.VarChar(100)
-  brand        String?   @db.VarChar(100)
-  quantity     Decimal   @default(0) @db.Decimal(10, 2)
-  unit         String    @default("piece") @db.VarChar(50)
-  reorderPoint Decimal   @default(10) @map("reorder_point") @db.Decimal(10, 2)
+  id            String    @id @default(uuid()) @db.Uuid
+  garageId      String    @map("garage_id") @db.Uuid
+  garage        Garage    @relation(fields: [garageId], references: [id], onDelete: Cascade)
+  partNumber    String    @unique @map("part_number") @db.VarChar(100)
+  barcode       String?   @unique @db.VarChar(100)
+  name          String    @db.VarChar(255)
+  nameAr        String?   @map("name_ar") @db.VarChar(255)
+  description   String?   @db.Text
+  category      String?   @db.VarChar(100)
+  brand         String?   @db.VarChar(100)
+  quantity      Decimal   @default(0) @db.Decimal(10, 2)
+  unit          String    @default("piece") @db.VarChar(50)
+  reorderPoint  Decimal   @default(10) @map("reorder_point") @db.Decimal(10, 2)
   costPrice     Decimal   @map("cost_price") @db.Decimal(10, 2)
   sellingPrice  Decimal   @map("selling_price") @db.Decimal(10, 2)
   minStockLevel Decimal?  @map("min_stock_level") @db.Decimal(10, 2)
@@ -626,11 +626,11 @@ model PartsInventory {
   supplierPhone String?   @map("supplier_phone") @db.VarChar(20)
   leadTimeDays  Int?      @map("lead_time_days")
   location      String?   @db.VarChar(100)
-  imageUrl     String?   @map("image_url") @db.Text
-  isActive     Boolean   @default(true) @map("is_active")
-  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz
-  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz
+  imageUrl      String?   @map("image_url") @db.Text
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz
 
   // Relations
   stockMovements StockMovement[]
@@ -647,24 +647,24 @@ model PartsInventory {
 }
 
 model StockMovement {
-  id            String            @id @default(uuid()) @db.Uuid
-  inventoryId   String            @map("inventory_id") @db.Uuid
-  part          PartsInventory    @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
-  garageId      String?           @map("garage_id") @db.Uuid
-  garage        Garage?           @relation(fields: [garageId], references: [id], onDelete: SetNull)
-  type          StockMovementType
-  quantity      Decimal           @db.Decimal(10, 2)
-  quantityBefore Decimal?         @map("quantity_before") @db.Decimal(10, 2)
-  quantityAfter  Decimal?          @map("quantity_after") @db.Decimal(10, 2)
-  unitPrice     Decimal?          @db.Decimal(10, 2)
-  reference     String?           @db.VarChar(255)
-  referenceType String?           @map("reference_type") @db.VarChar(50)
-  referenceId   String?           @map("reference_id") @db.VarChar(255)
-  notes         String?           @db.Text
-  performedBy   String?           @map("performed_by") @db.VarChar(255)
+  id              String            @id @default(uuid()) @db.Uuid
+  inventoryId     String            @map("inventory_id") @db.Uuid
+  part            PartsInventory    @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  garageId        String?           @map("garage_id") @db.Uuid
+  garage          Garage?           @relation(fields: [garageId], references: [id], onDelete: SetNull)
+  type            StockMovementType
+  quantity        Decimal           @db.Decimal(10, 2)
+  quantityBefore  Decimal?          @map("quantity_before") @db.Decimal(10, 2)
+  quantityAfter   Decimal?          @map("quantity_after") @db.Decimal(10, 2)
+  unitPrice       Decimal?          @db.Decimal(10, 2)
+  reference       String?           @db.VarChar(255)
+  referenceType   String?           @map("reference_type") @db.VarChar(50)
+  referenceId     String?           @map("reference_id") @db.VarChar(255)
+  notes           String?           @db.Text
+  performedBy     String?           @map("performed_by") @db.VarChar(255)
   performedByUser User?             @relation("PerformedStockMovements", fields: [performedBy], references: [id], onDelete: SetNull)
-  performedAt   DateTime          @default(now()) @map("performed_at") @db.Timestamptz
-  createdAt     DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  performedAt     DateTime          @default(now()) @map("performed_at") @db.Timestamptz
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([inventoryId])
   @@index([garageId])
@@ -674,26 +674,26 @@ model StockMovement {
 }
 
 model PartsRequest {
-  id            String             @id @default(uuid()) @db.Uuid
-  inventoryId   String             @map("inventory_id") @db.Uuid
-  part          PartsInventory     @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
-  partName      String?            @map("part_name") @db.VarChar(255)
-  partNumber    String?            @map("part_number") @db.VarChar(100)
-  garageId      String?            @map("garage_id") @db.Uuid
-  garage        Garage?            @relation(fields: [garageId], references: [id], onDelete: SetNull)
-  bookingId     String?            @map("booking_id") @db.Uuid
-  quantity      Decimal            @db.Decimal(10, 2)
-  urgency       String?            @default("NORMAL") @db.VarChar(50)
-  status        PartsRequestStatus @default(PENDING)
-  requestedBy   String?            @map("requested_by") @db.VarChar(255)
-  requestedByUser User?            @relation("RequestedPartsRequests", fields: [requestedBy], references: [id], onDelete: SetNull)
-  approvedBy    String?            @map("approved_by") @db.VarChar(255)
-  approvedAt    DateTime?          @map("approved_at") @db.Timestamptz
-  orderedAt     DateTime?          @map("ordered_at") @db.Timestamptz
-  receivedAt    DateTime?          @map("received_at") @db.Timestamptz
-  notes         String?            @db.Text
-  createdAt     DateTime           @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt     DateTime           @updatedAt @map("updated_at") @db.Timestamptz
+  id              String             @id @default(uuid()) @db.Uuid
+  inventoryId     String             @map("inventory_id") @db.Uuid
+  part            PartsInventory     @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  partName        String?            @map("part_name") @db.VarChar(255)
+  partNumber      String?            @map("part_number") @db.VarChar(100)
+  garageId        String?            @map("garage_id") @db.Uuid
+  garage          Garage?            @relation(fields: [garageId], references: [id], onDelete: SetNull)
+  bookingId       String?            @map("booking_id") @db.Uuid
+  quantity        Decimal            @db.Decimal(10, 2)
+  urgency         String?            @default("NORMAL") @db.VarChar(50)
+  status          PartsRequestStatus @default(PENDING)
+  requestedBy     String?            @map("requested_by") @db.VarChar(255)
+  requestedByUser User?              @relation("RequestedPartsRequests", fields: [requestedBy], references: [id], onDelete: SetNull)
+  approvedBy      String?            @map("approved_by") @db.VarChar(255)
+  approvedAt      DateTime?          @map("approved_at") @db.Timestamptz
+  orderedAt       DateTime?          @map("ordered_at") @db.Timestamptz
+  receivedAt      DateTime?          @map("received_at") @db.Timestamptz
+  notes           String?            @db.Text
+  createdAt       DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime           @updatedAt @map("updated_at") @db.Timestamptz
 
   @@index([inventoryId])
   @@index([garageId])
@@ -812,15 +812,15 @@ model PaymentHistory {
 }
 
 model QRSession {
-  id          String   @id @default(uuid()) @db.Uuid
-  bookingId   String   @map("booking_id") @db.Uuid
-  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  qrToken     String   @map("qr_token") @db.VarChar(255)
-  scannedBy   String?  @map("scanned_by") @db.Uuid
-  scannedByUser User?  @relation("ScannedQRSessions", fields: [scannedBy], references: [id], onDelete: SetNull)
-  ipAddress   String?  @map("ip_address") @db.VarChar(50)
-  userAgent   String?  @map("user_agent") @db.Text
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id            String   @id @default(uuid()) @db.Uuid
+  bookingId     String   @map("booking_id") @db.Uuid
+  booking       Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  qrToken       String   @map("qr_token") @db.VarChar(255)
+  scannedBy     String?  @map("scanned_by") @db.Uuid
+  scannedByUser User?    @relation("ScannedQRSessions", fields: [scannedBy], references: [id], onDelete: SetNull)
+  ipAddress     String?  @map("ip_address") @db.VarChar(50)
+  userAgent     String?  @map("user_agent") @db.Text
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([bookingId])
   @@index([qrToken])
