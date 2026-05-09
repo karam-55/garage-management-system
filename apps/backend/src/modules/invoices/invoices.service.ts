@@ -66,34 +66,6 @@ export class InvoicesService {
       }
     }
 
-    // Apply discount if provided
-    if (discountCode) {
-      const discount = await this.prisma.discount.findFirst({
-        where: {
-          code: discountCode,
-          isActive: true,
-          startDate: { lte: new Date() },
-          endDate: { gte: new Date() },
-        },
-      });
-
-      if (discount) {
-        if (discount.type === 'PERCENTAGE') {
-          discountAmount = subtotal * (Number(discount.value) / 100);
-        } else {
-          discountAmount = Number(discount.value);
-        }
-
-        // Update discount usage
-        await this.prisma.discount.update({
-          where: { id: discount.id },
-          data: { usedCount: { increment: 1 } },
-        });
-
-        invoiceData.discountId = discount.id;
-      }
-    }
-
     const totalAmount = subtotal + taxAmount - discountAmount;
 
     const invoice = await this.prisma.invoice.create({
@@ -183,49 +155,20 @@ export class InvoicesService {
     let discountAmount = 0;
     let discountId = null;
 
-    // Apply discount if provided
-    if (discountCode) {
-      const discount = await this.prisma.discount.findFirst({
-        where: {
-          code: discountCode,
-          isActive: true,
-          garageId: booking.garageId,
-          startDate: { lte: new Date() },
-          endDate: { gte: new Date() },
-        },
-      });
-
-      if (discount) {
-        if (discount.type === 'PERCENTAGE') {
-          discountAmount = subtotal * (Number(discount.value) / 100);
-        } else {
-          discountAmount = Number(discount.value);
-        }
-
-        await this.prisma.discount.update({
-          where: { id: discount.id },
-          data: { usedCount: { increment: 1 } },
-        });
-
-        discountId = discount.id;
-      }
-    }
-
     const totalAmount = subtotal + taxAmount - discountAmount;
 
     const invoice = await this.prisma.invoice.create({
       data: {
-        bookingId,
+        bookingId: booking.id,
         customerId: booking.customerId,
         garageId: booking.garageId,
         invoiceNumber: await this.generateInvoiceNumber(booking.garageId),
-        status: 'DRAFT' as any,
         subtotal,
-        taxAmount,
         discountAmount,
+        taxAmount,
         totalAmount,
-        discountId,
-        currency: 'SAR',
+        status: 'DRAFT' as any,
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       },
     });
 
@@ -252,17 +195,16 @@ export class InvoicesService {
   async update(id: string, updateInvoiceDto: any) {
     const { items, ...invoiceData } = updateInvoiceDto;
 
-    const oldInvoice = await this.prisma.invoice.findUnique({
+    const invoice = await this.prisma.invoice.findUnique({
       where: { id },
-      include: { items: true },
     });
 
-    if (!oldInvoice) {
+    if (!invoice) {
       throw new NotFoundException('Invoice not found');
     }
 
     // Prevent updates if invoice is already paid
-    if (oldInvoice.status === 'PAID') {
+    if (invoice.status === 'PAID') {
       throw new BadRequestException('Cannot update a paid invoice');
     }
 
@@ -284,49 +226,24 @@ export class InvoicesService {
 
         await this.prisma.invoiceItem.create({
           data: {
-            invoiceId: id,
+            invoiceId: invoice.id,
             description: item.description,
             quantity: item.quantity,
-            unitPrice: item.unitPrice,
-            discount: item.discount || 0,
-            taxRateValue: item.taxRate || 0.15,
-            taxAmount: itemTotal * (Number(item.taxRate) || 0.15),
-            total: itemTotal * (1 + (Number(item.taxRate) || 0.15)),
+            unitPrice: item.price,
+            discount: 0,
+            tax: item.quantity * item.price * (item.taxRate || 0.15),
+            total: item.quantity * item.price * (1 + (item.taxRate || 0.15)),
             serviceId: item.serviceId,
             partId: item.partId,
           },
         });
       }
     } else {
-      subtotal = Number(oldInvoice.subtotal);
-      taxAmount = Number(oldInvoice.taxAmount);
+      subtotal = Number(invoice.subtotal);
+      taxAmount = Number(invoice.taxAmount);
     }
 
-    let discountAmount = Number(oldInvoice.discountAmount);
-
-    // Recalculate discount
-    if (invoiceData.discountCode) {
-      const discount = await this.prisma.discount.findFirst({
-        where: {
-          code: invoiceData.discountCode,
-          isActive: true,
-          startDate: { lte: new Date() },
-          endDate: { gte: new Date() },
-        },
-      });
-
-      if (discount) {
-        if (discount.type === 'PERCENTAGE') {
-          discountAmount = subtotal * (Number(discount.value) / 100);
-        } else {
-          discountAmount = Number(discount.value);
-        }
-
-        invoiceData.discountId = discount.id;
-      }
-    }
-
-    const totalAmount = subtotal + taxAmount - discountAmount;
+    const totalAmount = subtotal + taxAmount;
 
     const updatedInvoice = await this.prisma.invoice.update({
       where: { id },
@@ -334,7 +251,6 @@ export class InvoicesService {
         ...invoiceData,
         subtotal,
         taxAmount,
-        discountAmount,
         totalAmount,
       },
     });
@@ -347,7 +263,6 @@ export class InvoicesService {
     return this.prisma.invoice.update({
       where: { id },
       data: {
-        deletedAt: new Date(),
         status: 'CANCELLED' as any,
       },
     });
@@ -531,23 +446,23 @@ export class InvoicesService {
 
     for (const item of items) {
       subtotal += Number(item.quantity) * Number(item.unitPrice);
-      taxAmount += Number(item.taxAmount);
+      taxAmount += Number(item.tax);
     }
 
     const invoice = await this.prisma.invoice.findUnique({
       where: { id: invoiceId },
-      include: { discount: true },
     });
 
     let discountAmount = Number(invoice.discountAmount);
 
-    if (invoice.discount) {
-      if (invoice.discount.type === 'PERCENTAGE') {
-        discountAmount = subtotal * (Number(invoice.discount.value) / 100);
-      } else {
-        discountAmount = Number(invoice.discount.value);
-      }
-    }
+    // Discount calculation disabled until discount model is added to schema
+    // if (invoice.discount) {
+    //   if (invoice.discount.type === 'PERCENTAGE') {
+    //     discountAmount = subtotal * (Number(invoice.discount.value) / 100);
+    //   } else {
+    //     discountAmount = Number(invoice.discount.value);
+    //   }
+    // }
 
     const totalAmount = subtotal + taxAmount - discountAmount;
 

@@ -112,7 +112,7 @@ export class PaymentsService {
       where: { id: invoiceId },
       data: {
         status: newPaidAmount >= Number(invoice.totalAmount) ? 'PAID' as any : 'SENT' as any,
-        paidDate: newPaidAmount >= Number(invoice.totalAmount) ? new Date() : null,
+        paidAt: newPaidAmount >= Number(invoice.totalAmount) ? new Date() : null,
       },
     });
 
@@ -241,7 +241,7 @@ export class PaymentsService {
       where: { id: payment.invoiceId },
       data: {
         status: 'SENT' as any,
-        paidDate: null,
+        paidAt: null,
       },
     });
 

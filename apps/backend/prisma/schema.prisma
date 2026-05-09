@@ -685,7 +685,7 @@ model Invoice {
   totalAmount    Decimal       @map("total_amount") @db.Decimal(15, 2)
   status         InvoiceStatus @default(DRAFT)
   dueDate        DateTime?     @map("due_date") @db.Timestamptz
-  paidAt         DateTime?     @map("paid_at") @db.Timestamptz
+  paidDate       DateTime?     @map("paid_date") @db.Timestamptz
   notes          String?       @db.Text
   createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz
   updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz
