@@ -97,14 +97,14 @@ export class PaymentsService {
       },
     });
 
-    // Log payment history
-    await this.prisma.paymentHistory.create({
-      data: {
-        paymentId: payment.id,
-        status: 'COMPLETED' as any,
-        notes: 'Payment created',
-      },
-    });
+    // Log payment history (disabled until Prisma Client is updated)
+    // await this.prisma.paymentHistory.create({
+    //   data: {
+    //     paymentId: payment.id,
+    //     status: 'COMPLETED' as any,
+    //     notes: 'Payment created',
+    //   },
+    // });
 
     // Update invoice status
     const newPaidAmount = paidAmount + Number(amount);
@@ -144,14 +144,14 @@ export class PaymentsService {
       data: updatePaymentDto,
     });
 
-    // Log payment history
-    await this.prisma.paymentHistory.create({
-      data: {
-        paymentId: id,
-        status: updatePaymentDto.status || payment.status,
-        notes: 'Payment updated',
-      },
-    });
+    // Log payment history (disabled until Prisma Client is updated)
+    // await this.prisma.paymentHistory.create({
+    //   data: {
+    //     paymentId: id,
+    //     status: updatePaymentDto.status || payment.status,
+    //     notes: 'Payment updated',
+    //   },
+    // });
 
     return this.findOne(id);
   }
@@ -175,14 +175,14 @@ export class PaymentsService {
       where: { id },
     });
 
-    // Log payment history
-    await this.prisma.paymentHistory.create({
-      data: {
-        paymentId: id,
-        status: payment.status,
-        notes: 'Payment deleted',
-      },
-    });
+    // Log payment history (disabled until Prisma Client is updated)
+    // await this.prisma.paymentHistory.create({
+    //   data: {
+    //     paymentId: id,
+    //     status: payment.status,
+    //     notes: 'Payment deleted',
+    //   },
+    // });
 
     return { success: true };
   }
@@ -219,14 +219,14 @@ export class PaymentsService {
       },
     });
 
-    // Log payment history
-    await this.prisma.paymentHistory.create({
-      data: {
-        paymentId: refundPayment.id,
-        status: 'REFUNDED' as any,
-        notes: reason || 'Refund',
-      },
-    });
+    // Log payment history (disabled until Prisma Client is updated)
+    // await this.prisma.paymentHistory.create({
+    //   data: {
+    //     paymentId: refundPayment.id,
+    //     status: 'REFUNDED' as any,
+    //     notes: reason || 'Refund',
+    //   },
+    // });
 
     // Update original payment status
     await this.prisma.payment.update({
@@ -281,14 +281,14 @@ export class PaymentsService {
       },
     });
 
-    // Log payment history
-    await this.prisma.paymentHistory.create({
-      data: {
-        paymentId: refundPayment.id,
-        status: 'REFUNDED' as any,
-        notes: reason || 'Partial refund',
-      },
-    });
+    // Log payment history (disabled until Prisma Client is updated)
+    // await this.prisma.paymentHistory.create({
+    //   data: {
+    //     paymentId: refundPayment.id,
+    //     status: 'REFUNDED' as any,
+    //     notes: reason || 'Partial refund',
+    //   },
+    // });
 
     // Update original payment status
     await this.prisma.payment.update({

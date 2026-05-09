@@ -209,10 +209,10 @@ export class ReportsService {
 
     const items = await this.prisma.partsInventory.findMany({
       where: { ...where, isActive: true },
-      select: { quantity: true, unitPrice: true },
+      select: { quantity: true, sellingPrice: true },
     });
 
-    const totalValue = items.reduce((sum, item) => sum + Number(item.quantity) * Number(item.unitPrice), 0);
+    const totalValue = items.reduce((sum, item) => sum + Number(item.quantity) * Number(item.sellingPrice), 0);
 
     return {
       totalItems,
@@ -280,7 +280,6 @@ export class ReportsService {
       where,
       include: {
         user: true,
-        bookings: true,
       },
     });
 
@@ -289,7 +288,7 @@ export class ReportsService {
       name: customer.fullName,
       email: customer.email,
       phone: customer.phone,
-      totalBookings: customer.bookings.length,
+      totalBookings: customer.totalBookings,
       loyaltyPoints: customer.loyaltyPoints,
       isActive: customer.user?.isActive || false,
     }));
