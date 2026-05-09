@@ -3,7 +3,8 @@ services:
     name: garage-backend
     env: node
     plan: free
-    buildCommand: npm install && npx prisma db push && npm run build
+    # Use db push for initial schema (no migration history needed)
+    buildCommand: npm install && npx prisma db push --accept-data-loss && npm run build
     startCommand: npm run start:prod
     envVars:
       - key: DATABASE_URL
