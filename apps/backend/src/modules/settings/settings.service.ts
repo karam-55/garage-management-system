@@ -154,89 +154,28 @@ export class SettingsService {
   }
 
   async getDiscounts(garageId?: string) {
-    const where = garageId ? { garageId } : {};
-    return this.prisma.discount.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-    });
+    // Discount feature not implemented in current schema
+    return [];
   }
 
   async createDiscount(discountDto: any, garageId?: string) {
-    const { code, type, value, startDate, endDate, maxUses, ...rest } = discountDto;
-
-    // Check if code already exists
-    const existing = await this.prisma.discount.findFirst({
-      where: { code },
-    });
-
-    if (existing) {
-      throw new BadRequestException('Discount code already exists');
-    }
-
-    return this.prisma.discount.create({
-      data: {
-        code,
-        type: type || 'PERCENTAGE' as any,
-        value,
-        startDate: startDate || new Date(),
-        endDate,
-        maxUses,
-        usedCount: 0,
-        isActive: true,
-        garageId,
-        ...rest,
-      },
-    });
+    // Discount feature not implemented in current schema
+    throw new BadRequestException('Discount feature not implemented');
   }
 
   async updateDiscount(id: string, discountDto: any) {
-    const discount = await this.prisma.discount.findUnique({ where: { id } });
-    if (!discount) {
-      throw new NotFoundException('Discount not found');
-    }
-
-    return this.prisma.discount.update({
-      where: { id },
-      data: discountDto,
-    });
+    // Discount feature not implemented in current schema
+    throw new BadRequestException('Discount feature not implemented');
   }
 
   async deleteDiscount(id: string) {
-    return this.prisma.discount.delete({
-      where: { id },
-    });
+    // Discount feature not implemented in current schema
+    throw new BadRequestException('Discount feature not implemented');
   }
 
   async validateDiscount(code: string, garageId?: string) {
-    const where: any = { code, isActive: true };
-    if (garageId) where.garageId = garageId;
-
-    const discount = await this.prisma.discount.findFirst({
-      where,
-    });
-
-    if (!discount) {
-      throw new NotFoundException('Invalid discount code');
-    }
-
-    const now = new Date();
-
-    // Check if discount is expired
-    if (discount.endDate && new Date(discount.endDate) < now) {
-      throw new BadRequestException('Discount code has expired');
-    }
-
-    // Check if discount hasn't started yet
-    if (discount.startDate && new Date(discount.startDate) > now) {
-      throw new BadRequestException('Discount code is not yet valid');
-    }
-
-    // Check if max uses reached
-    if (discount.maxUses && discount.usedCount >= discount.maxUses) {
-      throw new BadRequestException('Discount code has reached maximum uses');
-    }
-
-    return discount;
+    // Discount feature not implemented in current schema
+    throw new BadRequestException('Discount feature not implemented');
   }
 
   async getGarageSettings(garageId: string) {

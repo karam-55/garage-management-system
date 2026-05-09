@@ -17,7 +17,7 @@ export class UsersService {
       select: {
         id: true,
         email: true,
-        full_name: true,
+        fullName: true,
         phone: true,
         role: true,
         garageId: true,
@@ -45,7 +45,7 @@ export class UsersService {
     }
 
     // Remove password hash from response
-    const { password_hash, ...userWithoutPassword } = user;
+    const { passwordHash, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
@@ -55,7 +55,7 @@ export class UsersService {
       select: {
         id: true,
         email: true,
-        full_name: true,
+        fullName: true,
         phone: true,
         role: true,
         garageId: true,
@@ -98,7 +98,7 @@ export class UsersService {
       select: {
         id: true,
         email: true,
-        full_name: true,
+        fullName: true,
         phone: true,
         role: true,
         garageId: true,
@@ -123,7 +123,7 @@ export class UsersService {
       select: {
         id: true,
         email: true,
-        full_name: true,
+        fullName: true,
         phone: true,
         role: true,
         garageId: true,
@@ -170,7 +170,7 @@ export class UsersService {
       select: {
         id: true,
         email: true,
-        full_name: true,
+        fullName: true,
         phone: true,
         avatarUrl: true,
         updatedAt: true,
