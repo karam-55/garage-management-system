@@ -38,7 +38,6 @@ export class BookingsService {
         service: true,
         additionalServices: true,
         customerApprovals: true,
-        qrSessions: true,
       },
     });
 
@@ -97,8 +96,7 @@ export class BookingsService {
             booking: { connect: { id: booking.id } },
             serviceName: as.serviceName,
             price: as.price,
-            approved: false,
-            approvalDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            status: 'PENDING' as any,
           },
         });
       }
@@ -276,8 +274,7 @@ export class BookingsService {
         booking: { connect: { id: bookingId } },
         serviceName,
         price,
-        approved: false,
-        approvalDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        status: 'PENDING' as any,
       },
     });
 
@@ -299,7 +296,7 @@ export class BookingsService {
     return this.prisma.additionalService.update({
       where: { id: additionalServiceId },
       data: {
-        approved: true,
+        status: 'APPROVED' as any,
       },
     });
   }
@@ -332,7 +329,6 @@ export class BookingsService {
       where: { id: handoverId },
       data: {
         status: 'COMPLETED' as any,
-        acknowledgedAt: new Date(),
       },
     });
   }
@@ -347,7 +343,7 @@ export class BookingsService {
         fromMechanic: true,
         toMechanic: true,
       },
-      orderBy: { handoverTime: 'desc' },
+      orderBy: { handedOverAt: 'desc' },
     });
   }
 
@@ -365,9 +361,9 @@ export class BookingsService {
 
     return this.prisma.qRSession.create({
       data: {
-        booking: { connect: { id: bookingId } },
+        bookingId,
         qrToken: uuidv4(),
-        scannedAt: new Date(),
+        scannedBy,
       },
     });
   }
@@ -442,21 +438,18 @@ export class BookingsService {
         service: true,
         additionalServices: true,
         customerApprovals: true,
-        mechanicHandovers: {
+        handovers: {
           include: {
             fromMechanic: true,
             toMechanic: true,
           },
-          orderBy: { handoverTime: 'desc' },
+          orderBy: { handedOverAt: 'desc' },
         },
-        invoices: {
+        invoice: {
           include: {
             items: true,
-            discount: true,
             payments: true,
           },
-          orderBy: { createdAt: 'desc' },
-          take: 1,
         },
       },
     });
@@ -473,11 +466,10 @@ export class BookingsService {
     if (ipAddress || userAgent) {
       await this.prisma.qRSession.create({
         data: {
-          booking: { connect: { id: booking.id } },
+          bookingId: booking.id,
           qrToken,
           ipAddress,
           userAgent,
-          scannedAt: new Date(),
         },
       });
     }
@@ -501,13 +493,13 @@ export class BookingsService {
       throw new NotFoundException('Additional service not found');
     }
 
-    if (additionalService.approved) {
+    if (additionalService.status === 'APPROVED') {
       throw new BadRequestException('Additional service already approved');
     }
 
     await this.prisma.additionalService.update({
       where: { id: serviceId },
-      data: { approved: true },
+      data: { status: 'APPROVED' as any },
     });
 
     // Create customer approval record
@@ -542,13 +534,13 @@ export class BookingsService {
       throw new NotFoundException('Additional service not found');
     }
 
-    if (additionalService.approved) {
+    if (additionalService.status === 'APPROVED') {
       throw new BadRequestException('Additional service already approved');
     }
 
     await this.prisma.additionalService.update({
       where: { id: serviceId },
-      data: { approved: false },
+      data: { status: 'REJECTED' as any },
     });
 
     // Create customer approval record

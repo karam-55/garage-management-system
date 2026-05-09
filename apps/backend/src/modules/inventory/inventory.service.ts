@@ -74,7 +74,7 @@ export class InventoryService {
     if (filters?.movementType) where.movementType = filters.movementType;
     if (filters?.garageId) where.garageId = filters.garageId;
 
-    return this.prisma.stockMovementHistory.findMany({
+    return this.prisma.stockMovement.findMany({
       where,
       include: {
         part: true,
@@ -100,8 +100,8 @@ export class InventoryService {
     }
 
     // Get stock movements for this part
-    const movements = await this.prisma.stockMovementHistory.findMany({
-      where: { partId: id },
+    const movements = await this.prisma.stockMovement.findMany({
+      where: { inventoryId: id },
       orderBy: { createdAt: 'desc' },
       take: 10,
     });
@@ -146,10 +146,10 @@ export class InventoryService {
 
     // Log initial stock movement
     if (rest.quantity > 0) {
-      await this.prisma.stockMovementHistory.create({
+      await this.prisma.stockMovement.create({
         data: {
-          partId: part.id,
-          movementType: 'IN',
+          inventoryId: part.id,
+          type: 'IN',
           quantity: rest.quantity,
           quantityBefore: 0,
           quantityAfter: rest.quantity,
@@ -188,10 +188,10 @@ export class InventoryService {
       });
 
       // Log stock movement
-      await this.prisma.stockMovementHistory.create({
+      await this.prisma.stockMovement.create({
         data: {
-          partId: id,
-          movementType: movementType as any,
+          inventoryId: id,
+          type: movementType as any,
           quantity: Math.abs(quantityChange),
           quantityBefore: oldPart.quantity,
           quantityAfter: quantity,
@@ -239,10 +239,10 @@ export class InventoryService {
       data: { quantity: newQuantity },
     });
 
-    await this.prisma.stockMovementHistory.create({
+    await this.prisma.stockMovement.create({
       data: {
-        partId: id,
-        movementType: 'IN' as any,
+        inventoryId: id,
+        type: 'IN',
         quantity,
         quantityBefore: part.quantity,
         quantityAfter: newQuantity,
@@ -272,10 +272,10 @@ export class InventoryService {
       data: { quantity: newQuantity },
     });
 
-    await this.prisma.stockMovementHistory.create({
+    await this.prisma.stockMovement.create({
       data: {
-        partId: id,
-        movementType: 'OUT' as any,
+        inventoryId: id,
+        type: 'OUT',
         quantity,
         quantityBefore: part.quantity,
         quantityAfter: newQuantity,
@@ -328,7 +328,7 @@ export class InventoryService {
           category: part.category,
           brand: part.brand,
           quantity,
-          unitPrice: part.unitPrice,
+          costPrice: part.costPrice,
           sellingPrice: part.sellingPrice,
           supplier: part.supplier,
           supplierPhone: part.supplierPhone,
@@ -340,10 +340,10 @@ export class InventoryService {
       });
 
       // Log movement
-      await this.prisma.stockMovementHistory.create({
+      await this.prisma.stockMovement.create({
         data: {
-          partId: id,
-          movementType: 'TRANSFER' as any,
+          inventoryId: id,
+          type: 'TRANSFER',
           quantity,
           quantityBefore: part.quantity,
           quantityAfter: Number(part.quantity) - quantity,
@@ -372,10 +372,10 @@ export class InventoryService {
       data: { quantity },
     });
 
-    await this.prisma.stockMovementHistory.create({
+    await this.prisma.stockMovement.create({
       data: {
-        partId: id,
-        movementType: 'ADJUSTMENT' as any,
+        inventoryId: id,
+        type: movementType,
         quantity: Math.abs(quantityChange),
         quantityBefore: part.quantity,
         quantityAfter: quantity,
@@ -399,7 +399,7 @@ export class InventoryService {
 
     return this.prisma.partsRequest.create({
       data: {
-        partId,
+        inventoryId: partId,
         partName,
         partNumber,
         quantity,
@@ -585,7 +585,7 @@ export class InventoryService {
     // Get all items to count low stock manually
     const allItems = await this.prisma.partsInventory.findMany({
       where: { ...where, isActive: true },
-      select: { quantity: true, reorderPoint: true, unitPrice: true },
+      select: { quantity: true, reorderPoint: true, sellingPrice: true },
     });
 
     const lowStockItems = allItems.filter(item => Number(item.quantity) <= Number(item.reorderPoint)).length;
@@ -597,7 +597,7 @@ export class InventoryService {
 
     // Calculate total value
     const totalValue = allItems.reduce((sum, item) => {
-      return sum + Number(item.quantity) * Number(item.unitPrice);
+      return sum + Number(item.quantity) * Number(item.sellingPrice);
     }, 0);
 
     return {
