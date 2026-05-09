@@ -210,6 +210,8 @@ model User {
   assignedMechanicBookings Booking[]                 @relation("BookingMechanic")
   customerBookings        Booking[]                 @relation("CustomerBookings")
   vehicleStatusUser       VehicleStatusHistory[]     @relation("VehicleStatusUser")
+  vehicleStatusBookings   VehicleStatusHistory[]     @relation("VehicleStatusBooking")
+  notificationPreferences NotificationPreferences[]    @relation("UserNotificationPreferences")
 
   @@index([email])
   @@index([phone])
@@ -299,7 +301,9 @@ model Customer {
   vehicles        Vehicle[]
   bookings        Booking[]
   invoices        Invoice[]
+  invoiceCustomer Invoice[] @relation("InvoiceCustomer")
   payments        Payment[]
+  paymentCustomer Payment[] @relation("PaymentCustomer")
   customerApprovals CustomerApproval[]
 
   @@index([userId])
@@ -445,6 +449,7 @@ model Booking {
   invoice            Invoice?
   payments           Payment[]
   customerUser       User?    @relation("CustomerBookings", fields: [customerId], references: [id])
+  vehicleStatusHistory VehicleStatusHistory[] @relation("VehicleStatusBooking")
 
   @@index([customerId])
   @@index([garageId])
@@ -676,7 +681,7 @@ model Invoice {
   bookingId       String       @unique @map("booking_id") @db.Uuid
   booking         Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
   customerId      String       @map("customer_id") @db.Uuid
-  customer        Customer     @relation(fields: [customerId], references: [id])
+  customer        Customer     @relation("InvoiceCustomer", fields: [customerId], references: [id])
   garageId        String       @map("garage_id") @db.Uuid
   garage          Garage       @relation(fields: [garageId], references: [id])
   invoiceNumber   String       @unique @map("invoice_number") @db.VarChar(50)
@@ -697,6 +702,7 @@ model Invoice {
   items        InvoiceItem[]
   payments     Payment[]
   customerUser User?        @relation("CustomerInvoices", fields: [customerId], references: [id])
+  invoicePayment Payment[] @relation("PaymentInvoice")
 
   @@index([bookingId])
   @@index([customerId])
@@ -730,9 +736,9 @@ model InvoiceItem {
 model Payment {
   id              String        @id @default(uuid()) @db.Uuid
   invoiceId       String        @map("invoice_id") @db.Uuid
-  invoice         Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoice         Invoice       @relation("PaymentInvoice", fields: [invoiceId], references: [id], onDelete: Cascade)
   customerId      String        @map("customer_id") @db.Uuid
-  customer        Customer      @relation(fields: [customerId], references: [id])
+  customer        Customer      @relation("PaymentCustomer", fields: [customerId], references: [id])
   garageId        String        @map("garage_id") @db.Uuid
   garage          Garage        @relation(fields: [garageId], references: [id])
   amount          Decimal       @db.Decimal(15, 2)
@@ -749,7 +755,6 @@ model Payment {
 
   // Relations
   history   PaymentHistory[]
-  booking   Booking?    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 
   @@index([invoiceId])
   @@index([customerId])
@@ -785,8 +790,8 @@ model VehicleStatusHistory {
   notes     String?  @db.Text
   userId    String?  @map("user_id") @db.Uuid
   User      User?    @relation("VehicleStatusUser", fields: [userId], references: [id], onDelete: SetNull)
-  Booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
   bookingId String?  @map("booking_id") @db.Uuid
+  Booking   Booking? @relation("VehicleStatusBooking", fields: [bookingId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([vehicleId])
@@ -907,7 +912,7 @@ model AuditLog {
 model NotificationPreferences {
   id              String   @id @default(uuid()) @db.Uuid
   userId          String   @unique @map("user_id") @db.Uuid
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User     @relation("UserNotificationPreferences", fields: [userId], references: [id], onDelete: Cascade)
   emailEnabled    Boolean @default(true) @map("email_enabled")
   smsEnabled      Boolean @default(true) @map("sms_enabled")
   whatsappEnabled Boolean @default(true) @map("whatsapp_enabled")
