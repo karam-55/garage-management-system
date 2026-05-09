@@ -444,7 +444,6 @@ model Booking {
   handovers          MechanicHandover[]
   invoice            Invoice?
   payments           Payment[]
-  mechanic           User?    @relation("BookingMechanic")
   customerUser       User?    @relation("CustomerBookings", fields: [customerId], references: [id])
 
   @@index([customerId])
