@@ -192,16 +192,15 @@ class _HandoverScreenState extends State<HandoverScreen> {
             // Action Buttons
             CustomButton(
               text: 'تسليم السيارة',
-              onPressed: _selectedMechanic.isEmpty
-                  ? null
-                  : () {
-                      setState(() => _isHandingOver = true);
-                      // TODO: Implement handover logic
-                      Future.delayed(const Duration(seconds: 2), () {
-                        setState(() => _isHandingOver = false);
-                        Navigator.pop(context);
-                      });
-                    },
+              onPressed: () {
+                setState(() => _isHandingOver = true);
+                // TODO: Implement handover logic
+                Future.delayed(const Duration(seconds: 2), () {
+                  setState(() => _isHandingOver = false);
+                  Navigator.pop(context);
+                });
+              },
+              isDisabled: _selectedMechanic.isEmpty,
               isLoading: _isHandingOver,
             ),
             const SizedBox(height: 12),

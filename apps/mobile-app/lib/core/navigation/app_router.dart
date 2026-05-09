@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../screens/auth/login_screen.dart';
-import '../screens/auth/register_screen.dart';
-import '../screens/dashboard/dashboard_screen.dart';
-import '../screens/bookings/bookings_screen.dart';
-import '../screens/bookings/booking_details_screen.dart';
-import '../screens/vehicles/vehicle_details_screen.dart';
-import '../screens/customers/customer_details_screen.dart';
-import '../screens/inventory/inventory_screen.dart';
-import '../screens/handover/handover_screen.dart';
-import '../screens/notifications/notifications_screen.dart';
-import '../screens/profile/profile_screen.dart';
-import '../screens/settings/settings_screen.dart';
+import '../../screens/auth/login_screen.dart';
+import '../../screens/auth/register_screen.dart';
+import '../../screens/dashboard/dashboard_screen.dart';
+import '../../screens/bookings/bookings_screen.dart';
+import '../../screens/bookings/booking_details_screen.dart';
+import '../../screens/vehicles/vehicle_details_screen.dart';
+import '../../screens/customers/customer_details_screen.dart';
+import '../../screens/inventory/inventory_screen.dart';
+import '../../screens/handover/handover_screen.dart';
+import '../../screens/notifications/notifications_screen.dart';
+import '../../screens/profile/profile_screen.dart';
+import '../../screens/settings/settings_screen.dart';
 
 class AppRouter {
   static const String login = '/login';
@@ -49,7 +49,12 @@ class AppRouter {
           GoRoute(
             path: ':id',
             builder: (context, state) {
-              final id = state.pathParameters['id']!;
+              final id = state.pathParameters['id'];
+              if (id == null) {
+                return const Scaffold(
+                  body: Center(child: Text('Invalid booking ID')),
+                );
+              }
               return BookingDetailsScreen(bookingId: id);
             },
           ),
@@ -58,14 +63,24 @@ class AppRouter {
       GoRoute(
         path: '/vehicles/:id',
         builder: (context, state) {
-          final id = state.pathParameters['id']!;
+          final id = state.pathParameters['id'];
+          if (id == null) {
+            return const Scaffold(
+              body: Center(child: Text('Invalid vehicle ID')),
+            );
+          }
           return VehicleDetailsScreen(vehicleId: id);
         },
       ),
       GoRoute(
         path: '/customers/:id',
         builder: (context, state) {
-          final id = state.pathParameters['id']!;
+          final id = state.pathParameters['id'];
+          if (id == null) {
+            return const Scaffold(
+              body: Center(child: Text('Invalid customer ID')),
+            );
+          }
           return CustomerDetailsScreen(customerId: id);
         },
       ),

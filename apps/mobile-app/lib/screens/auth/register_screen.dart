@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
+import '../../core/api/api_client.dart';
+import '../../core/navigation/app_router.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -16,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _secureStorage = const FlutterSecureStorage();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
@@ -31,21 +35,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _handleRegister() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_formKey.currentState == null || !_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 2));
+      final response = await apiClient.post('/auth/register', {
+        'fullName': _nameController.text,
+        'email': _emailController.text,
+        'phone': _phoneController.text,
+        'password': _passwordController.text,
+      });
       
-      if (mounted) {
-        Navigator.pop(context);
+      if (response.data['token'] != null) {
+        await _secureStorage.write(key: 'token', value: response.data['token']);
+        
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, AppRouter.dashboard);
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('فشل إنشاء الحساب')),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration failed: $e')),
+          SnackBar(content: Text('فشل إنشاء الحساب: $e')),
         );
       }
     } finally {
@@ -168,7 +186,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const Text('لديك حساب بالفعل؟'),
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pushReplacementNamed(context, AppRouter.login);
                       },
                       child: const Text('تسجيل الدخول'),
                     ),

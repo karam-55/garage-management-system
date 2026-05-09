@@ -11,6 +11,7 @@ function createWindow() {
       preload: path.join(__dirname, '../preload/index.js'),
       nodeIntegration: false,
       contextIsolation: true,
+      webSecurity: false,
     },
   });
 
@@ -70,33 +71,187 @@ ipcMain.handle('close-window', () => {
   }
 });
 
-// API Handlers - These will be connected to the backend
-ipcMain.handle('api-get', async (_event, url: string) => {
-  // Implement API GET call to backend
-  return { success: true, data: [] };
+// API Handlers - Connected to backend
+import https from 'https';
+
+ipcMain.handle('api-get', async (_event, url: string, token?: string) => {
+  try {
+    return new Promise((resolve, reject) => {
+      const options = {
+        hostname: 'garage-backend.onrender.com',
+        port: 443,
+        path: `/api/v1${url}`,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          try {
+            resolve({ success: true, data: JSON.parse(data) });
+          } catch (e) {
+            resolve({ success: true, data: data });
+          }
+        });
+      });
+
+      req.on('error', reject);
+      req.end();
+    });
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 });
 
-ipcMain.handle('api-post', async (_event, url: string, data: any) => {
-  // Implement API POST call to backend
-  return { success: true, data: {} };
+ipcMain.handle('api-post', async (_event, url: string, data: any, token?: string) => {
+  try {
+    return new Promise((resolve, reject) => {
+      const postData = JSON.stringify(data);
+      const options = {
+        hostname: 'garage-backend.onrender.com',
+        port: 443,
+        path: `/api/v1${url}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData),
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        let responseData = '';
+        res.on('data', chunk => responseData += chunk);
+        res.on('end', () => {
+          try {
+            resolve({ success: true, data: JSON.parse(responseData) });
+          } catch (e) {
+            resolve({ success: true, data: responseData });
+          }
+        });
+      });
+
+      req.on('error', reject);
+      req.write(postData);
+      req.end();
+    });
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 });
 
-ipcMain.handle('api-put', async (_event, url: string, data: any) => {
-  // Implement API PUT call to backend
-  return { success: true, data: {} };
+ipcMain.handle('api-put', async (_event, url: string, data: any, token?: string) => {
+  try {
+    return new Promise((resolve, reject) => {
+      const putData = JSON.stringify(data);
+      const options = {
+        hostname: 'garage-backend.onrender.com',
+        port: 443,
+        path: `/api/v1${url}`,
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(putData),
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        let responseData = '';
+        res.on('data', chunk => responseData += chunk);
+        res.on('end', () => {
+          try {
+            resolve({ success: true, data: JSON.parse(responseData) });
+          } catch (e) {
+            resolve({ success: true, data: responseData });
+          }
+        });
+      });
+
+      req.on('error', reject);
+      req.write(putData);
+      req.end();
+    });
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 });
 
-ipcMain.handle('api-delete', async (_event, url: string) => {
-  // Implement API DELETE call to backend
-  return { success: true };
+ipcMain.handle('api-delete', async (_event, url: string, token?: string) => {
+  try {
+    return new Promise((resolve, reject) => {
+      const options = {
+        hostname: 'garage-backend.onrender.com',
+        port: 443,
+        path: `/api/v1${url}`,
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => {
+          try {
+            resolve({ success: true, data: JSON.parse(data) });
+          } catch (e) {
+            resolve({ success: true, data: data });
+          }
+        });
+      });
+
+      req.on('error', reject);
+      req.end();
+    });
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 });
 
 ipcMain.handle('login', async (_event, credentials: { email: string; password: string }) => {
-  // Implement login logic
-  return { success: true, token: 'mock-token' };
+  try {
+    return new Promise((resolve, reject) => {
+      const postData = JSON.stringify(credentials);
+      const options = {
+        hostname: 'garage-backend.onrender.com',
+        port: 443,
+        path: '/api/v1/auth/login',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData)
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        let responseData = '';
+        res.on('data', chunk => responseData += chunk);
+        res.on('end', () => {
+          try {
+            resolve({ success: true, data: JSON.parse(responseData) });
+          } catch (e) {
+            resolve({ success: true, data: responseData });
+          }
+        });
+      });
+
+      req.on('error', reject);
+      req.write(postData);
+      req.end();
+    });
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 });
 
 ipcMain.handle('logout', async () => {
-  // Implement logout logic
   return { success: true };
 });

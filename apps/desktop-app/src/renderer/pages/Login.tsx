@@ -1,23 +1,30 @@
 import React, { useState } from 'react';
+import apiClient from '../lib/api-client';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
     try {
-      // Login logic
-      // await window.electronAPI.login({ email, password });
-      // window.location.href = '/dashboard';
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 1000);
-    } catch (error) {
+      const response = await apiClient.post('/auth/login', { email, password });
+      
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        window.location.hash = '#/dashboard';
+      } else {
+        setError('فشل تسجيل الدخول');
+      }
+    } catch (error: any) {
       console.error('Login error:', error);
+      setError(error.response?.data?.message || 'فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.');
     } finally {
       setLoading(false);
     }
@@ -99,6 +106,13 @@ const Login: React.FC = () => {
               </a>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
+                {error}
+              </div>
+            )}
+
             {/* Login Button */}
             <button
               type="submit"
@@ -130,7 +144,7 @@ const Login: React.FC = () => {
           <div className="text-center">
             <p className="text-gray-600">
               ليس لديك حساب؟{' '}
-              <a href="#" className="text-blue-600 font-bold hover:text-blue-800">
+              <a href="#/register" className="text-blue-600 font-bold hover:text-blue-800">
                 إنشاء حساب جديد
               </a>
             </p>

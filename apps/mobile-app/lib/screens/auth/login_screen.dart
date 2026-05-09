@@ -4,6 +4,7 @@ import '../../widgets/custom_card.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 import '../../core/navigation/app_router.dart';
+import '../../core/api/api_client.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -29,24 +30,33 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_formKey.currentState == null || !_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 2));
+      final response = await apiClient.post('/auth/login', {
+        'email': _emailController.text,
+        'password': _passwordController.text,
+      });
       
-      // Mock login success
-      await _secureStorage.write(key: 'token', value: 'mock-token');
-      
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, AppRouter.dashboard);
+      if (response.data['token'] != null) {
+        await _secureStorage.write(key: 'token', value: response.data['token']);
+        
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, AppRouter.dashboard);
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('فشل تسجيل الدخول')),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: $e')),
+          SnackBar(content: Text('فشل تسجيل الدخول: $e')),
         );
       }
     } finally {

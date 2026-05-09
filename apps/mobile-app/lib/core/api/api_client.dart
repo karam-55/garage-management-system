@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiClient {
-  static const String baseUrl = 'http://localhost:3000';
+  static const String baseUrl = 'https://garage-backend.onrender.com';
   static const Duration timeout = Duration(seconds: 30);
   
   late Dio _dio;

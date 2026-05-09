@@ -1,23 +1,41 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import apiClient from '@/lib/api-client';
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
-      // TODO: Implement register logic
-      console.log('Register:', { fullName, email, phone, password });
-    } catch (error) {
+      const response = await apiClient.post('/auth/register', {
+        fullName,
+        email,
+        phone,
+        password,
+      });
+      
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        router.push('/dashboard');
+      } else {
+        setError('فشل إنشاء الحساب');
+      }
+    } catch (error: any) {
       console.error('Register error:', error);
+      setError(error.response?.data?.message || 'فشل إنشاء الحساب. يرجى المحاولة مرة أخرى.');
     } finally {
       setLoading(false);
     }
@@ -76,6 +94,11 @@ export default function RegisterPage() {
               required
             />
           </div>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+              {error}
+            </div>
+          )}
           <button
             type="submit"
             disabled={loading}
