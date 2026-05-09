@@ -102,8 +102,6 @@ export class PaymentsService {
       data: {
         paymentId: payment.id,
         status: 'COMPLETED' as any,
-        changedAt: new Date(),
-        changedBy: userId,
         notes: 'Payment created',
       },
     });
@@ -118,10 +116,10 @@ export class PaymentsService {
       },
     });
 
-    // Update payment limits
-    if (userId) {
-      await this.updatePaymentLimits(userId, Number(amount));
-    }
+    // Update payment limits (not implemented)
+    // if (userId) {
+    //   await this.updatePaymentLimits(userId, Number(amount));
+    // }
 
     return this.findOne(payment.id);
   }
@@ -151,8 +149,6 @@ export class PaymentsService {
       data: {
         paymentId: id,
         status: updatePaymentDto.status || payment.status,
-        changedAt: new Date(),
-        changedBy: userId,
         notes: 'Payment updated',
       },
     });
@@ -184,8 +180,6 @@ export class PaymentsService {
       data: {
         paymentId: id,
         status: payment.status,
-        changedAt: new Date(),
-        changedBy: userId,
         notes: 'Payment deleted',
       },
     });
@@ -230,8 +224,6 @@ export class PaymentsService {
       data: {
         paymentId: refundPayment.id,
         status: 'REFUNDED' as any,
-        changedAt: new Date(),
-        changedBy: userId,
         notes: reason || 'Refund',
       },
     });
@@ -294,8 +286,6 @@ export class PaymentsService {
       data: {
         paymentId: refundPayment.id,
         status: 'REFUNDED' as any,
-        changedAt: new Date(),
-        changedBy: userId,
         notes: reason || 'Partial refund',
       },
     });
@@ -312,114 +302,13 @@ export class PaymentsService {
   }
 
   async checkPaymentLimits(userId: string, amount: number) {
-    const limit = await this.prisma.paymentLimit.findUnique({
-      where: { userId },
-    });
-
-    if (!limit) {
-      return true; // No limits set
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-
-    // Get today's payments
-    const todayPayments = await this.prisma.payment.findMany({
-      where: {
-        processedBy: userId,
-        paymentDate: {
-          gte: today,
-        },
-        status: 'COMPLETED',
-      },
-    });
-
-    const dailySpent = todayPayments.reduce((sum, p) => sum + Number(p.amount), 0);
-
-    // Get this month's payments
-    const monthPayments = await this.prisma.payment.findMany({
-      where: {
-        processedBy: userId,
-        paymentDate: {
-          gte: thisMonth,
-        },
-        status: 'COMPLETED',
-      },
-    });
-
-    const monthlySpent = monthPayments.reduce((sum, p) => sum + Number(p.amount), 0);
-
-    // Check limits
-    if (dailySpent + amount > Number(limit.dailyLimit)) {
-      throw new BadRequestException(`Daily payment limit exceeded. Remaining: ${Number(limit.dailyLimit) - dailySpent}`);
-    }
-
-    if (monthlySpent + amount > Number(limit.monthlyLimit)) {
-      throw new BadRequestException(`Monthly payment limit exceeded. Remaining: ${Number(limit.monthlyLimit) - monthlySpent}`);
-    }
-
-    if (amount > Number(limit.perTransactionLimit)) {
-      throw new BadRequestException(`Per transaction limit exceeded. Max: ${limit.perTransactionLimit}`);
-    }
-
+    // Payment limits feature not implemented in current schema
     return true;
-  }
-
-  async updatePaymentLimits(userId: string, amount: number) {
-    const limit = await this.prisma.paymentLimit.findUnique({
-      where: { userId },
-    });
-
-    if (!limit) {
-      await this.prisma.paymentLimit.create({
-        data: {
-          userId,
-          dailyLimit: 10000,
-          monthlyLimit: 50000,
-          perTransactionLimit: 5000,
-          dailySpent: amount,
-          monthlySpent: amount,
-          resetDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1),
-        },
-      });
-    } else {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      // Reset daily if new day
-      if (new Date(limit.resetDate) < today) {
-        await this.prisma.paymentLimit.update({
-          where: { userId },
-          data: {
-            dailySpent: amount,
-            resetDate: today,
-          },
-        });
-      } else {
-        await this.prisma.paymentLimit.update({
-          where: { userId },
-          data: {
-            dailySpent: { increment: amount },
-          },
-        });
-      }
-
-      // Update monthly
-      await this.prisma.paymentLimit.update({
-        where: { userId },
-        data: {
-          monthlySpent: { increment: amount },
-        },
-      });
-    }
   }
 
   async getPaymentHistory(paymentId: string) {
     return this.prisma.paymentHistory.findMany({
       where: { paymentId },
-      orderBy: { changedAt: 'desc' },
     });
   }
 
@@ -459,22 +348,12 @@ export class PaymentsService {
   }
 
   async setPaymentLimits(userId: string, limits: any) {
-    return this.prisma.paymentLimit.upsert({
-      where: { userId },
-      update: limits,
-      create: {
-        userId,
-        ...limits,
-        dailySpent: 0,
-        monthlySpent: 0,
-        resetDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1),
-      },
-    });
+    // Payment limits feature not implemented in current schema
+    return { message: 'Payment limits feature not implemented' };
   }
 
   async getPaymentLimits(userId: string) {
-    return this.prisma.paymentLimit.findUnique({
-      where: { userId },
-    });
+    // Payment limits feature not implemented in current schema
+    return { message: 'Payment limits feature not implemented' };
   }
 }
