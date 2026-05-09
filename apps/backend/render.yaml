@@ -3,7 +3,7 @@ services:
     name: garage-backend
     env: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install && npx prisma migrate deploy && npm run build
     startCommand: npm run start:prod
     envVars:
       - key: DATABASE_URL
