@@ -19,7 +19,7 @@ export class InvoicesService {
         garage: true,
         items: true,
         payments: true,
-        discount: true,
+        // discount: true, // disabled until discount model is added
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -32,14 +32,9 @@ export class InvoicesService {
         booking: true,
         customer: true,
         garage: true,
-        items: {
-          include: {
-            taxRate: true,
-            part: true,
-          },
-        },
+        items: true,
         payments: true,
-        discount: true,
+        // discount: true, // disabled until discount model is added
       },
     });
 
@@ -89,10 +84,10 @@ export class InvoicesService {
             quantity: item.quantity,
             unitPrice: item.unitPrice,
             discount: item.discount || 0,
-            taxRateValue: item.taxRate || 0.15,
+            // taxRateValue: item.taxRate || 0.15, // disabled
             taxAmount: (Number(item.quantity) * Number(item.unitPrice)) * (Number(item.taxRate) || 0.15),
             total: (Number(item.quantity) * Number(item.unitPrice)) * (1 + (Number(item.taxRate) || 0.15)),
-            serviceId: item.serviceId,
+            // serviceId: item.serviceId, // disabled - not in schema
             partId: item.partId,
           },
         });
@@ -138,11 +133,11 @@ export class InvoicesService {
     // Add additional services
     if (booking.additionalServices && booking.additionalServices.length > 0) {
       for (const as of booking.additionalServices) {
-        if (as.approved) {
+        if (as.approvedBy) {
           const asTotal = Number(as.price);
           subtotal += asTotal;
           items.push({
-            description: as.serviceName,
+            description: as.description || 'Additional Service',
             quantity: 1,
             unitPrice: as.price,
             taxRate: 0.15,
@@ -231,9 +226,9 @@ export class InvoicesService {
             quantity: item.quantity,
             unitPrice: item.price,
             discount: 0,
-            tax: item.quantity * item.price * (item.taxRate || 0.15),
+            taxAmount: item.quantity * item.price * (item.taxRate || 0.15),
             total: item.quantity * item.price * (1 + (item.taxRate || 0.15)),
-            serviceId: item.serviceId,
+            // serviceId: item.serviceId, // disabled - not in schema
             partId: item.partId,
           },
         });
@@ -278,7 +273,7 @@ export class InvoicesService {
       where: { id },
       data: {
         status: 'SENT' as any,
-        issuedDate: new Date(),
+        // issuedDate: new Date(), // disabled - not in schema
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
       },
     });
@@ -389,7 +384,7 @@ export class InvoicesService {
         quantity: itemDto.quantity,
         unitPrice: itemDto.unitPrice,
         discount: itemDto.discount || 0,
-        taxRateValue: itemDto.taxRate || 0.15,
+        // taxRateValue: itemDto.taxRate || 0.15, // disabled
         taxAmount,
         total,
         serviceId: itemDto.serviceId,
@@ -446,7 +441,7 @@ export class InvoicesService {
 
     for (const item of items) {
       subtotal += Number(item.quantity) * Number(item.unitPrice);
-      taxAmount += Number(item.tax);
+      taxAmount += Number(item.taxAmount);
     }
 
     const invoice = await this.prisma.invoice.findUnique({
