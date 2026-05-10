@@ -30,7 +30,7 @@ export class VehiclesService {
       data: {
         ...rest,
         plate: licensePlate || rest.plate,
-        year: year ? parseInt(year) : null,
+        year: year ? (typeof year === 'string' ? parseInt(year) : year) : null,
       },
     });
   }
