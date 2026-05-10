@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/dashboard/dashboard_screen.dart';
+import 'package:garage_management/screens/dashboard/dashboard_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

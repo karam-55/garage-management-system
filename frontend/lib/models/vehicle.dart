@@ -1,3 +1,5 @@
+import 'customer.dart';
+
 class Vehicle {
   final String id;
   final String customerId;
