@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   console.log('Starting application...');
   console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+  console.log('DATABASE_URL value:', process.env.DATABASE_URL);
   console.log('PORT:', process.env.PORT);
   
   try {

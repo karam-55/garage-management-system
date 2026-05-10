@@ -6,6 +6,7 @@ const app_module_1 = require("./app.module");
 async function bootstrap() {
     console.log('Starting application...');
     console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+    console.log('DATABASE_URL value:', process.env.DATABASE_URL);
     console.log('PORT:', process.env.PORT);
     try {
         const app = await core_1.NestFactory.create(app_module_1.AppModule);
