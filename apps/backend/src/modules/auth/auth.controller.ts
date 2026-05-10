@@ -35,6 +35,27 @@ export class AuthController {
     return { message: 'User upgraded to ADMIN', user: updatedUser };
   }
 
+  @Post('add-phone-to-admin')
+  @ApiOperation({ summary: 'Add phone number to admin user (requires setup secret)' })
+  async addPhoneToAdmin(@Body() body: { phone: string; secret: string }) {
+    const setupSecret = process.env.SETUP_SECRET || 'garage-setup-2025';
+    if (body.secret !== setupSecret) {
+      throw new UnauthorizedException('Invalid setup secret');
+    }
+    const admin = await this.prisma.user.findFirst({
+      where: { role: 'ADMIN' },
+    });
+    if (!admin) {
+      throw new UnauthorizedException('No admin user found');
+    }
+    const updatedAdmin = await this.prisma.user.update({
+      where: { id: admin.id },
+      data: { phone: body.phone },
+      select: { id: true, phone: true, fullName: true, role: true },
+    });
+    return { message: 'Phone added to admin', user: updatedAdmin };
+  }
+
   @Post('login')
   @ApiOperation({ summary: 'Login user' })
   async login(@Body() loginDto: LoginDto) {
