@@ -5,8 +5,8 @@ export declare class CustomersController {
     constructor(customersService: CustomersService);
     findAll(): Promise<({
         vehicles: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -17,8 +17,8 @@ export declare class CustomersController {
             fuelType: string;
         }[];
         bookings: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -30,33 +30,33 @@ export declare class CustomersController {
             expectedFinishAt: Date | null;
         }[];
         invoices: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
+            date: Date;
             totalAmount: number;
             discount: number;
             netAmount: number;
             paymentMethod: string;
-            date: Date;
         }[];
     } & {
+        id: string;
         name: string;
         phone: string;
         secondaryPhone: string | null;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
     })[]>;
     findOne(id: string): Promise<{
         vehicles: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -67,8 +67,8 @@ export declare class CustomersController {
             fuelType: string;
         }[];
         bookings: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -80,44 +80,44 @@ export declare class CustomersController {
             expectedFinishAt: Date | null;
         }[];
         invoices: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
+            date: Date;
             totalAmount: number;
             discount: number;
             netAmount: number;
             paymentMethod: string;
-            date: Date;
         }[];
     } & {
+        id: string;
         name: string;
         phone: string;
         secondaryPhone: string | null;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
     }>;
     create(createCustomerDto: CreateCustomerDto): Promise<{
+        id: string;
         name: string;
         phone: string;
         secondaryPhone: string | null;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
     }>;
     update(id: string, updateCustomerDto: UpdateCustomerDto): Promise<{
+        id: string;
         name: string;
         phone: string;
         secondaryPhone: string | null;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
     }>;

@@ -5,11 +5,11 @@ export declare class VehiclesController {
     constructor(vehiclesService: VehiclesService);
     findAll(): Promise<({
         customer: {
+            id: string;
             name: string;
             phone: string;
             secondaryPhone: string | null;
             notes: string | null;
-            id: string;
             createdAt: Date;
             updatedAt: Date;
         };
@@ -21,8 +21,8 @@ export declare class VehiclesController {
             trackingData: import("@prisma/client/runtime/client").JsonValue | null;
         };
         bookings: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -34,23 +34,23 @@ export declare class VehiclesController {
             expectedFinishAt: Date | null;
         }[];
         invoices: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
+            date: Date;
             totalAmount: number;
             discount: number;
             netAmount: number;
             paymentMethod: string;
-            date: Date;
         }[];
     } & {
-        notes: string | null;
         id: string;
+        notes: string | null;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
@@ -62,11 +62,11 @@ export declare class VehiclesController {
     })[]>;
     findOne(id: string): Promise<{
         customer: {
+            id: string;
             name: string;
             phone: string;
             secondaryPhone: string | null;
             notes: string | null;
-            id: string;
             createdAt: Date;
             updatedAt: Date;
         };
@@ -78,8 +78,8 @@ export declare class VehiclesController {
             trackingData: import("@prisma/client/runtime/client").JsonValue | null;
         };
         bookings: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -91,23 +91,23 @@ export declare class VehiclesController {
             expectedFinishAt: Date | null;
         }[];
         invoices: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
+            date: Date;
             totalAmount: number;
             discount: number;
             netAmount: number;
             paymentMethod: string;
-            date: Date;
         }[];
     } & {
-        notes: string | null;
         id: string;
+        notes: string | null;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
@@ -118,8 +118,8 @@ export declare class VehiclesController {
         fuelType: string;
     }>;
     create(createVehicleDto: CreateVehicleDto): Promise<{
-        notes: string | null;
         id: string;
+        notes: string | null;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
@@ -130,8 +130,8 @@ export declare class VehiclesController {
         fuelType: string;
     }>;
     update(id: string, updateVehicleDto: UpdateVehicleDto): Promise<{
-        notes: string | null;
         id: string;
+        notes: string | null;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;

@@ -5,17 +5,17 @@ export declare class BookingsService {
     constructor(prisma: PrismaService);
     findAll(): Promise<({
         customer: {
+            id: string;
             name: string;
             phone: string;
             secondaryPhone: string | null;
             notes: string | null;
-            id: string;
             createdAt: Date;
             updatedAt: Date;
         };
         vehicle: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -26,32 +26,32 @@ export declare class BookingsService {
             fuelType: string;
         };
         technician: {
+            id: string;
             name: string;
             phone: string;
             notes: string | null;
-            id: string;
             createdAt: Date;
             updatedAt: Date;
             specialty: string | null;
         };
         invoices: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
+            date: Date;
             totalAmount: number;
             discount: number;
             netAmount: number;
             paymentMethod: string;
-            date: Date;
         }[];
     } & {
-        notes: string | null;
         id: string;
+        notes: string | null;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
@@ -64,17 +64,17 @@ export declare class BookingsService {
     })[]>;
     findOne(id: string): Promise<{
         customer: {
+            id: string;
             name: string;
             phone: string;
             secondaryPhone: string | null;
             notes: string | null;
-            id: string;
             createdAt: Date;
             updatedAt: Date;
         };
         vehicle: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -85,32 +85,32 @@ export declare class BookingsService {
             fuelType: string;
         };
         technician: {
+            id: string;
             name: string;
             phone: string;
             notes: string | null;
-            id: string;
             createdAt: Date;
             updatedAt: Date;
             specialty: string | null;
         };
         invoices: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
+            date: Date;
             totalAmount: number;
             discount: number;
             netAmount: number;
             paymentMethod: string;
-            date: Date;
         }[];
     } & {
-        notes: string | null;
         id: string;
+        notes: string | null;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
@@ -122,8 +122,8 @@ export declare class BookingsService {
         expectedFinishAt: Date | null;
     }>;
     create(createBookingDto: CreateBookingDto): Promise<{
-        notes: string | null;
         id: string;
+        notes: string | null;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
@@ -135,8 +135,8 @@ export declare class BookingsService {
         expectedFinishAt: Date | null;
     }>;
     update(id: string, updateBookingDto: UpdateBookingDto): Promise<{
-        notes: string | null;
         id: string;
+        notes: string | null;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
@@ -148,8 +148,8 @@ export declare class BookingsService {
         expectedFinishAt: Date | null;
     }>;
     delete(id: string): Promise<{
-        notes: string | null;
         id: string;
+        notes: string | null;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;

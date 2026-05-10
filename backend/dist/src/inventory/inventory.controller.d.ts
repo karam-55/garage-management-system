@@ -4,9 +4,9 @@ export declare class InventoryController {
     private readonly inventoryService;
     constructor(inventoryService: InventoryService);
     findAll(): Promise<{
+        id: string;
         name: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;
@@ -16,9 +16,9 @@ export declare class InventoryController {
         minAlertQuantity: number;
     }[]>;
     findOne(id: string): Promise<{
+        id: string;
         name: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;
@@ -28,9 +28,9 @@ export declare class InventoryController {
         minAlertQuantity: number;
     }>;
     create(createInventoryItemDto: CreateInventoryItemDto): Promise<{
+        id: string;
         name: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;
@@ -40,9 +40,9 @@ export declare class InventoryController {
         minAlertQuantity: number;
     }>;
     update(id: string, updateInventoryItemDto: UpdateInventoryItemDto): Promise<{
+        id: string;
         name: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;

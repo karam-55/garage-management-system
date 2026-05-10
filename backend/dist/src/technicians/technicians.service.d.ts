@@ -5,8 +5,8 @@ export declare class TechniciansService {
     constructor(prisma: PrismaService);
     findAll(): Promise<({
         bookings: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -18,18 +18,18 @@ export declare class TechniciansService {
             expectedFinishAt: Date | null;
         }[];
     } & {
+        id: string;
         name: string;
         phone: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         specialty: string | null;
     })[]>;
     findOne(id: string): Promise<{
         bookings: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -41,37 +41,37 @@ export declare class TechniciansService {
             expectedFinishAt: Date | null;
         }[];
     } & {
+        id: string;
         name: string;
         phone: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         specialty: string | null;
     }>;
     create(createTechnicianDto: CreateTechnicianDto): Promise<{
+        id: string;
         name: string;
         phone: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         specialty: string | null;
     }>;
     update(id: string, updateTechnicianDto: UpdateTechnicianDto): Promise<{
+        id: string;
         name: string;
         phone: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         specialty: string | null;
     }>;
     delete(id: string): Promise<{
+        id: string;
         name: string;
         phone: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         specialty: string | null;

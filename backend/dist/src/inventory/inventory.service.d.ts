@@ -4,9 +4,9 @@ export declare class InventoryService {
     private prisma;
     constructor(prisma: PrismaService);
     findAll(): Promise<{
+        id: string;
         name: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;
@@ -16,9 +16,9 @@ export declare class InventoryService {
         minAlertQuantity: number;
     }[]>;
     findOne(id: string): Promise<{
+        id: string;
         name: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;
@@ -28,9 +28,9 @@ export declare class InventoryService {
         minAlertQuantity: number;
     }>;
     create(createInventoryItemDto: CreateInventoryItemDto): Promise<{
+        id: string;
         name: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;
@@ -40,9 +40,9 @@ export declare class InventoryService {
         minAlertQuantity: number;
     }>;
     update(id: string, updateInventoryItemDto: UpdateInventoryItemDto): Promise<{
+        id: string;
         name: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;
@@ -52,9 +52,9 @@ export declare class InventoryService {
         minAlertQuantity: number;
     }>;
     delete(id: string): Promise<{
+        id: string;
         name: string;
         notes: string | null;
-        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;

@@ -4,11 +4,11 @@ export declare class TrackingController {
     constructor(trackingService: TrackingService);
     trackVehicle(vehicleId: string): Promise<{
         customer: {
+            id: string;
             name: string;
             phone: string;
             secondaryPhone: string | null;
             notes: string | null;
-            id: string;
             createdAt: Date;
             updatedAt: Date;
         };
@@ -20,8 +20,8 @@ export declare class TrackingController {
             trackingData: import("@prisma/client/runtime/client").JsonValue | null;
         };
         bookings: {
-            notes: string | null;
             id: string;
+            notes: string | null;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -33,8 +33,8 @@ export declare class TrackingController {
             expectedFinishAt: Date | null;
         }[];
     } & {
-        notes: string | null;
         id: string;
+        notes: string | null;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
