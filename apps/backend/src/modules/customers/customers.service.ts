@@ -38,15 +38,14 @@ export class CustomersService {
   }
 
   async create(createCustomerDto: any) {
-    const { password, fullName, phone, email, address, city, notes, garageId, ...rest } = createCustomerDto;
+    const { password, fullName, phone, address, city, notes, garageId, ...rest } = createCustomerDto;
 
-    // Create User record if email is provided
+    // Create User record if phone is provided
     let userId: string | undefined;
-    if (email) {
+    if (phone) {
       const passwordHash = await bcrypt.hash(password || 'ChangeMe@123', 12);
       const user = await this.prisma.user.create({
         data: {
-          email,
           passwordHash,
           fullName,
           phone,
@@ -70,7 +69,6 @@ export class CustomersService {
         lastName,
         fullName: fullName || firstName + ' ' + lastName,
         phone,
-        email,
         address,
         city,
         notes,

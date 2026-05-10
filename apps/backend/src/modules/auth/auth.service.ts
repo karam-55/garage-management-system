@@ -13,10 +13,10 @@ export class AuthService {
   ) {}
 
   async login(loginDto: any) {
-    const { email, password } = loginDto;
+    const { phone, password } = loginDto;
 
-    const user = await this.prisma.user.findUnique({
-      where: { email },
+    const user = await this.prisma.user.findFirst({
+      where: { phone },
       include: { garage: true },
     });
 
@@ -56,7 +56,7 @@ export class AuthService {
       data: { failedLoginAttempts: 0, lockedUntil: null, lastLoginAt: new Date() },
     }).catch(() => {});
 
-    const payload = { sub: user.id, email: user.email, role: user.role, garageId: user.garageId };
+    const payload = { sub: user.id, phone: user.phone, role: user.role, garageId: user.garageId };
     const access_token = this.jwtService.sign(payload, {
       expiresIn: this.configService.get('JWT_EXPIRES_IN') || '1h',
     });
@@ -74,7 +74,7 @@ export class AuthService {
         ipAddress: '',
         userAgent: '',
         oldValues: null,
-        newValues: JSON.stringify({ email, timestamp: new Date() }),
+        newValues: JSON.stringify({ phone, timestamp: new Date() }),
       },
     }).catch(() => {});
 
@@ -83,8 +83,8 @@ export class AuthService {
       refresh_token,
       user: {
         id: user.id,
-        email: user.email,
         full_name: user.fullName,
+        phone: user.phone,
         role: user.role,
         garage_id: user.garageId,
         garage: user.garage,
@@ -93,14 +93,14 @@ export class AuthService {
   }
 
   async register(registerDto: any) {
-    const { email, password, fullName, phone, role, garageId } = registerDto;
+    const { password, fullName, phone, role, garageId } = registerDto;
 
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email },
+    const existingUser = await this.prisma.user.findFirst({
+      where: { phone },
     });
 
     if (existingUser) {
-      throw new ConflictException('Email already exists');
+      throw new ConflictException('Phone number already exists');
     }
 
     // Validate password strength
@@ -110,19 +110,23 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    const userData: any = {
+      passwordHash: hashedPassword,
+      fullName,
+      phone,
+      role: role || 'CUSTOMER',
+      isActive: true,
+    };
+
+    if (garageId) {
+      userData.garageId = garageId;
+    }
+
     const user = await this.prisma.user.create({
-      data: {
-        email,
-        passwordHash: hashedPassword,
-        fullName,
-        phone,
-        role: role || 'CUSTOMER',
-        garageId,
-        isActive: true,
-      },
+      data: userData,
     });
 
-    const payload = { sub: user.id, email: user.email, role: user.role, garageId: user.garageId };
+    const payload = { sub: user.id, phone: user.phone, role: user.role, garageId: user.garageId };
     const access_token = this.jwtService.sign(payload, {
       expiresIn: this.configService.get('JWT_EXPIRES_IN') || '1h',
     });
@@ -140,7 +144,7 @@ export class AuthService {
         ipAddress: '',
         userAgent: '',
         oldValues: null,
-        newValues: JSON.stringify({ email, role: user.role, timestamp: new Date() }),
+        newValues: JSON.stringify({ phone, role: user.role, timestamp: new Date() }),
       },
     }).catch(() => {});
 
@@ -149,8 +153,8 @@ export class AuthService {
       refresh_token,
       user: {
         id: user.id,
-        email: user.email,
         full_name: user.fullName,
+        phone: user.phone,
         role: user.role,
         garage_id: user.garageId,
       },

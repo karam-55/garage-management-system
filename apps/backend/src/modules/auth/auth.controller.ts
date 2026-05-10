@@ -16,17 +16,23 @@ export class AuthController {
 
   @Post('make-admin')
   @ApiOperation({ summary: 'Upgrade user to ADMIN (requires setup secret)' })
-  async makeAdmin(@Body() body: { email: string; secret: string }) {
+  async makeAdmin(@Body() body: { phone: string; secret: string }) {
     const setupSecret = process.env.SETUP_SECRET || 'garage-setup-2025';
     if (body.secret !== setupSecret) {
       throw new UnauthorizedException('Invalid setup secret');
     }
-    const user = await this.prisma.user.update({
-      where: { email: body.email },
+    const user = await this.prisma.user.updateMany({
+      where: { phone: body.phone },
       data: { role: 'ADMIN' as any },
-      select: { id: true, email: true, fullName: true, role: true },
     });
-    return { message: 'User upgraded to ADMIN', user };
+    if (user.count === 0) {
+      throw new UnauthorizedException('User not found');
+    }
+    const updatedUser = await this.prisma.user.findFirst({
+      where: { phone: body.phone },
+      select: { id: true, phone: true, fullName: true, role: true },
+    });
+    return { message: 'User upgraded to ADMIN', user: updatedUser };
   }
 
   @Post('login')

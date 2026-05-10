@@ -171,7 +171,6 @@ enum AuditAction {
 
 model User {
   id                  String             @id @default(uuid()) @db.Uuid
-  email               String             @unique @db.VarChar(255)
   passwordHash        String             @map("password_hash") @db.VarChar(255)
   fullName            String             @map("full_name") @db.VarChar(255)
   phone               String?            @db.VarChar(20)
@@ -180,7 +179,6 @@ model User {
   garage              Garage?            @relation("GarageMechanic", fields: [garageId], references: [id], onDelete: SetNull)
   isActive            Boolean            @default(true) @map("is_active")
   phoneVerified       Boolean            @default(false) @map("phone_verified")
-  emailVerified       Boolean            @default(false) @map("email_verified")
   availabilityStatus  AvailabilityStatus @default(AVAILABLE) @map("availability_status")
   failedLoginAttempts Int                @default(0) @map("failed_login_attempts")
   lockedUntil         DateTime?          @map("locked_until") @db.Timestamptz
@@ -212,7 +210,6 @@ model User {
   requestedPartsRequests   PartsRequest[]            @relation("RequestedPartsRequests")
   scannedQRSessions        QRSession[]               @relation("ScannedQRSessions")
 
-  @@index([email])
   @@index([phone])
   @@index([role])
   @@index([garageId])
@@ -233,7 +230,6 @@ model Garage {
   postalCode    String?   @map("postal_code") @db.VarChar(20)
   country       String    @default("Saudi Arabia") @db.VarChar(100)
   phone         String    @db.VarChar(20)
-  email         String?   @db.VarChar(255)
   website       String?   @db.Text
   latitude      Decimal?  @db.Decimal(10, 8)
   longitude     Decimal?  @db.Decimal(11, 8)
@@ -281,7 +277,6 @@ model Customer {
   lastName          String    @db.VarChar(100)
   fullName          String    @map("full_name") @db.VarChar(255)
   phone             String    @unique @db.VarChar(20)
-  email             String?   @unique @db.VarChar(255)
   address           String?   @db.Text
   city              String?   @db.VarChar(100)
   state             String?   @db.VarChar(100)
@@ -307,7 +302,6 @@ model Customer {
 
   @@index([userId])
   @@index([phone])
-  @@index([email])
   @@index([garageId])
   @@index([deletedAt])
   @@map("customers")
