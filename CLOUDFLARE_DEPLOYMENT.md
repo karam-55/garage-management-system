@@ -22,6 +22,11 @@
    - `NODE_ENV`: `production`
 7. انقر على **Save and Deploy**
 
+بعد النشر، سيكون الـ URL:
+```
+https://garage-management-system.pages.dev
+```
+
 #### الطريقة الثانية: عبر Wrangler CLI
 
 ```bash
@@ -48,7 +53,7 @@ wrangler pages deploy .next
 2. اختر domain الخاص بك
 3. أضف CNAME record:
    - **Name:** `garage` (أو أي اسم تريده)
-   - **Target:** `garage-web-panel.pages.dev`
+   - **Target:** `garage-management-system.pages.dev`
    - **Proxy status:** Proxied (Cloudflare orange cloud)
 
 ### 3. تحديث Environment Variables في Backend
@@ -57,8 +62,8 @@ wrangler pages deploy .next
 1. اذهب إلى backend service
 2. اذهب إلى Environment Variables
 3. تحديث:
-   - `CORS_ORIGIN`: `https://garage-web-panel.pages.dev`
-   - `SOCKET_CORS_ORIGIN`: `https://garage-web-panel.pages.dev`
+   - `CORS_ORIGIN`: `https://garage-management-system.pages.dev`
+   - `SOCKET_CORS_ORIGIN`: `https://garage-management-system.pages.dev`
 
 ### 4. إعدادات الـ Headers والـ Redirects
 
@@ -76,7 +81,7 @@ Cloudflare Pages سيقوم تلقائياً بـ:
 
 ### 6. التحقق من النشر
 
-1. افتح URL: `https://garage-web-panel.pages.dev`
+1. افتح URL: `https://garage-management-system.pages.dev`
 2. تأكد من أن جميع الصفحات تعمل
 3. تأكد من أن API calls تعمل بشكل صحيح
 4. تأكد من أن Auth يعمل

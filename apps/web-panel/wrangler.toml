@@ -1,4 +1,4 @@
-name = "garage-web-panel"
+name = "garage-management-system"
 compatibility_date = "2024-01-01"
 
 [env.production]
