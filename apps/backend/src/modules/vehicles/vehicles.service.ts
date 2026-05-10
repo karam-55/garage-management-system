@@ -25,7 +25,7 @@ export class VehiclesService {
   }
 
   async create(createVehicleDto: any) {
-    const { licensePlate, year, customerId, ...rest } = createVehicleDto;
+    const { licensePlate, year, customerId, make, model, vin, color, mileage, fuelType, transmission, engineSize, bodyType, notes } = createVehicleDto;
 
     // Validate customer exists
     const customer = await this.prisma.user.findUnique({
@@ -38,9 +38,18 @@ export class VehiclesService {
     return this.prisma.vehicle.create({
       data: {
         customerId,
-        plate: licensePlate || rest.plate,
+        plate: licensePlate,
+        make,
+        model,
         year: year ? (typeof year === 'string' ? parseInt(year) : year) : null,
-        ...rest,
+        vin,
+        color,
+        mileage: mileage ? (typeof mileage === 'string' ? parseInt(mileage) : mileage) : null,
+        fuelType,
+        transmission,
+        engineSize,
+        bodyType,
+        notes,
       },
     });
   }
