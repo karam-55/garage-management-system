@@ -1,12 +1,12 @@
-import { IsString, IsOptional, IsUUID, IsInt, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsUUID, IsInt, Min } from 'class-validator';
 
 export class CreateVehicleDto {
   @IsUUID()
   customerId: string;
 
   @IsString()
-  @IsOptional()
-  plate?: string;
+  @IsNotEmpty()
+  plate: string;
 
   @IsString()
   @IsOptional()
