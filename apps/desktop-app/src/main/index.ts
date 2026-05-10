@@ -80,7 +80,7 @@ ipcMain.handle('api-get', async (_event, url: string, token?: string) => {
       const options = {
         hostname: 'garage-backend.onrender.com',
         port: 443,
-        path: `/api/v1${url}`,
+        path: url,
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ ipcMain.handle('api-post', async (_event, url: string, data: any, token?: string
       const options = {
         hostname: 'garage-backend.onrender.com',
         port: 443,
-        path: `/api/v1${url}`,
+        path: url,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ ipcMain.handle('api-put', async (_event, url: string, data: any, token?: string)
       const options = {
         hostname: 'garage-backend.onrender.com',
         port: 443,
-        path: `/api/v1${url}`,
+        path: url,
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -188,7 +188,7 @@ ipcMain.handle('api-delete', async (_event, url: string, token?: string) => {
       const options = {
         hostname: 'garage-backend.onrender.com',
         port: 443,
-        path: `/api/v1${url}`,
+        path: url,
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -223,7 +223,7 @@ ipcMain.handle('login', async (_event, credentials: { email: string; password: s
       const options = {
         hostname: 'garage-backend.onrender.com',
         port: 443,
-        path: '/api/v1/auth/login',
+        path: '/auth/login',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

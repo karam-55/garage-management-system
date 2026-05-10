@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { MechanicsService } from './mechanics.service';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
 @ApiTags('Mechanics')
 @Controller('mechanics')
@@ -8,42 +9,42 @@ export class MechanicsController {
   constructor(private readonly mechanicsService: MechanicsService) {}
 
   @Get()
-  @UseGuards()
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async findAll() {
     return this.mechanicsService.findAll();
   }
 
   @Get('available')
-  @UseGuards()
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async findAvailable() {
     return this.mechanicsService.findAvailable();
   }
 
   @Get(':id')
-  @UseGuards()
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async findOne(@Param('id') id: string) {
     return this.mechanicsService.findOne(id);
   }
 
   @Post()
-  @UseGuards()
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async create(@Body() createMechanicDto: any) {
     return this.mechanicsService.create(createMechanicDto);
   }
 
   @Put(':id')
-  @UseGuards()
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async update(@Param('id') id: string, @Body() updateMechanicDto: any) {
     return this.mechanicsService.update(id, updateMechanicDto);
   }
 
   @Delete(':id')
-  @UseGuards()
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async remove(@Param('id') id: string) {
     return this.mechanicsService.remove(id);

@@ -22,4 +22,8 @@ export class RegisterDto {
   @IsString()
   @IsOptional()
   role?: string;
+
+  @IsString()
+  @IsOptional()
+  garageId?: string;
 }
