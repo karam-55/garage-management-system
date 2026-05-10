@@ -15,7 +15,6 @@ export class MechanicsService {
       },
       select: {
         id: true,
-        email: true,
         fullName: true,
         phone: true,
         role: true,
@@ -40,7 +39,6 @@ export class MechanicsService {
       },
       select: {
         id: true,
-        email: true,
         fullName: true,
         phone: true,
         role: true,
@@ -57,7 +55,6 @@ export class MechanicsService {
       where: { id },
       select: {
         id: true,
-        email: true,
         fullName: true,
         phone: true,
         role: true,
@@ -92,7 +89,6 @@ export class MechanicsService {
       },
       select: {
         id: true,
-        email: true,
         fullName: true,
         phone: true,
         role: true,

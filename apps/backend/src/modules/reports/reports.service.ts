@@ -284,7 +284,6 @@ export class ReportsService {
     const customerStats = customers.map((customer) => ({
       id: customer.id,
       name: customer.fullName,
-      email: customer.email,
       phone: customer.phone,
       totalBookings: customer.totalBookings,
       loyaltyPoints: customer.loyaltyPoints,

@@ -1,21 +1,17 @@
-import { IsString, IsNotEmpty, IsOptional, IsUUID, IsEmail, IsPhoneNumber, IsIn, IsDateString, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsUUID, IsPhoneNumber, IsIn, IsDateString, Min } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   full_name: string;
 
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
   @IsString()
   @IsNotEmpty()
   password: string;
 
-  @IsPhoneNumber('SA')
-  @IsOptional()
-  phone?: string;
+  @IsString()
+  @IsNotEmpty()
+  phone: string;
 
   @IsIn(['ADMIN', 'GARAGE_OWNER', 'GARAGE_MANAGER', 'MECHANIC', 'RECEPTIONIST', 'CASHIER', 'CUSTOMER', 'INVENTORY_MANAGER'])
   role: 'ADMIN' | 'GARAGE_OWNER' | 'GARAGE_MANAGER' | 'MECHANIC' | 'RECEPTIONIST' | 'CASHIER' | 'CUSTOMER' | 'INVENTORY_MANAGER';
@@ -57,10 +53,6 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   full_name?: string;
-
-  @IsEmail()
-  @IsOptional()
-  email?: string;
 
   @IsPhoneNumber('SA')
   @IsOptional()
