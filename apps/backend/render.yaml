@@ -27,6 +27,8 @@ services:
         value: https://garage-management-system.pages.dev
       - key: WHATSAPP_API_KEY
         value: ""
+      - key: WHATSAPP_API_URL
+        value: "https://graph.facebook.com/v18.0"
       - key: WHATSAPP_PHONE_NUMBER_ID
         value: ""
       - key: SMTP_HOST
