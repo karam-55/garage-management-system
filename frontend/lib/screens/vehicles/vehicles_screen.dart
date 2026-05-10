@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../models/vehicle.dart';
 import '../../state/vehicle_provider.dart';
+import '../../utils/api_config.dart';
 
 class VehiclesScreen extends ConsumerStatefulWidget {
   const VehiclesScreen({super.key});
@@ -54,17 +56,19 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                           Text('نوع الوقود: ${vehicle.fuelType}'),
                           if (vehicle.notes != null) Text('ملاحظات: ${vehicle.notes}'),
                           const SizedBox(height: 16),
-                          Center(
-                            child: QrImageView(
-                              data: vehicle.id,
-                              version: QrVersions.auto,
-                              size: 150.0,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  _showQRDialog(context, vehicle);
+                                },
+                                icon: const Icon(Icons.qr_code),
+                                label: const Text('QR تتبع'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                ),
+                              ),
                               ElevatedButton.icon(
                                 onPressed: () {
                                   _showEditDialog(context, vehicle);
@@ -264,6 +268,55 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
               }
             },
             child: const Text('حفظ'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showQRDialog(BuildContext context, Vehicle vehicle) {
+    final trackingUrl = 'https://garage-management.pages.dev/track/${vehicle.id}';
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('QR Code - تتبع السيارة'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${vehicle.model} - ${vehicle.plateNumber}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              QrImageView(
+                data: trackingUrl,
+                version: QrVersions.auto,
+                size: 250.0,
+              ),
+              const SizedBox(height: 16),
+              SelectableText(
+                trackingUrl,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إغلاق'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: trackingUrl));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('تم نسخ الرابط!')),
+              );
+            },
+            icon: const Icon(Icons.copy),
+            label: const Text('نسخ الرابط'),
           ),
         ],
       ),
