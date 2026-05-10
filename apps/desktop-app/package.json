@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Garage Management System - Desktop App",
   "main": "out/main/index.js",
+  "packageManager": "pnpm@8.15.0",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",

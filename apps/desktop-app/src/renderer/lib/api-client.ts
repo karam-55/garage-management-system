@@ -10,24 +10,38 @@ const apiClient = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token and log requests
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    console.log('[API Request]', config.method?.toUpperCase(), config.url);
     return config;
   },
   (error) => {
+    console.error('[API Request Error]', error);
     return Promise.reject(error);
   }
 );
 
-// Response interceptor to handle errors
+// Response interceptor to handle errors and log responses
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('[API Response]', response.status, response.config.url);
+    return response;
+  },
   async (error) => {
+    console.error('[API Response Error]', error);
+    console.error('[API Error Details]', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+    });
+    
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;

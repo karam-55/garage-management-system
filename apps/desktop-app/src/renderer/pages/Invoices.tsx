@@ -31,8 +31,8 @@ const Invoices: React.FC = () => {
       const res = await apiClient.get('/invoices');
       const data = res.data?.data || res.data || [];
       setInvoices(Array.isArray(data) ? data.map((inv: any) => ({
-        id: inv.invoiceNumber || inv.id,
-        customer: inv.customer?.fullName || 'عميل',
+        id: inv.id,
+        customer: inv.customer?.fullName || inv.customerId || 'عميل',
         amount: Number(inv.totalAmount || 0).toFixed(2),
         status: inv.status,
         date: inv.createdAt ? new Date(inv.createdAt).toLocaleDateString('ar-SA') : '',

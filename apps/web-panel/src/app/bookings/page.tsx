@@ -34,7 +34,14 @@ export default function BookingsPage() {
     try {
       const { default: apiClient } = await import('@/lib/api-client');
       const response = await apiClient.get('/bookings');
-      setBookings(response.data || []);
+      const data = (response.data || []).map((b: any) => ({
+        ...b,
+        customer: b.customer || { fullName: '', phone: '' },
+        vehicle: b.vehicle || { make: '', model: '', plate: '' },
+        service: b.service || { name: '-' },
+        assignedMechanic: b.assignedMechanic || null,
+      }));
+      setBookings(data);
     } catch (error) {
       console.error('Error fetching bookings:', error);
       setBookings([]);
@@ -70,10 +77,14 @@ export default function BookingsPage() {
   };
 
   const filteredBookings = bookings.filter(booking => {
+    const searchLower = searchTerm.toLowerCase();
+    const customerName = booking.customer?.fullName || '';
+    const vehiclePlate = booking.vehicle?.plate || '';
+    const bookingId = booking.id || '';
     const matchesSearch = 
-      booking.customer.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.vehicle.plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.bookingNumber.toLowerCase().includes(searchTerm.toLowerCase());
+      customerName.toLowerCase().includes(searchLower) ||
+      vehiclePlate.toLowerCase().includes(searchLower) ||
+      bookingId.toLowerCase().includes(searchLower);
     const matchesStatus = !statusFilter || booking.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -177,7 +188,7 @@ export default function BookingsPage() {
                   {filteredBookings.map((booking) => (
                     <tr key={booking.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="font-semibold text-gray-900">{booking.bookingNumber}</span>
+                        <span className="font-semibold text-gray-900">{booking.id?.substring(0, 8) || '-'}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
@@ -185,8 +196,8 @@ export default function BookingsPage() {
                             <User className="w-4 h-4 text-blue-600" />
                           </div>
                           <div>
-                            <p className="font-medium text-gray-900">{booking.customer.fullName}</p>
-                            <p className="text-xs text-gray-500">{booking.customer.phone}</p>
+                            <p className="font-medium text-gray-900">{booking.customer?.fullName || '-'}</p>
+                            <p className="text-xs text-gray-500">{booking.customer?.phone || '-'}</p>
                           </div>
                         </div>
                       </td>
@@ -194,8 +205,8 @@ export default function BookingsPage() {
                         <div className="flex items-center gap-2">
                           <Car className="w-4 h-4 text-gray-400" />
                           <div>
-                            <p className="font-medium text-gray-900">{booking.vehicle.make} {booking.vehicle.model}</p>
-                            <p className="text-xs text-gray-500">{booking.vehicle.plate}</p>
+                            <p className="font-medium text-gray-900">{booking.vehicle?.make || ''} {booking.vehicle?.model || ''}</p>
+                            <p className="text-xs text-gray-500">{booking.vehicle?.plate || '-'}</p>
                           </div>
                         </div>
                       </td>

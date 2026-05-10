@@ -31,10 +31,10 @@ const Customers: React.FC = () => {
       const data = res.data?.data || res.data || [];
       setCustomers(Array.isArray(data) ? data.map((c: any) => ({
         id: c.id,
-        name: c.fullName || c.user?.fullName || 'عميل',
-        phone: c.phone || c.user?.phone || '',
-        email: c.email || c.user?.email || '',
-        vehicles: c.vehicles?.length || c._count?.vehicles || 0,
+        name: c.fullName || 'عميل',
+        phone: c.phone || '',
+        email: c.email || '',
+        vehicles: 0, // TODO: Fetch actual vehicle count
       })) : []);
     } catch (error) {
       console.error('Error fetching customers:', error);
@@ -74,10 +74,13 @@ const Customers: React.FC = () => {
     if (!confirm('هل أنت متأكد من حذف هذا العميل؟')) return;
     try {
       await apiClient.delete(`/customers/${id}`);
-      fetchCustomers();
-    } catch (error) {
+      // Update local state immediately
+      setCustomers(prev => prev.filter(c => c.id !== id));
+      // Then refresh from server
+      await fetchCustomers();
+    } catch (error: any) {
       console.error('Error deleting customer:', error);
-      alert('فشل حذف العميل');
+      alert(`فشل حذف العميل: ${error.response?.data?.message || error.message}`);
     }
   };
 
@@ -90,8 +93,17 @@ const Customers: React.FC = () => {
             <Button onClick={() => setIsModalOpen(true)}>عميل جديد</Button>
           </div>
 
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-500">جاري التحميل...</p>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {customers.map((customer) => (
+            {customers.length === 0 ? (
+              <p className="text-center text-gray-500 py-8 col-span-full">لا يوجد عملاء</p>
+            ) : (
+            customers.map((customer) => (
               <div key={customer.id} className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
@@ -111,8 +123,10 @@ const Customers: React.FC = () => {
                   <Button variant="outline" size="sm" onClick={() => handleDeleteCustomer(customer.id)} className="flex-1">حذف</Button>
                 </div>
               </div>
-            ))}
+            ))
+            )}
           </div>
+          )}
         </div>
       </Card>
 

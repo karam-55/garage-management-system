@@ -26,51 +26,20 @@ export default function VehiclesPage() {
   const fetchVehicles = async () => {
     setLoading(true);
     try {
-      // Fetch vehicles from backend
-      // const response = await apiClient.get('/vehicles');
-      // setVehicles(response.data);
-      
-      // Mock data for now
-      setVehicles([
-        {
-          id: '1',
-          make: 'Toyota',
-          model: 'Camry',
-          year: 2022,
-          plate: 'ABC1234',
-          vin: 'JTDKN3DU5A0123456',
-          color: 'أبيض',
-          customer: { fullName: 'أحمد محمد' },
-          totalBookings: 3,
-          createdAt: '2024-01-10T00:00:00Z',
-        },
-        {
-          id: '2',
-          make: 'Honda',
-          model: 'Accord',
-          year: 2021,
-          plate: 'XYZ5678',
-          vin: '1HGCV1F31KA0123456',
-          color: 'أسود',
-          customer: { fullName: 'خالد علي' },
-          totalBookings: 5,
-          createdAt: '2024-01-12T00:00:00Z',
-        },
-        {
-          id: '3',
-          make: 'BMW',
-          model: 'X5',
-          year: 2023,
-          plate: 'DEF9012',
-          vin: 'WBAJA0C50KA0123456',
-          color: 'رمادي',
-          customer: { fullName: 'سعيد أحمد' },
-          totalBookings: 2,
-          createdAt: '2024-01-08T00:00:00Z',
-        },
-      ]);
+      const { default: apiClient } = await import('@/lib/api-client');
+      const response = await apiClient.get('/vehicles');
+      const data = (response.data || []).map((v: any) => ({
+        ...v,
+        make: v.make || '',
+        model: v.model || '',
+        plate: v.plate || v.licensePlate || '',
+        customer: v.customer || { fullName: '' },
+        totalBookings: v.totalBookings || 0,
+      }));
+      setVehicles(data);
     } catch (error) {
       console.error('Error fetching vehicles:', error);
+      setVehicles([]);
     } finally {
       setLoading(false);
     }

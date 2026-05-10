@@ -38,10 +38,30 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, currentPage = 'dashboar
   const fetchNotifications = async () => {
     try {
       const res = await apiClient.get('/notifications');
-      const data = res.data?.data || res.data || [];
-      setNotifications(Array.isArray(data) ? data.slice(0, 5) : []);
+      const responseData = res.data;
+      // Handle different response structures
+      const data = Array.isArray(responseData) 
+        ? responseData 
+        : responseData?.data || responseData?.items || [];
+      
+      if (Array.isArray(data)) {
+        setNotifications(data
+          .filter((n: any) => n && n.id) // Filter out null/invalid notifications
+          .slice(0, 5)
+          .map((n: any) => ({
+            id: n.id,
+            title: n.title || 'إشعار',
+            message: n.message || '',
+            read: n.status === 'READ' || n.isRead || false,
+            createdAt: n.createdAt,
+          }))
+        );
+      } else {
+        setNotifications([]);
+      }
     } catch (error) {
       console.error('Error fetching notifications:', error);
+      setNotifications([]);
     }
   };
 

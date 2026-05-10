@@ -34,9 +34,9 @@ const Bookings: React.FC = () => {
       const data = res.data?.data || res.data || [];
       setBookings(Array.isArray(data) ? data.map((b: any) => ({
         id: b.id,
-        customer: b.customer?.fullName || 'عميل',
-        vehicle: b.vehicle ? `${b.vehicle.make} ${b.vehicle.model}` : 'سيارة',
-        service: b.service?.name || '',
+        customer: b.customer?.fullName || b.customerId || 'عميل',
+        vehicle: b.vehicle ? `${b.vehicle.make} ${b.vehicle.model}` : b.vehicleId || 'سيارة',
+        service: b.service?.name || b.serviceId || '',
         status: b.status,
         date: b.scheduledAt ? new Date(b.scheduledAt).toLocaleDateString('ar-SA') : '',
       })) : []);
@@ -80,8 +80,10 @@ const Bookings: React.FC = () => {
       console.log('[API] Deleting booking:', id);
       await apiClient.delete(`/bookings/${id}`);
       console.log('[API] Booking deleted successfully');
-      fetchBookings();
-      alert('تم حذف الحجز بنجاح');
+      // Update local state immediately
+      setBookings(prev => prev.filter(b => b.id !== id));
+      // Then refresh from server
+      await fetchBookings();
     } catch (error: any) {
       console.error('[API] Error deleting booking:', error);
       console.error('[API] Response:', error.response?.data);

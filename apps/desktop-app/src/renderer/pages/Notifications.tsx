@@ -4,9 +4,18 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import apiClient from '../lib/api-client';
 
+interface NotificationItem {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  read: boolean;
+  time: string;
+}
+
 const Notifications: React.FC = () => {
   const [loading, setLoading] = useState(true);
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
@@ -24,7 +33,7 @@ const Notifications: React.FC = () => {
         type: n.type || 'info',
         title: n.title || 'إشعار',
         message: n.message || '',
-        read: n.read || false,
+        read: n.status === 'READ' || n.isRead || false,
         time: n.createdAt ? new Date(n.createdAt).toLocaleDateString('ar-SA') : 'الآن',
       })) : []);
     } catch (error) {
@@ -59,7 +68,7 @@ const Notifications: React.FC = () => {
     try {
       console.log('[API] Marking notification as read:', id);
       await apiClient.put(`/notifications/${id}/read`);
-      setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
     } catch (error) {
       console.error('[API] Error marking notification as read:', error);
     }
@@ -69,19 +78,25 @@ const Notifications: React.FC = () => {
     try {
       console.log('[API] Marking all notifications as read');
       await apiClient.put('/notifications/mark-all-read');
-      setNotifications(notifications.map(n => ({ ...n, read: true })));
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     } catch (error) {
       console.error('[API] Error marking all notifications as read:', error);
     }
   };
 
   const deleteNotification = async (id: string) => {
+    if (!confirm('هل أنت متأكد من حذف هذا الإشعار؟')) return;
+    
     try {
       console.log('[API] Deleting notification:', id);
       await apiClient.delete(`/notifications/${id}`);
       console.log('[API] Notification deleted successfully');
-      setNotifications(notifications.filter(n => n.id !== id));
-      alert('تم حذف الإشعار بنجاح');
+      
+      // Remove from local state immediately for instant feedback
+      setNotifications(prev => prev.filter(n => n.id !== id));
+      
+      // Then refresh from server to confirm
+      await fetchNotifications();
     } catch (error: any) {
       console.error('[API] Error deleting notification:', error);
       console.error('[API] Response:', error.response?.data);
@@ -119,33 +134,44 @@ const Notifications: React.FC = () => {
             </Button>
           </div>
 
-          <div className="space-y-3">
-            {filteredNotifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`flex items-start gap-4 p-4 rounded-xl border-l-4 ${getColor(notification.type)} ${!notification.read ? 'shadow-md' : 'opacity-75'}`}
-              >
-                <span className="text-2xl">{getIcon(notification.type)}</span>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-gray-900">{notification.title}</h4>
-                    <span className="text-xs text-gray-500">{notification.time}</span>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-500">جاري التحميل...</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredNotifications.length === 0 ? (
+                <p className="text-center text-gray-500 py-8">لا توجد إشعارات</p>
+              ) : (
+                filteredNotifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    className={`flex items-start gap-4 p-4 rounded-xl border-l-4 ${getColor(notification.type)} ${!notification.read ? 'shadow-md' : 'opacity-75'}`}
+                  >
+                    <span className="text-2xl">{getIcon(notification.type)}</span>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold text-gray-900">{notification.title}</h4>
+                        <span className="text-xs text-gray-500">{notification.time}</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      {!notification.read && (
+                        <Button variant="outline" size="sm" onClick={() => markAsRead(notification.id)}>
+                          قراءة
+                        </Button>
+                      )}
+                      <Button variant="danger" size="sm" onClick={() => deleteNotification(notification.id)}>
+                        حذف
+                      </Button>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                </div>
-                <div className="flex gap-2">
-                  {!notification.read && (
-                    <Button variant="outline" size="sm" onClick={() => markAsRead(notification.id)}>
-                      قراءة
-                    </Button>
-                  )}
-                  <Button variant="danger" size="sm" onClick={() => deleteNotification(notification.id)}>
-                    حذف
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
       </Card>
     </AppLayout>

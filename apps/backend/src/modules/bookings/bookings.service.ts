@@ -7,7 +7,7 @@ export class BookingsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(filters?: { customerId?: string; garageId?: string; status?: string; mechanicId?: string }) {
-    const where: any = {};
+    const where: any = { deletedAt: null };
     if (filters?.customerId) where.customerId = filters.customerId;
     if (filters?.garageId) where.garageId = filters.garageId;
     if (filters?.status) where.status = filters.status;
@@ -51,19 +51,16 @@ export class BookingsService {
   async create(createBookingDto: any, userId?: string) {
     const { serviceId, additionalServices, vehicleId, customerId, garageId, estimatedDurationMinutes, scheduledAt, notes, assignedMechanicId, pickupAddress, dropoffAddress } = createBookingDto;
 
-    // Find Customer record by User ID
+    // Validate customer exists directly by customerId
     let finalCustomerId = customerId;
     if (customerId) {
-      const user = await this.prisma.user.findUnique({
+      const customer = await this.prisma.customer.findUnique({
         where: { id: customerId },
       });
-      if (user && user.role === 'CUSTOMER') {
-        const customer = await this.prisma.customer.findUnique({
-          where: { phone: user.phone },
-        });
-        if (customer) {
-          finalCustomerId = customer.id;
-        }
+      if (customer) {
+        finalCustomerId = customer.id;
+      } else {
+        throw new NotFoundException('Customer not found');
       }
     }
 

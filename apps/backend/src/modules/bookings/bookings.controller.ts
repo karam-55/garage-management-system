@@ -20,6 +20,13 @@ export class BookingsController {
     return this.bookingsService.findAll(filters);
   }
 
+  @Get('statistics')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async getStatistics(@Req() req: any) {
+    return this.bookingsService.getStatistics(req.user.garageId);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

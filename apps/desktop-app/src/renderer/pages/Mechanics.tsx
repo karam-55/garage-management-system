@@ -34,8 +34,8 @@ const Mechanics: React.FC = () => {
       const data = res.data?.data || res.data || [];
       setMechanics(Array.isArray(data) ? data.map((m: any) => ({
         id: m.id,
-        name: m.user?.fullName || m.fullName || 'فني',
-        phone: m.user?.phone || m.phone || '',
+        name: m.fullName || 'فني',
+        phone: m.phone || '',
         status: m.isActive ? 'ACTIVE' : 'INACTIVE',
         rating: m.rating || 0,
         specializations: m.specializations || [],
@@ -80,8 +80,10 @@ const Mechanics: React.FC = () => {
       console.log('[API] Deleting mechanic:', id);
       await apiClient.delete(`/mechanics/${id}`);
       console.log('[API] Mechanic deleted successfully');
-      fetchMechanics();
-      alert('تم حذف الفني بنجاح');
+      // Update local state immediately
+      setMechanics(prev => prev.filter(m => m.id !== id));
+      // Then refresh from server
+      await fetchMechanics();
     } catch (error: any) {
       console.error('[API] Error deleting mechanic:', error);
       console.error('[API] Response:', error.response?.data);
@@ -124,8 +126,17 @@ const Mechanics: React.FC = () => {
             <Button onClick={() => setIsModalOpen(true)}>فني جديد</Button>
           </div>
 
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-500">جاري التحميل...</p>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mechanics.map((mechanic) => (
+            {mechanics.length === 0 ? (
+              <p className="text-center text-gray-500 py-8 col-span-full">لا يوجد فنيين</p>
+            ) : (
+            mechanics.map((mechanic) => (
               <div key={mechanic.id} className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
@@ -156,8 +167,10 @@ const Mechanics: React.FC = () => {
                   <Button variant="outline" size="sm" onClick={() => handleDeleteMechanic(mechanic.id)} className="flex-1">حذف</Button>
                 </div>
               </div>
-            ))}
+            ))
+            )}
           </div>
+          )}
         </div>
       </Card>
 

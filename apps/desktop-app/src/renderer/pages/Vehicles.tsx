@@ -35,11 +35,11 @@ const Vehicles: React.FC = () => {
       const data = res.data?.data || res.data || [];
       setVehicles(Array.isArray(data) ? data.map((v: any) => ({
         id: v.id,
-        plate: v.licensePlate || '',
+        plate: v.plate || v.licensePlate || '',
         brand: v.make || '',
         model: v.model || '',
         year: v.year || '',
-        customer: v.owner?.fullName || v.customer?.fullName || '',
+        customer: v.customer?.fullName || v.customerId || '',
       })) : []);
     } catch (error) {
       console.error('Error fetching vehicles:', error);
@@ -83,8 +83,10 @@ const Vehicles: React.FC = () => {
       console.log('[API] Deleting vehicle:', id);
       await apiClient.delete(`/vehicles/${id}`);
       console.log('[API] Vehicle deleted successfully');
-      fetchVehicles();
-      alert('تم حذف السيارة بنجاح');
+      // Update local state immediately
+      setVehicles(prev => prev.filter(v => v.id !== id));
+      // Then refresh from server
+      await fetchVehicles();
     } catch (error: any) {
       console.error('[API] Error deleting vehicle:', error);
       console.error('[API] Response:', error.response?.data);
@@ -112,8 +114,17 @@ const Vehicles: React.FC = () => {
             <Button onClick={() => setIsModalOpen(true)}>سيارة جديدة</Button>
           </div>
 
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-500">جاري التحميل...</p>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {vehicles.map((vehicle) => (
+            {vehicles.length === 0 ? (
+              <p className="text-center text-gray-500 py-8 col-span-full">لا توجد سيارات</p>
+            ) : (
+            vehicles.map((vehicle) => (
               <div key={vehicle.id} className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-4xl">🚗</span>
@@ -127,8 +138,10 @@ const Vehicles: React.FC = () => {
                   <Button variant="outline" size="sm" onClick={() => handleDeleteVehicle(vehicle.id)} className="flex-1">حذف</Button>
                 </div>
               </div>
-            ))}
+            ))
+            )}
           </div>
+          )}
         </div>
       </Card>
 

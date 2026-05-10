@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { InventoryService } from './inventory.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -47,8 +47,8 @@ export class InventoryController {
   @Post(':id/request')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async requestPart(@Param('id') id: string, @Body() requestDto: any) {
-    return this.inventoryService.requestPart(id, requestDto);
+  async requestPart(@Req() req: any, @Param('id') id: string, @Body() requestDto: any) {
+    return this.inventoryService.requestPart({ ...requestDto, partId: id }, req.user.id);
   }
 
   @Put(':id')

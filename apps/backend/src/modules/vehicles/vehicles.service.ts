@@ -5,8 +5,16 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class VehiclesService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.vehicle.findMany();
+  async findAll(garageId?: string) {
+    const where: any = {};
+    if (garageId) where.garageId = garageId;
+    return this.prisma.vehicle.findMany({
+      where,
+      include: {
+        customer: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   async findOne(id: string) {
@@ -27,21 +35,13 @@ export class VehiclesService {
   async create(createVehicleDto: any) {
     const { licensePlate, year, customerId, make, model, vin, color, mileage, fuelType, transmission, engineSize, bodyType, notes } = createVehicleDto;
 
-    // Validate customer exists - find by phone from User and get corresponding Customer record
-    const user = await this.prisma.user.findUnique({
-      where: { id: customerId },
-    });
-    if (!user || user.role !== 'CUSTOMER') {
-      throw new NotFoundException('Customer not found');
-    }
-
-    // Find Customer record by phone
+    // Validate customer exists directly by customerId
     const customer = await this.prisma.customer.findUnique({
-      where: { phone: user.phone },
+      where: { id: customerId },
     });
 
     if (!customer) {
-      throw new NotFoundException('Customer record not found');
+      throw new NotFoundException('Customer not found');
     }
 
     return this.prisma.vehicle.create({

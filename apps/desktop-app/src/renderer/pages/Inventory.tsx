@@ -33,10 +33,10 @@ const Inventory: React.FC = () => {
       setInventory(Array.isArray(data) ? data.map((item: any) => ({
         id: item.id,
         name: item.name || '',
-        sku: item.sku || '',
+        sku: item.partNumber || item.sku || '',
         quantity: item.quantity || 0,
-        reorderPoint: item.reorderPoint || item.minQuantity || 0,
-        price: Number(item.unitPrice || item.price || 0).toFixed(2),
+        reorderPoint: item.reorderPoint || item.minStockLevel || 0,
+        price: Number(item.sellingPrice || item.unitPrice || item.price || 0).toFixed(2),
       })) : []);
     } catch (error) {
       console.error('Error fetching inventory:', error);
@@ -78,8 +78,10 @@ const Inventory: React.FC = () => {
       console.log('[API] Deleting inventory item:', id);
       await apiClient.delete(`/inventory/${id}`);
       console.log('[API] Inventory item deleted successfully');
-      fetchInventory();
-      alert('تم حذف العنصر بنجاح');
+      // Update local state immediately
+      setInventory(prev => prev.filter(item => item.id !== id));
+      // Then refresh from server
+      await fetchInventory();
     } catch (error: any) {
       console.error('[API] Error deleting inventory item:', error);
       console.error('[API] Response:', error.response?.data);
@@ -102,14 +104,23 @@ const Inventory: React.FC = () => {
     {
       key: 'status',
       title: 'الحالة',
-      render: (value: any, row: any) => {
-        const status = getStockStatus(row.quantity, row.reorderPoint);
+      render: (_value: any, row: any) => {
+        const status = getStockStatus(Number(row.quantity), Number(row.reorderPoint));
         return (
           <span className={`px-3 py-1 rounded-full text-xs font-medium ${status.bg} ${status.color}`}>
             {status.text}
           </span>
         );
       },
+    },
+    {
+      key: 'actions',
+      title: 'إجراءات',
+      render: (_value: any, row: any) => (
+        <Button variant="outline" size="sm" onClick={() => handleDeleteInventory(row.id)}>
+          حذف
+        </Button>
+      ),
     },
   ];
 

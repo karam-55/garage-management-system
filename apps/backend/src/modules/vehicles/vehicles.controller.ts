@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { VehiclesService } from './vehicles.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -12,8 +12,8 @@ export class VehiclesController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async findAll() {
-    return this.vehiclesService.findAll();
+  async findAll(@Request() req) {
+    return this.vehiclesService.findAll(req.user?.garageId);
   }
 
   @Get(':id')
