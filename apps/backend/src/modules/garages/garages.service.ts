@@ -10,7 +10,7 @@ export class GaragesService {
       where: { deletedAt: null },
       include: {
         owner: {
-          select: { id: true, email: true, fullName: true, phone: true, role: true },
+          select: { id: true, fullName: true, phone: true, role: true },
         },
         services: true,
       },
@@ -22,7 +22,7 @@ export class GaragesService {
       where: { id },
       include: {
         owner: {
-          select: { id: true, email: true, fullName: true, phone: true, role: true },
+          select: { id: true, fullName: true, phone: true, role: true },
         },
         services: true,
       },

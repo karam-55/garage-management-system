@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsIn, IsEmail, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsIn, IsBoolean } from 'class-validator';
 
 export class CreateMechanicDto {
   @IsString()
@@ -8,10 +8,6 @@ export class CreateMechanicDto {
   @IsString()
   @IsNotEmpty()
   phone: string;
-
-  @IsEmail()
-  @IsOptional()
-  email?: string;
 
   @IsString()
   @IsOptional()
@@ -34,10 +30,6 @@ export class UpdateMechanicDto {
   @IsString()
   @IsOptional()
   phone?: string;
-
-  @IsEmail()
-  @IsOptional()
-  email?: string;
 
   @IsString()
   @IsOptional()

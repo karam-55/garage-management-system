@@ -3,7 +3,6 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 const USER_SAFE_SELECT = {
   id: true,
-  email: true,
   fullName: true,
   phone: true,
   role: true,

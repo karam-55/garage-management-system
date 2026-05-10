@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsUUID, IsNumber, IsBoolean, IsLatitude, IsLongitude, IsEmail } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsUUID, IsNumber, IsBoolean, IsLatitude, IsLongitude } from 'class-validator';
 
 export class CreateGarageDto {
   @IsUUID()
@@ -35,10 +35,6 @@ export class CreateGarageDto {
   @IsString()
   @IsNotEmpty()
   phone: string;
-
-  @IsEmail()
-  @IsOptional()
-  email?: string;
 
   @IsString()
   @IsOptional()
@@ -89,10 +85,6 @@ export class UpdateGarageDto {
   @IsString()
   @IsOptional()
   phone?: string;
-
-  @IsEmail()
-  @IsOptional()
-  email?: string;
 
   @IsString()
   @IsOptional()

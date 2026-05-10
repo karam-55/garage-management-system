@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
-const USER_SAFE_SELECT = { id: true, email: true, fullName: true, phone: true, role: true };
+const USER_SAFE_SELECT = { id: true, fullName: true, phone: true, role: true };
 
 @Injectable()
 export class InvoicesService {

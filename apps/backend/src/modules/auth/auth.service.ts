@@ -185,7 +185,7 @@ export class AuthService {
 
       const access_token = this.jwtService.sign({
         sub: payload.sub,
-        email: payload.email,
+        phone: payload.phone,
         role: payload.role,
         garageId: payload.garageId,
       }, {
@@ -276,19 +276,19 @@ export class AuthService {
     return { message: 'Password changed successfully' };
   }
 
-  async forgotPassword(email: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
+  async forgotPassword(phone: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { phone },
     });
 
     if (!user) {
-      // Don't reveal if email exists or not
-      return { message: 'If the email exists, a password reset link will be sent' };
+      // Don't reveal if phone exists or not
+      return { message: 'If the phone exists, a password reset link will be sent' };
     }
 
-    // Generate reset token (in production, send email with reset link)
+    // Generate reset token (in production, send SMS with reset link)
     const resetToken = this.jwtService.sign(
-      { sub: user.id, email: user.email },
+      { sub: user.id, phone: user.phone },
       { expiresIn: '1h' },
     );
 
@@ -302,14 +302,14 @@ export class AuthService {
         ipAddress: '',
         userAgent: '',
         oldValues: null,
-        newValues: JSON.stringify({ email, timestamp: new Date() }),
+        newValues: JSON.stringify({ phone, timestamp: new Date() }),
       },
     }).catch(() => {});
 
-    // NOTE: In production, send resetToken via email only. Never expose in API response.
-    // TODO: Integrate with SMTP service to send email with reset link
-    // await this.emailService.sendPasswordResetEmail(user.email, resetToken);
-    return { message: 'If the email exists, a password reset link will be sent' };
+    // NOTE: In production, send resetToken via SMS only. Never expose in API response.
+    // TODO: Integrate with SMS service to send password reset SMS
+    // await this.smsService.sendPasswordResetSMS(user.phone, resetToken);
+    return { message: 'If the phone exists, a password reset link will be sent' };
   }
 
   async resetPassword(token: string, newPassword: string) {
