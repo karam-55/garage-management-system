@@ -3,12 +3,17 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+const dbUrl = process.env["DATABASE_URL"];
+if (!dbUrl) {
+  console.warn("DATABASE_URL not found in environment, using default");
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: dbUrl || "postgresql://localhost:5432/garage_db",
   },
 });
