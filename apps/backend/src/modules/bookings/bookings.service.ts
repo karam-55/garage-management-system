@@ -51,10 +51,12 @@ export class BookingsService {
   async create(createBookingDto: any, userId?: string) {
     const { serviceId, additionalServices, vehicleId, customerId, garageId, estimatedDurationMinutes, ...rest } = createBookingDto;
 
-    // Validate vehicle
-    const vehicle = await this.prisma.vehicle.findUnique({ where: { id: vehicleId } });
-    if (!vehicle) {
-      throw new NotFoundException('Vehicle not found');
+    // Validate vehicle if provided
+    if (vehicleId) {
+      const vehicle = await this.prisma.vehicle.findUnique({ where: { id: vehicleId } });
+      if (!vehicle) {
+        throw new NotFoundException('Vehicle not found');
+      }
     }
 
     // Validate service if provided
@@ -76,7 +78,7 @@ export class BookingsService {
     const booking = await this.prisma.booking.create({
       data: {
         customerId: customerId || userId,
-        vehicleId,
+        vehicleId: vehicleId || null,
         garageId: garageId || null,
         serviceId: serviceId || null,
         qrToken: uuidv4(),

@@ -113,7 +113,12 @@ export class InventoryService {
   }
 
   async create(createInventoryDto: any) {
-    const { partNumber, barcode, garageId, sku, minQuantity, unitPrice, ...rest } = createInventoryDto;
+    const { sku, minQuantity, unitPrice, garageId, ...rest } = createInventoryDto;
+
+    // Map DTO fields to Prisma schema fields
+    const partNumber = sku || rest.partNumber;
+    const minStockLevel = minQuantity !== undefined ? minQuantity : rest.minStockLevel;
+    const sellingPrice = unitPrice !== undefined ? unitPrice : rest.sellingPrice;
 
     // Check if part number already exists
     if (partNumber) {
@@ -125,23 +130,12 @@ export class InventoryService {
       }
     }
 
-    // Check if barcode already exists
-    if (barcode) {
-      const existingBarcode = await this.prisma.partsInventory.findUnique({
-        where: { barcode },
-      });
-      if (existingBarcode) {
-        throw new BadRequestException('Barcode already exists');
-      }
-    }
-
     const part = await this.prisma.partsInventory.create({
       data: {
-        partNumber: partNumber || sku,
-        barcode: barcode || sku,
+        partNumber,
         garageId,
-        minStockLevel: minQuantity || rest.minStockLevel,
-        sellingPrice: unitPrice || rest.sellingPrice,
+        minStockLevel,
+        sellingPrice,
         ...rest,
       },
     });

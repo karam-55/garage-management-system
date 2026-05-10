@@ -10,7 +10,8 @@ export class CreateBookingDto {
   garageId?: string;
 
   @IsUUID()
-  vehicleId: string;
+  @IsOptional()
+  vehicleId?: string;
 
   @IsUUID()
   @IsOptional()

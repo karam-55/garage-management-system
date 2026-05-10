@@ -25,12 +25,22 @@ export class VehiclesService {
   }
 
   async create(createVehicleDto: any) {
-    const { licensePlate, year, ...rest } = createVehicleDto;
+    const { licensePlate, year, customerId, ...rest } = createVehicleDto;
+
+    // Validate customer exists
+    const customer = await this.prisma.user.findUnique({
+      where: { id: customerId },
+    });
+    if (!customer || customer.role !== 'CUSTOMER') {
+      throw new NotFoundException('Customer not found');
+    }
+
     return this.prisma.vehicle.create({
       data: {
-        ...rest,
+        customerId,
         plate: licensePlate || rest.plate,
         year: year ? (typeof year === 'string' ? parseInt(year) : year) : null,
+        ...rest,
       },
     });
   }
