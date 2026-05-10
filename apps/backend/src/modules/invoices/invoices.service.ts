@@ -11,7 +11,10 @@ export class InvoicesService {
     const where: any = {};
     if (filters?.customerId) where.customerId = filters.customerId;
     if (filters?.garageId) where.garageId = filters.garageId;
-    if (filters?.status) where.status = filters.status;
+    if (filters?.status) {
+      const statuses = filters.status.split(',').map((s) => s.trim()).filter(Boolean);
+      where.status = statuses.length === 1 ? statuses[0] : { in: statuses };
+    }
 
     return this.prisma.invoice.findMany({
       where,
