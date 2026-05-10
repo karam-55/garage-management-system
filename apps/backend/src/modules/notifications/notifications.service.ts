@@ -107,6 +107,16 @@ export class NotificationsService {
     });
   }
 
+  async markAllAsRead(recipientId: string) {
+    return this.prisma.notificationsQueue.updateMany({
+      where: {
+        recipientId,
+        status: { notIn: ['READ', 'FAILED'] },
+      },
+      data: { status: 'READ' },
+    });
+  }
+
   async markAsFailed(id: string, errorMessage: string) {
     const notification = await this.prisma.notificationsQueue.findUnique({
       where: { id },

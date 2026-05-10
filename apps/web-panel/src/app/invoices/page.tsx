@@ -27,48 +27,12 @@ export default function InvoicesPage() {
   const fetchInvoices = async () => {
     setLoading(true);
     try {
-      // Fetch invoices from backend
-      // const response = await apiClient.get('/invoices');
-      // setInvoices(response.data);
-      
-      // Mock data for now
-      setInvoices([
-        {
-          id: '1',
-          invoiceNumber: 'INV-2024-001',
-          customer: { fullName: 'أحمد محمد' },
-          totalAmount: 500,
-          paidAmount: 0,
-          status: 'SENT',
-          dueDate: '2024-01-20T00:00:00Z',
-          issuedDate: '2024-01-15T00:00:00Z',
-          itemsCount: 3,
-        },
-        {
-          id: '2',
-          invoiceNumber: 'INV-2024-002',
-          customer: { fullName: 'خالد علي' },
-          totalAmount: 350,
-          paidAmount: 350,
-          status: 'PAID',
-          dueDate: '2024-01-18T00:00:00Z',
-          issuedDate: '2024-01-12T00:00:00Z',
-          itemsCount: 2,
-        },
-        {
-          id: '3',
-          invoiceNumber: 'INV-2024-003',
-          customer: { fullName: 'سعيد أحمد' },
-          totalAmount: 1200,
-          paidAmount: 800,
-          status: 'OVERDUE',
-          dueDate: '2024-01-10T00:00:00Z',
-          issuedDate: '2024-01-05T00:00:00Z',
-          itemsCount: 5,
-        },
-      ]);
+      const { default: apiClient } = await import('@/lib/api-client');
+      const response = await apiClient.get('/invoices');
+      setInvoices(response.data || []);
     } catch (error) {
       console.error('Error fetching invoices:', error);
+      setInvoices([]);
     } finally {
       setLoading(false);
     }

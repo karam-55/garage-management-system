@@ -70,8 +70,8 @@ export class InventoryService {
 
   async getMovements(filters?: { partId?: string; movementType?: string; garageId?: string }) {
     const where: any = {};
-    if (filters?.partId) where.partId = filters.partId;
-    if (filters?.movementType) where.movementType = filters.movementType;
+    if (filters?.partId) where.inventoryId = filters.partId;
+    if (filters?.movementType) where.type = filters.movementType;
     if (filters?.garageId) where.garageId = filters.garageId;
 
     return this.prisma.stockMovement.findMany({

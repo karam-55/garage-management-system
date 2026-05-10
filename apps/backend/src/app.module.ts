@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -16,6 +16,9 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { SettingsModule } from './modules/settings/settings.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { HealthModule } from './health/health.module';
+import { LoggingMiddleware } from './common/middlewares/logging.middleware';
+import { RateLimitMiddleware } from './common/middlewares/rate-limit.middleware';
+import { ErrorHandlingMiddleware } from './common/middlewares/error-handling.middleware';
 
 @Module({
   imports: [
@@ -40,4 +43,16 @@ import { HealthModule } from './health/health.module';
     ReportsModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggingMiddleware)
+      .forRoutes('*');
+    consumer
+      .apply(RateLimitMiddleware)
+      .forRoutes('*');
+    consumer
+      .apply(ErrorHandlingMiddleware)
+      .forRoutes('*');
+  }
+}

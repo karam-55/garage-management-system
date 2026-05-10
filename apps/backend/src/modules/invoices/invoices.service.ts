@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
+const USER_SAFE_SELECT = { id: true, email: true, fullName: true, phone: true, role: true };
+
 @Injectable()
 export class InvoicesService {
   constructor(private prisma: PrismaService) {}
@@ -15,11 +17,10 @@ export class InvoicesService {
       where,
       include: {
         booking: true,
-        customer: true,
-        garage: true,
+        customer: { select: USER_SAFE_SELECT },
+        garage: { select: { id: true, name: true } },
         items: true,
         payments: true,
-        // discount: true, // disabled until discount model is added
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -30,11 +31,10 @@ export class InvoicesService {
       where: { id },
       include: {
         booking: true,
-        customer: true,
-        garage: true,
+        customer: { select: USER_SAFE_SELECT },
+        garage: { select: { id: true, name: true } },
         items: true,
         payments: true,
-        // discount: true, // disabled until discount model is added
       },
     });
 
@@ -84,10 +84,9 @@ export class InvoicesService {
             quantity: item.quantity,
             unitPrice: item.unitPrice,
             discount: item.discount || 0,
-            // taxRateValue: item.taxRate || 0.15, // disabled
+            taxRateValue: item.taxRate || 0.15,
             taxAmount: (Number(item.quantity) * Number(item.unitPrice)) * (Number(item.taxRate) || 0.15),
             total: (Number(item.quantity) * Number(item.unitPrice)) * (1 + (Number(item.taxRate) || 0.15)),
-            // serviceId: item.serviceId, // disabled - not in schema
             partId: item.partId,
           },
         });
@@ -224,11 +223,11 @@ export class InvoicesService {
             invoiceId: invoice.id,
             description: item.description,
             quantity: item.quantity,
-            unitPrice: item.price,
+            unitPrice: item.unitPrice,
             discount: 0,
-            taxAmount: item.quantity * item.price * (item.taxRate || 0.15),
-            total: item.quantity * item.price * (1 + (item.taxRate || 0.15)),
-            // serviceId: item.serviceId, // disabled - not in schema
+            taxRateValue: item.taxRate || 0.15,
+            taxAmount: item.quantity * item.unitPrice * (item.taxRate || 0.15),
+            total: item.quantity * item.unitPrice * (1 + (item.taxRate || 0.15)),
             partId: item.partId,
           },
         });

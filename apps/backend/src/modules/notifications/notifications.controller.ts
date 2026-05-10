@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, Query } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -11,8 +11,12 @@ export class NotificationsController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async findAll() {
-    return this.notificationsService.findAll();
+  async findAll(@Req() req: any, @Query() query: any) {
+    const filters = {
+      ...query,
+      recipientId: query.recipientId || req.user.id,
+    };
+    return this.notificationsService.findAll(filters);
   }
 
   @Get('queue')
@@ -34,6 +38,13 @@ export class NotificationsController {
   @ApiBearerAuth()
   async create(@Body() createNotificationDto: any) {
     return this.notificationsService.create(createNotificationDto);
+  }
+
+  @Put('mark-all-read')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async markAllAsRead(@Req() req: any) {
+    return this.notificationsService.markAllAsRead(req.user.id);
   }
 
   @Put(':id/read')

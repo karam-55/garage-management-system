@@ -28,48 +28,23 @@ export default function MechanicsPage() {
   const fetchMechanics = async () => {
     setLoading(true);
     try {
-      // Fetch mechanics from backend
-      // const response = await apiClient.get('/mechanics');
-      // setMechanics(response.data);
-      
-      // Mock data for now
-      setMechanics([
-        {
-          id: '1',
-          fullName: 'أحمد محمد',
-          phone: '0501234567',
-          specializations: ['صيانة عامة', 'تغيير زيت'],
-          status: 'AVAILABLE',
-          rating: 4.5,
-          reviewCount: 12,
-          totalBookings: 45,
-          completedBookings: 42,
-        },
-        {
-          id: '2',
-          fullName: 'خالد عبدالله',
-          phone: '0507654321',
-          specializations: ['فحص كهرباء', 'ميكانيكا'],
-          status: 'BUSY',
-          rating: 4.8,
-          reviewCount: 8,
-          totalBookings: 38,
-          completedBookings: 35,
-        },
-        {
-          id: '3',
-          fullName: 'علي حسن',
-          phone: '0509876543',
-          specializations: ['إصلاح المحركات', 'ناقل الحركة'],
-          status: 'ON_LEAVE',
-          rating: 4.2,
-          reviewCount: 15,
-          totalBookings: 52,
-          completedBookings: 48,
-        },
-      ]);
+      const { default: apiClient } = await import('@/lib/api-client');
+      const response = await apiClient.get('/mechanics');
+      const data = (response.data || []).map((m: any) => ({
+        ...m,
+        status: m.availabilityStatus ?? m.status ?? 'AVAILABLE',
+        specializations: (m.mechanicSpecializations || []).map((s: any) => s.service?.name || s.name || ''),
+        rating: m.mechanicRatings?.length
+          ? (m.mechanicRatings.reduce((sum: number, r: any) => sum + r.rating, 0) / m.mechanicRatings.length).toFixed(1)
+          : 0,
+        reviewCount: m.mechanicRatings?.length ?? 0,
+        totalBookings: 0,
+        completedBookings: 0,
+      }));
+      setMechanics(data);
     } catch (error) {
       console.error('Error fetching mechanics:', error);
+      setMechanics([]);
     } finally {
       setLoading(false);
     }

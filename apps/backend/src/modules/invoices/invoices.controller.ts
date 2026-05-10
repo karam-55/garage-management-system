@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { InvoicesService } from './invoices.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -11,8 +11,8 @@ export class InvoicesController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async findAll() {
-    return this.invoicesService.findAll();
+  async findAll(@Request() req) {
+    return this.invoicesService.findAll({ garageId: req.user?.garageId });
   }
 
   @Get(':id')
@@ -25,8 +25,8 @@ export class InvoicesController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async create(@Body() createInvoiceDto: any) {
-    return this.invoicesService.create(createInvoiceDto);
+  async create(@Body() createInvoiceDto: any, @Request() req) {
+    return this.invoicesService.create({ ...createInvoiceDto, garageId: createInvoiceDto.garageId || req.user?.garageId });
   }
 
   @Post('from-booking')

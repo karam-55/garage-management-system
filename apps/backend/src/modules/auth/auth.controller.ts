@@ -32,7 +32,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout user' })
-  async logout(@Request() req) {
-    return this.authService.logout(req.user.id);
+  async logout(@Request() req, @Body() body: { refresh_token?: string }) {
+    return this.authService.logout(req.user.id, body.refresh_token);
   }
 }

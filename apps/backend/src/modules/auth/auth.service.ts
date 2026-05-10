@@ -32,16 +32,29 @@ export class AuthService {
       throw new UnauthorizedException('Account has been deleted');
     }
 
+    // Check account lockout
+    if (user.lockedUntil && user.lockedUntil > new Date()) {
+      const minutesLeft = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000);
+      throw new UnauthorizedException(`Account is locked. Try again in ${minutesLeft} minute(s).`);
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
+      // Increment failed attempts and lock if threshold reached
+      const newAttempts = (user.failedLoginAttempts || 0) + 1;
+      const lockData: any = { failedLoginAttempts: newAttempts };
+      if (newAttempts >= 5) {
+        lockData.lockedUntil = new Date(Date.now() + 15 * 60 * 1000);
+      }
+      await this.prisma.user.update({ where: { id: user.id }, data: lockData }).catch(() => {});
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Update last login
+    // Reset failed attempts on successful login
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { lastLoginAt: new Date() },
-    });
+      data: { failedLoginAttempts: 0, lockedUntil: null, lastLoginAt: new Date() },
+    }).catch(() => {});
 
     const payload = { sub: user.id, email: user.email, role: user.role, garageId: user.garageId };
     const access_token = this.jwtService.sign(payload, {
@@ -109,9 +122,12 @@ export class AuthService {
       },
     });
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const payload = { sub: user.id, email: user.email, role: user.role, garageId: user.garageId };
     const access_token = this.jwtService.sign(payload, {
       expiresIn: this.configService.get('JWT_EXPIRES_IN') || '1h',
+    });
+    const refresh_token = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN') || '7d',
     });
 
     // Log registration
@@ -130,6 +146,7 @@ export class AuthService {
 
     return {
       access_token,
+      refresh_token,
       user: {
         id: user.id,
         email: user.email,
@@ -285,7 +302,10 @@ export class AuthService {
       },
     }).catch(() => {});
 
-    return { message: 'If the email exists, a password reset link will be sent', resetToken };
+    // NOTE: In production, send resetToken via email only. Never expose in API response.
+    // TODO: Integrate with SMTP service to send email with reset link
+    // await this.emailService.sendPasswordResetEmail(user.email, resetToken);
+    return { message: 'If the email exists, a password reset link will be sent' };
   }
 
   async resetPassword(token: string, newPassword: string) {

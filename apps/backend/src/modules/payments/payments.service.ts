@@ -1,6 +1,14 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
+const USER_SAFE_SELECT = {
+  id: true,
+  email: true,
+  fullName: true,
+  phone: true,
+  role: true,
+};
+
 @Injectable()
 export class PaymentsService {
   constructor(private prisma: PrismaService) {}
@@ -14,10 +22,10 @@ export class PaymentsService {
     return this.prisma.payment.findMany({
       where,
       include: {
-        invoice: true,
-        customer: true,
-        garage: true,
-        processedByUser: true,
+        invoice: { select: { id: true, invoiceNumber: true, totalAmount: true, status: true } },
+        customer: { select: USER_SAFE_SELECT },
+        garage: { select: { id: true, name: true } },
+        processedByUser: { select: USER_SAFE_SELECT },
       },
       orderBy: { paymentDate: 'desc' },
     });
@@ -28,9 +36,9 @@ export class PaymentsService {
       where: { id },
       include: {
         invoice: true,
-        customer: true,
-        garage: true,
-        processedByUser: true,
+        customer: { select: USER_SAFE_SELECT },
+        garage: { select: { id: true, name: true } },
+        processedByUser: { select: USER_SAFE_SELECT },
         history: true,
       },
     });
@@ -46,9 +54,9 @@ export class PaymentsService {
     return this.prisma.payment.findMany({
       where: { invoiceId },
       include: {
-        invoice: true,
-        customer: true,
-        garage: true,
+        invoice: { select: { id: true, invoiceNumber: true, totalAmount: true, status: true } },
+        customer: { select: USER_SAFE_SELECT },
+        garage: { select: { id: true, name: true } },
       },
       orderBy: { paymentDate: 'desc' },
     });

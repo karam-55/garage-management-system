@@ -2,6 +2,17 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
+const ROLE_PERMISSIONS: Record<string, string[]> = {
+  ADMIN: ['*'],
+  GARAGE_OWNER: ['manage_garage', 'manage_users', 'view_reports', 'manage_bookings', 'manage_invoices'],
+  GARAGE_MANAGER: ['manage_bookings', 'manage_invoices', 'view_reports', 'manage_inventory'],
+  MECHANIC: ['view_assignments', 'update_work_status'],
+  RECEPTIONIST: ['create_bookings', 'view_customers', 'manage_bookings'],
+  CASHIER: ['manage_payments', 'manage_invoices'],
+  CUSTOMER: ['view_own_bookings', 'view_own_invoices', 'create_bookings'],
+  INVENTORY_MANAGER: ['manage_inventory', 'view_reports'],
+};
+
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
@@ -225,19 +236,7 @@ export class UsersService {
 
     if (!user) return false;
 
-    // Define role permissions
-    const rolePermissions: Record<string, string[]> = {
-      ADMIN: ['*'], // Admin has all permissions
-      GARAGE_OWNER: ['manage_garage', 'manage_users', 'view_reports', 'manage_bookings', 'manage_invoices'],
-      GARAGE_MANAGER: ['manage_bookings', 'manage_invoices', 'view_reports', 'manage_inventory'],
-      MECHANIC: ['view_assignments', 'update_work_status'],
-      RECEPTIONIST: ['create_bookings', 'view_customers', 'manage_bookings'],
-      CASHIER: ['manage_payments', 'manage_invoices'],
-      CUSTOMER: ['view_own_bookings', 'view_own_invoices', 'create_bookings'],
-      INVENTORY_MANAGER: ['manage_inventory', 'view_reports'],
-    };
-
-    const permissions = rolePermissions[user.role] || [];
+    const permissions = ROLE_PERMISSIONS[user.role] || [];
     return permissions.includes('*') || permissions.includes(permission);
   }
 
@@ -250,18 +249,7 @@ export class UsersService {
 
     if (!user) return [];
 
-    const rolePermissions: Record<string, string[]> = {
-      ADMIN: ['*'],
-      GARAGE_OWNER: ['manage_garage', 'manage_users', 'view_reports', 'manage_bookings', 'manage_invoices'],
-      GARAGE_MANAGER: ['manage_bookings', 'manage_invoices', 'view_reports', 'manage_inventory'],
-      MECHANIC: ['view_assignments', 'update_work_status'],
-      RECEPTIONIST: ['create_bookings', 'view_customers', 'manage_bookings'],
-      CASHIER: ['manage_payments', 'manage_invoices'],
-      CUSTOMER: ['view_own_bookings', 'view_own_invoices', 'create_bookings'],
-      INVENTORY_MANAGER: ['manage_inventory', 'view_reports'],
-    };
-
-    return rolePermissions[user.role] || [];
+    return ROLE_PERMISSIONS[user.role] || [];
   }
 
   async updateLastLogin(userId: string) {

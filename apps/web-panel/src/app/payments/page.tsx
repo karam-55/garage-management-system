@@ -22,42 +22,18 @@ export default function PaymentsPage() {
   const fetchPayments = async () => {
     setLoading(true);
     try {
-      // Fetch payments from backend
-      // const response = await apiClient.get('/payments');
-      // setPayments(response.data);
-      
-      // Mock data for now
-      setPayments([
-        {
-          id: '1',
-          invoiceNumber: 'INV-2024-001',
-          customer: { fullName: 'أحمد محمد' },
-          amount: 500,
-          method: 'CASH',
-          status: 'COMPLETED',
-          paidAt: '2024-01-15T10:30:00Z',
-        },
-        {
-          id: '2',
-          invoiceNumber: 'INV-2024-002',
-          customer: { fullName: 'خالد علي' },
-          amount: 350,
-          method: 'CARD',
-          status: 'COMPLETED',
-          paidAt: '2024-01-14T14:20:00Z',
-        },
-        {
-          id: '3',
-          invoiceNumber: 'INV-2024-003',
-          customer: { fullName: 'سعيد أحمد' },
-          amount: 800,
-          method: 'BANK_TRANSFER',
-          status: 'PENDING',
-          paidAt: null,
-        },
-      ]);
+      const { default: apiClient } = await import('@/lib/api-client');
+      const response = await apiClient.get('/payments');
+      const data = (response.data || []).map((p: any) => ({
+        ...p,
+        invoiceNumber: p.invoice?.invoiceNumber ?? p.invoiceId ?? '-',
+        method: p.paymentMethod ?? p.method ?? 'CASH',
+        paidAt: p.paymentDate ?? p.paidAt ?? null,
+      }));
+      setPayments(data);
     } catch (error) {
       console.error('Error fetching payments:', error);
+      setPayments([]);
     } finally {
       setLoading(false);
     }

@@ -6,18 +6,19 @@ export class SettingsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(garageId?: string) {
-    const where = garageId ? { id: garageId } : {};
+    const garageWhere = garageId ? { id: garageId } : {};
+    const relatedWhere = garageId ? { garageId } : {};
 
     const garageSettings = await this.prisma.garage.findFirst({
-      where,
+      where: garageWhere,
     });
 
     const taxRates = await this.prisma.taxRate.findMany({
-      where,
+      where: relatedWhere,
     });
 
     const cancellationPolicies = await this.prisma.cancellationPolicy.findMany({
-      where,
+      where: relatedWhere,
     });
 
     return {

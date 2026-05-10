@@ -26,59 +26,21 @@ export default function InventoryPage() {
   const fetchInventory = async () => {
     setLoading(true);
     try {
-      // Fetch inventory from backend
-      // const response = await apiClient.get('/inventory');
-      // setInventory(response.data);
-      
-      // Mock data for now
-      setInventory([
-        {
-          id: '1',
-          name: 'زيت محرك Toyota',
-          partNumber: 'TOY-001',
-          quantity: 50,
-          reorderPoint: 10,
-          price: 150,
-          status: 'IN_STOCK',
-          category: 'زيوت',
-          supplier: 'Toyota Parts',
-        },
-        {
-          id: '2',
-          name: 'فرامل Honda',
-          partNumber: 'HON-002',
-          quantity: 5,
-          reorderPoint: 10,
-          price: 200,
-          status: 'LOW_STOCK',
-          category: 'فرامل',
-          supplier: 'Honda Parts',
-        },
-        {
-          id: '3',
-          name: 'فلتر هواء BMW',
-          partNumber: 'BMW-003',
-          quantity: 0,
-          reorderPoint: 15,
-          price: 80,
-          status: 'OUT_OF_STOCK',
-          category: 'فلاتر',
-          supplier: 'BMW Parts',
-        },
-        {
-          id: '4',
-          name: 'إطارات Nissan',
-          partNumber: 'NIS-004',
-          quantity: 30,
-          reorderPoint: 20,
-          price: 400,
-          status: 'IN_STOCK',
-          category: 'إطارات',
-          supplier: 'Nissan Parts',
-        },
-      ]);
+      const { default: apiClient } = await import('@/lib/api-client');
+      const response = await apiClient.get('/inventory');
+      const items = (response.data || []).map((item: any) => ({
+        ...item,
+        price: item.sellingPrice ?? item.price ?? 0,
+        status: Number(item.quantity) === 0
+          ? 'OUT_OF_STOCK'
+          : Number(item.quantity) <= Number(item.reorderPoint)
+          ? 'LOW_STOCK'
+          : 'IN_STOCK',
+      }));
+      setInventory(items);
     } catch (error) {
       console.error('Error fetching inventory:', error);
+      setInventory([]);
     } finally {
       setLoading(false);
     }

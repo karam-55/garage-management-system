@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { MechanicsService } from './mechanics.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -11,15 +11,15 @@ export class MechanicsController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async findAll() {
-    return this.mechanicsService.findAll();
+  async findAll(@Request() req) {
+    return this.mechanicsService.findAll(req.user?.garageId);
   }
 
   @Get('available')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async findAvailable() {
-    return this.mechanicsService.findAvailable();
+  async findAvailable(@Request() req) {
+    return this.mechanicsService.findAvailable(req.user?.garageId);
   }
 
   @Get(':id')

@@ -7,9 +7,11 @@ export class GaragesService {
 
   async findAll() {
     return this.prisma.garage.findMany({
+      where: { deletedAt: null },
       include: {
-        owner: true,
-        users: true,
+        owner: {
+          select: { id: true, email: true, fullName: true, phone: true, role: true },
+        },
         services: true,
       },
     });
@@ -19,11 +21,10 @@ export class GaragesService {
     const garage = await this.prisma.garage.findUnique({
       where: { id },
       include: {
-        owner: true,
-        users: true,
+        owner: {
+          select: { id: true, email: true, fullName: true, phone: true, role: true },
+        },
         services: true,
-        partsInventory: true,
-        bookings: true,
       },
     });
 
@@ -48,8 +49,13 @@ export class GaragesService {
   }
 
   async remove(id: string) {
-    return this.prisma.garage.delete({
+    const garage = await this.prisma.garage.findUnique({ where: { id } });
+    if (!garage) {
+      throw new NotFoundException('Garage not found');
+    }
+    return this.prisma.garage.update({
       where: { id },
+      data: { deletedAt: new Date(), isActive: false },
     });
   }
 }

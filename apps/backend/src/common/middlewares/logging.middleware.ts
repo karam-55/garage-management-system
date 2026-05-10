@@ -33,20 +33,24 @@ export class LoggingMiddleware implements NestMiddleware {
         this.logger.warn(`Slow request detected: ${method} ${url} - ${duration}ms`);
       }
 
-      // Log to database for audit trail
-      this.logToDatabase({
-        method,
-        url,
-        statusCode,
-        duration,
-        ip,
-        userId,
-        garageId,
-        userAgent,
-        timestamp: new Date(),
-      }).catch((err) => {
-        this.logger.error(`Failed to log to database: ${err.message}`);
-      });
+      // Only log errors or slow requests to database to avoid DB overload
+      const isError = statusCode >= 400;
+      const isSlow = duration > 2000;
+      if (isError || isSlow) {
+        this.logToDatabase({
+          method,
+          url,
+          statusCode,
+          duration,
+          ip,
+          userId,
+          garageId,
+          userAgent,
+          timestamp: new Date(),
+        }).catch((err) => {
+          this.logger.error(`Failed to log to database: ${err.message}`);
+        });
+      }
     });
 
     next();

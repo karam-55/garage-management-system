@@ -27,42 +27,17 @@ export default function CustomersPage() {
   const fetchCustomers = async () => {
     setLoading(true);
     try {
-      // Fetch customers from backend
-      // const response = await apiClient.get('/customers');
-      // setCustomers(response.data);
-      
-      // Mock data for now
-      setCustomers([
-        {
-          id: '1',
-          fullName: 'أحمد محمد',
-          email: 'ahmed@example.com',
-          phone: '0501234567',
-          vehiclesCount: 2,
-          totalBookings: 5,
-          createdAt: '2024-01-10T00:00:00Z',
-        },
-        {
-          id: '2',
-          fullName: 'خالد علي',
-          email: 'khaled@example.com',
-          phone: '0507654321',
-          vehiclesCount: 1,
-          totalBookings: 3,
-          createdAt: '2024-01-12T00:00:00Z',
-        },
-        {
-          id: '3',
-          fullName: 'سعيد أحمد',
-          email: 'saeed@example.com',
-          phone: '0509876543',
-          vehiclesCount: 3,
-          totalBookings: 8,
-          createdAt: '2024-01-08T00:00:00Z',
-        },
-      ]);
+      const { default: apiClient } = await import('@/lib/api-client');
+      const response = await apiClient.get('/customers');
+      const data = (response.data || []).map((c: any) => ({
+        ...c,
+        vehiclesCount: c.vehiclesCount ?? 0,
+        totalBookings: c.totalBookings ?? 0,
+      }));
+      setCustomers(data);
     } catch (error) {
       console.error('Error fetching customers:', error);
+      setCustomers([]);
     } finally {
       setLoading(false);
     }

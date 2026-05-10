@@ -32,45 +32,12 @@ export default function BookingsPage() {
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      // Fetch bookings from backend
-      // const response = await apiClient.get('/bookings');
-      // setBookings(response.data);
-      
-      // Mock data for now
-      setBookings([
-        {
-          id: '1',
-          bookingNumber: 'BK-2024-001',
-          customer: { fullName: 'أحمد محمد', phone: '0501234567' },
-          vehicle: { make: 'Toyota', model: 'Camry', year: 2022, plate: 'ABC1234' },
-          scheduledAt: '2024-01-15T10:00:00Z',
-          status: 'IN_PROGRESS',
-          assignedMechanic: { fullName: 'محمد علي' },
-          service: { name: 'صيانة دورية' },
-        },
-        {
-          id: '2',
-          bookingNumber: 'BK-2024-002',
-          customer: { fullName: 'خالد علي', phone: '0507654321' },
-          vehicle: { make: 'Honda', model: 'Accord', year: 2021, plate: 'XYZ5678' },
-          scheduledAt: '2024-01-16T14:00:00Z',
-          status: 'CONFIRMED',
-          assignedMechanic: { fullName: 'عمر حسن' },
-          service: { name: 'تغيير زيت' },
-        },
-        {
-          id: '3',
-          bookingNumber: 'BK-2024-003',
-          customer: { fullName: 'سعيد أحمد', phone: '0509876543' },
-          vehicle: { make: 'BMW', model: 'X5', year: 2023, plate: 'DEF9012' },
-          scheduledAt: '2024-01-14T09:00:00Z',
-          status: 'COMPLETED',
-          assignedMechanic: { fullName: 'علي حسن' },
-          service: { name: 'إصلاح المحرك' },
-        },
-      ]);
+      const { default: apiClient } = await import('@/lib/api-client');
+      const response = await apiClient.get('/bookings');
+      setBookings(response.data || []);
     } catch (error) {
       console.error('Error fetching bookings:', error);
+      setBookings([]);
     } finally {
       setLoading(false);
     }

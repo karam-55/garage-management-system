@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Settings as SettingsIcon, 
   Percent, 
@@ -17,32 +17,52 @@ import AppLayout from '@/components/layouts/AppLayout';
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('tax');
   const [loading, setLoading] = useState(false);
-  const [taxRates, setTaxRates] = useState([
-    { id: '1', name: 'ضريبة القيمة المضافة', rate: 15, description: 'ضريبة القيمة المضافة القياسية' },
-  ]);
-  const [cancellationPolicies, setCancellationPolicies] = useState([
-    { id: '1', name: 'سياسة الإلغاء القياسية', hoursBefore: 24, penaltyPercent: 10 },
-  ]);
-  const [discounts, setDiscounts] = useState([
-    { id: '1', name: 'خصم العميل الجديد', type: 'PERCENTAGE', value: 10, description: 'خصم للعملاء الجدد' },
-  ]);
-  const [garageSettings, setGarageSettings] = useState({
-    name: 'كراج المدينة',
-    address: 'الرياض، حي الملز',
-    phone: '0112345678',
-    email: 'info@garage.com',
-    workingHours: '8:00 ص - 10:00 م',
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [taxRates, setTaxRates] = useState<any[]>([]);
+  const [cancellationPolicies, setCancellationPolicies] = useState<any[]>([]);
+  const [discounts, setDiscounts] = useState<any[]>([]);
+  const [garageSettings, setGarageSettings] = useState<any>({
+    name: '',
+    address: '',
+    phone: '',
+    email: '',
+    workingHours: '',
   });
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const { default: apiClient } = await import('@/lib/api-client');
+        const response = await apiClient.get('/settings');
+        const data = response.data;
+        if (data.taxRates) setTaxRates(data.taxRates);
+        if (data.cancellationPolicies) setCancellationPolicies(data.cancellationPolicies);
+        if (data.garageSettings) setGarageSettings({
+          name: data.garageSettings.name || '',
+          address: data.garageSettings.address || '',
+          phone: data.garageSettings.phone || '',
+          email: data.garageSettings.email || '',
+          workingHours: data.garageSettings.workingHours || '',
+        });
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      }
+    };
+    loadSettings();
+  }, [])
 
   const handleSave = async () => {
     setLoading(true);
+    setSaveStatus('idle');
     try {
-      // Save settings to backend
-      // await apiClient.put('/settings', { taxRates, cancellationPolicies, discounts, garageSettings });
-      alert('تم حفظ الإعدادات بنجاح');
+      const { default: apiClient } = await import('@/lib/api-client');
+      await apiClient.put('/settings', { taxRates, cancellationPolicies, garageSettings });
+      setSaveStatus('success');
+      setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('حدث خطأ أثناء حفظ الإعدادات');
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
     } finally {
       setLoading(false);
     }
@@ -69,6 +89,16 @@ export default function SettingsPage() {
             حفظ التغييرات
           </Button>
         </div>
+        {saveStatus === 'success' && (
+          <div className="p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm">
+            ✓ تم حفظ الإعدادات بنجاح
+          </div>
+        )}
+        {saveStatus === 'error' && (
+          <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
+            ✗ حدث خطأ أثناء حفظ الإعدادات، حاول مرة أخرى
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="flex gap-2 overflow-x-auto pb-2">

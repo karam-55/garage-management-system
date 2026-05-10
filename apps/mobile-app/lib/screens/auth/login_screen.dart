@@ -40,9 +40,14 @@ class _LoginScreenState extends State<LoginScreen> {
         'password': _passwordController.text,
       });
       
-      if (response.data['token'] != null) {
-        await _secureStorage.write(key: 'token', value: response.data['token']);
-        
+      if (response.data['access_token'] != null) {
+        await _secureStorage.write(key: 'token', value: response.data['access_token']);
+        if (response.data['refresh_token'] != null) {
+          await _secureStorage.write(key: 'refresh_token', value: response.data['refresh_token']);
+        }
+        if (response.data['user'] != null) {
+          await _secureStorage.write(key: 'user', value: response.data['user'].toString());
+        }
         if (mounted) {
           Navigator.pushReplacementNamed(context, AppRouter.dashboard);
         }

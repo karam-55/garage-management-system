@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, Query } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { BookingsService } from './bookings.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -11,8 +11,12 @@ export class BookingsController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async findAll() {
-    return this.bookingsService.findAll();
+  async findAll(@Req() req: any, @Query() query: any) {
+    const filters = {
+      ...query,
+      garageId: req.user.garageId || query.garageId,
+    };
+    return this.bookingsService.findAll(filters);
   }
 
   @Get(':id')
@@ -25,8 +29,8 @@ export class BookingsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async create(@Body() createBookingDto: any) {
-    return this.bookingsService.create(createBookingDto);
+  async create(@Body() createBookingDto: any, @Req() req: any) {
+    return this.bookingsService.create(createBookingDto, req.user.id);
   }
 
   @Put(':id')

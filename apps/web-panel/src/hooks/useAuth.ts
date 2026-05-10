@@ -14,7 +14,10 @@ export function useAuth() {
 
   const login = async (credentials: LoginCredentials) => {
     const response = await authService.login(credentials);
-    authService.setToken(response.token);
+    authService.setToken(response.access_token);
+    if (response.refresh_token) {
+      authService.setRefreshToken(response.refresh_token);
+    }
     setUser(response.user);
     setIsAuthenticated(true);
     return response;
@@ -22,7 +25,10 @@ export function useAuth() {
 
   const register = async (credentials: RegisterCredentials) => {
     const response = await authService.register(credentials);
-    authService.setToken(response.token);
+    authService.setToken(response.access_token);
+    if (response.refresh_token) {
+      authService.setRefreshToken(response.refresh_token);
+    }
     setUser(response.user);
     setIsAuthenticated(true);
     return response;

@@ -23,47 +23,17 @@ export default function NotificationsPage() {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      // Fetch notifications from backend
-      // const response = await apiClient.get('/notifications');
-      // setNotifications(response.data);
-      
-      // Mock data for now
-      setNotifications([
-        {
-          id: '1',
-          title: 'حجز جديد',
-          message: 'تم إنشاء حجز جديد من قبل أحمد محمد',
-          type: 'INFO',
-          read: false,
-          createdAt: '2024-01-15T10:30:00Z',
-        },
-        {
-          id: '2',
-          title: 'تنبيه المخزون',
-          message: 'قطعة "فرامل Honda" منخفضة المخزون (5 قطع)',
-          type: 'WARNING',
-          read: false,
-          createdAt: '2024-01-15T09:15:00Z',
-        },
-        {
-          id: '3',
-          title: 'فاتورة متأخرة',
-          message: 'فاتورة INV-2024-003 متأخرة الدفع',
-          type: 'ERROR',
-          read: true,
-          createdAt: '2024-01-14T16:20:00Z',
-        },
-        {
-          id: '4',
-          title: 'إتمام الحجز',
-          message: 'تم إتمام حجز #BK-2024-001 بنجاح',
-          type: 'SUCCESS',
-          read: true,
-          createdAt: '2024-01-14T14:30:00Z',
-        },
-      ]);
+      const { default: apiClient } = await import('@/lib/api-client');
+      const response = await apiClient.get('/notifications');
+      const data = (response.data || []).map((n: any) => ({
+        ...n,
+        type: n.type ?? 'INFO',
+        read: n.isRead ?? n.read ?? false,
+      }));
+      setNotifications(data);
     } catch (error) {
       console.error('Error fetching notifications:', error);
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
@@ -102,9 +72,9 @@ export default function NotificationsPage() {
 
   const markAsRead = async (id: string) => {
     try {
-      // Mark notification as read
-      // await apiClient.put(`/notifications/${id}/read`);
-      setNotifications(notifications.map(n => 
+      const { default: apiClient } = await import('@/lib/api-client');
+      await apiClient.put(`/notifications/${id}/read`);
+      setNotifications(notifications.map(n =>
         n.id === id ? { ...n, read: true } : n
       ));
     } catch (error) {
@@ -114,8 +84,8 @@ export default function NotificationsPage() {
 
   const markAllAsRead = async () => {
     try {
-      // Mark all notifications as read
-      // await apiClient.put('/notifications/mark-all-read');
+      const { default: apiClient } = await import('@/lib/api-client');
+      await apiClient.put('/notifications/mark-all-read');
       setNotifications(notifications.map(n => ({ ...n, read: true })));
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
@@ -124,8 +94,8 @@ export default function NotificationsPage() {
 
   const deleteNotification = async (id: string) => {
     try {
-      // Delete notification
-      // await apiClient.delete(`/notifications/${id}`);
+      const { default: apiClient } = await import('@/lib/api-client');
+      await apiClient.delete(`/notifications/${id}`);
       setNotifications(notifications.filter(n => n.id !== id));
     } catch (error) {
       console.error('Error deleting notification:', error);

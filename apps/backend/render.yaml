@@ -3,9 +3,9 @@ services:
     name: garage-backend
     env: node
     plan: free
-    # Use db push for initial schema (no migration history needed)
-    buildCommand: npm install && npx prisma db push --accept-data-loss && npm run build
-    startCommand: npm run start:prod
+    # prisma db push syncs schema without migration files; no --accept-data-loss = safe (refuses destructive changes)
+    buildCommand: npm install && npx prisma generate && npx prisma db push && npm run build
+    startCommand: node dist/apps/backend/dist/main
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -50,3 +50,4 @@ databases:
   - name: garage-db
     databaseName: garage_db
     user: garage_user
+

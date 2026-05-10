@@ -1,14 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class CustomersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
+  async findAll(garageId?: string) {
     return this.prisma.user.findMany({
       where: {
         role: 'CUSTOMER',
+        ...(garageId ? { garageId } : {}),
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phone: true,
+        role: true,
+        garageId: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
   }
@@ -16,6 +30,18 @@ export class CustomersService {
   async findOne(id: string) {
     const customer = await this.prisma.user.findUnique({
       where: { id },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phone: true,
+        role: true,
+        garageId: true,
+        garage: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     if (!customer) {
@@ -26,10 +52,23 @@ export class CustomersService {
   }
 
   async create(createCustomerDto: any) {
+    const { password, ...rest } = createCustomerDto;
+    const passwordHash = await bcrypt.hash(password || 'ChangeMe@123', 12);
     return this.prisma.user.create({
       data: {
-        ...createCustomerDto,
+        ...rest,
+        passwordHash,
         role: 'CUSTOMER',
+      },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phone: true,
+        role: true,
+        garageId: true,
+        isActive: true,
+        createdAt: true,
       },
     });
   }
@@ -42,8 +81,13 @@ export class CustomersService {
   }
 
   async remove(id: string) {
-    return this.prisma.user.delete({
+    const customer = await this.prisma.user.findUnique({ where: { id } });
+    if (!customer) {
+      throw new NotFoundException('Customer not found');
+    }
+    return this.prisma.user.update({
       where: { id },
+      data: { deletedAt: new Date(), isActive: false },
     });
   }
 }

@@ -1,32 +1,53 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class MechanicsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
+  async findAll(garageId?: string) {
     return this.prisma.user.findMany({
       where: {
         role: 'MECHANIC',
+        ...(garageId ? { garageId } : {}),
+        deletedAt: null,
       },
-      include: {
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phone: true,
+        role: true,
+        garageId: true,
+        availabilityStatus: true,
+        isActive: true,
+        createdAt: true,
         garage: true,
-        mechanicSpecializations: {
-          include: {
-            service: true,
-          },
-        },
+        mechanicSpecializations: { include: { service: true } },
       },
     });
   }
 
-  async findAvailable() {
+  async findAvailable(garageId?: string) {
     return this.prisma.user.findMany({
       where: {
         role: 'MECHANIC',
         availabilityStatus: 'AVAILABLE',
         isActive: true,
+        deletedAt: null,
+        ...(garageId ? { garageId } : {}),
+      },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phone: true,
+        role: true,
+        garageId: true,
+        availabilityStatus: true,
+        garage: true,
+        mechanicSpecializations: { include: { service: true } },
       },
     });
   }
@@ -34,13 +55,19 @@ export class MechanicsService {
   async findOne(id: string) {
     const mechanic = await this.prisma.user.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phone: true,
+        role: true,
+        garageId: true,
+        availabilityStatus: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
         garage: true,
-        mechanicSpecializations: {
-          include: {
-            service: true,
-          },
-        },
+        mechanicSpecializations: { include: { service: true } },
         mechanicWorkSessions: true,
         mechanicRatings: true,
       },
@@ -54,10 +81,23 @@ export class MechanicsService {
   }
 
   async create(createMechanicDto: any) {
+    const { password, ...rest } = createMechanicDto;
+    const passwordHash = await bcrypt.hash(password || 'ChangeMe@123', 12);
     return this.prisma.user.create({
       data: {
-        ...createMechanicDto,
+        ...rest,
+        passwordHash,
         role: 'MECHANIC',
+      },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phone: true,
+        role: true,
+        garageId: true,
+        isActive: true,
+        createdAt: true,
       },
     });
   }
@@ -70,8 +110,13 @@ export class MechanicsService {
   }
 
   async remove(id: string) {
-    return this.prisma.user.delete({
+    const mechanic = await this.prisma.user.findUnique({ where: { id } });
+    if (!mechanic) {
+      throw new NotFoundException('Mechanic not found');
+    }
+    return this.prisma.user.update({
       where: { id },
+      data: { deletedAt: new Date(), isActive: false },
     });
   }
 }

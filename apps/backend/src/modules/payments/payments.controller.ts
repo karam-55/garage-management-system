@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -11,8 +11,8 @@ export class PaymentsController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async findAll() {
-    return this.paymentsService.findAll();
+  async findAll(@Request() req) {
+    return this.paymentsService.findAll({ garageId: req.user?.garageId });
   }
 
   @Get(':id')
@@ -32,8 +32,8 @@ export class PaymentsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async create(@Body() createPaymentDto: any) {
-    return this.paymentsService.create(createPaymentDto);
+  async create(@Body() createPaymentDto: any, @Request() req) {
+    return this.paymentsService.create(createPaymentDto, req.user?.id);
   }
 
   @Put(':id')

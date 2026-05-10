@@ -203,15 +203,13 @@ export class ReportsService {
     const where = garageId ? { garageId } : {};
 
     const totalItems = await this.prisma.partsInventory.count({ where: { ...where, isActive: true } });
-    const lowStockItems = await this.prisma.partsInventory.count({
-      where: { ...where, isActive: true },
-    });
 
     const items = await this.prisma.partsInventory.findMany({
       where: { ...where, isActive: true },
-      select: { quantity: true, sellingPrice: true },
+      select: { quantity: true, reorderPoint: true, sellingPrice: true },
     });
 
+    const lowStockItems = items.filter((item) => Number(item.quantity) <= Number(item.reorderPoint)).length;
     const totalValue = items.reduce((sum, item) => sum + Number(item.quantity) * Number(item.sellingPrice), 0);
 
     return {

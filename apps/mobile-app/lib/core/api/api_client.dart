@@ -38,8 +38,24 @@ class ApiClient {
       },
       onError: (error, handler) async {
         if (error.response?.statusCode == 401) {
-          await _secureStorage.delete(key: 'token');
-          // Navigate to login screen
+          final refreshToken = await _secureStorage.read(key: 'refresh_token');
+          if (refreshToken != null) {
+            try {
+              final refreshResponse = await Dio().post(
+                '$baseUrl/auth/refresh',
+                data: {'refresh_token': refreshToken},
+              );
+              final newToken = refreshResponse.data['access_token'];
+              await _secureStorage.write(key: 'token', value: newToken);
+              error.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+              final retryResponse = await _dio.fetch(error.requestOptions);
+              return handler.resolve(retryResponse);
+            } catch (_) {
+              await _secureStorage.deleteAll();
+            }
+          } else {
+            await _secureStorage.deleteAll();
+          }
         }
         return handler.next(error);
       },

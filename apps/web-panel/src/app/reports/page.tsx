@@ -39,22 +39,9 @@ export default function ReportsPage() {
   const generateReport = async () => {
     setLoading(true);
     try {
-      // Generate report from backend
-      // const response = await apiClient.get(`/reports/${reportType}`, { params: { period } });
-      // setReportData(response.data);
-      
-      // Mock data for now
-      setReportData({
-        totalRevenue: 125000,
-        totalBookings: 156,
-        completedBookings: 136,
-        averageRating: 4.5,
-        topServices: [
-          { name: 'صيانة دورية', count: 45, revenue: 22500 },
-          { name: 'تغيير زيت', count: 38, revenue: 19000 },
-          { name: 'فحص كهرباء', count: 28, revenue: 28000 },
-        ],
-      });
+      const { default: apiClient } = await import('@/lib/api-client');
+      const response = await apiClient.get(`/reports/${reportType}`, { params: { period } });
+      setReportData(response.data);
     } catch (error) {
       console.error('Error generating report:', error);
     } finally {
@@ -63,8 +50,14 @@ export default function ReportsPage() {
   };
 
   const handleDownload = () => {
-    // Download report logic
-    alert('جاري تحميل التقرير...');
+    if (!reportData) return;
+    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `report-${reportType}-${period}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (

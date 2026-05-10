@@ -13,12 +13,14 @@ export interface RegisterCredentials {
 }
 
 export interface AuthResponse {
-  token: string;
+  access_token: string;
+  refresh_token?: string;
   user: {
     id: string;
     email: string;
-    fullName: string;
+    full_name: string;
     role: string;
+    garage_id?: string;
   };
 }
 
@@ -34,13 +36,25 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
-    await apiClient.post('/auth/logout');
-    localStorage.removeItem('token');
+    const refreshToken = localStorage.getItem('refresh_token');
+    await apiClient.post('/auth/logout', { refresh_token: refreshToken }).catch(() => {});
+    this.clearTokens();
   },
 
-  async refreshToken(): Promise<AuthResponse> {
-    const response = await apiClient.post('/auth/refresh');
+  async refreshToken(): Promise<{ access_token: string }> {
+    const refreshToken = localStorage.getItem('refresh_token');
+    const response = await apiClient.post('/auth/refresh', { refresh_token: refreshToken });
     return response.data;
+  },
+
+  setRefreshToken(token: string): void {
+    localStorage.setItem('refresh_token', token);
+  },
+
+  clearTokens(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
   },
 
   getToken(): string | null {
