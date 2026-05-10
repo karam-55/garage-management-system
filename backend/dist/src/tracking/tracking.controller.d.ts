@@ -5,16 +5,23 @@ export declare class TrackingController {
     trackVehicle(vehicleId: string): Promise<{
         customer: {
             name: string;
-            id: string;
             phone: string;
             secondaryPhone: string | null;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
         };
-        bookings: {
+        vehicleTracking: {
             id: string;
+            vehicleId: string;
+            currentStatus: string;
+            lastUpdateAt: Date;
+            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
+        };
+        bookings: {
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -25,21 +32,14 @@ export declare class TrackingController {
             scheduledAt: Date;
             expectedFinishAt: Date | null;
         }[];
-        vehicleTracking: {
-            id: string;
-            vehicleId: string;
-            currentStatus: string;
-            lastUpdateAt: Date;
-            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
-        };
     } & {
-        model: string;
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
         plateNumber: string;
+        model: string;
         year: number;
         color: string;
         fuelType: string;

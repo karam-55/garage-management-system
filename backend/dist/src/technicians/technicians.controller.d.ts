@@ -5,8 +5,8 @@ export declare class TechniciansController {
     constructor(techniciansService: TechniciansService);
     findAll(): Promise<({
         bookings: {
-            id: string;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -19,17 +19,17 @@ export declare class TechniciansController {
         }[];
     } & {
         name: string;
-        id: string;
         phone: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         specialty: string | null;
     })[]>;
     findOne(id: string): Promise<{
         bookings: {
-            id: string;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -42,27 +42,27 @@ export declare class TechniciansController {
         }[];
     } & {
         name: string;
-        id: string;
         phone: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         specialty: string | null;
     }>;
     create(createTechnicianDto: CreateTechnicianDto): Promise<{
         name: string;
-        id: string;
         phone: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         specialty: string | null;
     }>;
     update(id: string, updateTechnicianDto: UpdateTechnicianDto): Promise<{
         name: string;
-        id: string;
         phone: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         specialty: string | null;

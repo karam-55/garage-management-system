@@ -6,52 +6,52 @@ export declare class BookingsService {
     findAll(): Promise<({
         customer: {
             name: string;
-            id: string;
             phone: string;
             secondaryPhone: string | null;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
         };
         vehicle: {
-            model: string;
-            id: string;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             plateNumber: string;
+            model: string;
             year: number;
             color: string;
             fuelType: string;
         };
-        invoices: {
-            id: string;
+        technician: {
+            name: string;
+            phone: string;
             notes: string | null;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            specialty: string | null;
+        };
+        invoices: {
+            notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
-            date: Date;
             totalAmount: number;
             discount: number;
             netAmount: number;
             paymentMethod: string;
+            date: Date;
         }[];
-        technician: {
-            name: string;
-            id: string;
-            phone: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            specialty: string | null;
-        };
     } & {
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
@@ -65,52 +65,52 @@ export declare class BookingsService {
     findOne(id: string): Promise<{
         customer: {
             name: string;
-            id: string;
             phone: string;
             secondaryPhone: string | null;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
         };
         vehicle: {
-            model: string;
-            id: string;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             plateNumber: string;
+            model: string;
             year: number;
             color: string;
             fuelType: string;
         };
-        invoices: {
-            id: string;
+        technician: {
+            name: string;
+            phone: string;
             notes: string | null;
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            specialty: string | null;
+        };
+        invoices: {
+            notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
-            date: Date;
             totalAmount: number;
             discount: number;
             netAmount: number;
             paymentMethod: string;
+            date: Date;
         }[];
-        technician: {
-            name: string;
-            id: string;
-            phone: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            specialty: string | null;
-        };
     } & {
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
@@ -122,8 +122,8 @@ export declare class BookingsService {
         expectedFinishAt: Date | null;
     }>;
     create(createBookingDto: CreateBookingDto): Promise<{
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
@@ -135,8 +135,8 @@ export declare class BookingsService {
         expectedFinishAt: Date | null;
     }>;
     update(id: string, updateBookingDto: UpdateBookingDto): Promise<{
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
@@ -148,8 +148,8 @@ export declare class BookingsService {
         expectedFinishAt: Date | null;
     }>;
     delete(id: string): Promise<{
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;

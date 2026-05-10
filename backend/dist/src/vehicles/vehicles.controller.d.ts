@@ -6,16 +6,23 @@ export declare class VehiclesController {
     findAll(): Promise<({
         customer: {
             name: string;
-            id: string;
             phone: string;
             secondaryPhone: string | null;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
         };
-        bookings: {
+        vehicleTracking: {
             id: string;
+            vehicleId: string;
+            currentStatus: string;
+            lastUpdateAt: Date;
+            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
+        };
+        bookings: {
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -27,35 +34,28 @@ export declare class VehiclesController {
             expectedFinishAt: Date | null;
         }[];
         invoices: {
-            id: string;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
-            date: Date;
             totalAmount: number;
             discount: number;
             netAmount: number;
             paymentMethod: string;
+            date: Date;
         }[];
-        vehicleTracking: {
-            id: string;
-            vehicleId: string;
-            currentStatus: string;
-            lastUpdateAt: Date;
-            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
-        };
     } & {
-        model: string;
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
         plateNumber: string;
+        model: string;
         year: number;
         color: string;
         fuelType: string;
@@ -63,16 +63,23 @@ export declare class VehiclesController {
     findOne(id: string): Promise<{
         customer: {
             name: string;
-            id: string;
             phone: string;
             secondaryPhone: string | null;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
         };
-        bookings: {
+        vehicleTracking: {
             id: string;
+            vehicleId: string;
+            currentStatus: string;
+            lastUpdateAt: Date;
+            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
+        };
+        bookings: {
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -84,59 +91,52 @@ export declare class VehiclesController {
             expectedFinishAt: Date | null;
         }[];
         invoices: {
-            id: string;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
-            date: Date;
             totalAmount: number;
             discount: number;
             netAmount: number;
             paymentMethod: string;
+            date: Date;
         }[];
-        vehicleTracking: {
-            id: string;
-            vehicleId: string;
-            currentStatus: string;
-            lastUpdateAt: Date;
-            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
-        };
     } & {
-        model: string;
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
         plateNumber: string;
+        model: string;
         year: number;
         color: string;
         fuelType: string;
     }>;
     create(createVehicleDto: CreateVehicleDto): Promise<{
-        model: string;
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
         plateNumber: string;
+        model: string;
         year: number;
         color: string;
         fuelType: string;
     }>;
     update(id: string, updateVehicleDto: UpdateVehicleDto): Promise<{
-        model: string;
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
         plateNumber: string;
+        model: string;
         year: number;
         color: string;
         fuelType: string;

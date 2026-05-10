@@ -5,8 +5,8 @@ export declare class InventoryService {
     constructor(prisma: PrismaService);
     findAll(): Promise<{
         name: string;
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;
@@ -17,8 +17,8 @@ export declare class InventoryService {
     }[]>;
     findOne(id: string): Promise<{
         name: string;
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;
@@ -29,8 +29,8 @@ export declare class InventoryService {
     }>;
     create(createInventoryItemDto: CreateInventoryItemDto): Promise<{
         name: string;
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;
@@ -41,8 +41,8 @@ export declare class InventoryService {
     }>;
     update(id: string, updateInventoryItemDto: UpdateInventoryItemDto): Promise<{
         name: string;
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;
@@ -53,8 +53,8 @@ export declare class InventoryService {
     }>;
     delete(id: string): Promise<{
         name: string;
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         code: string | null;

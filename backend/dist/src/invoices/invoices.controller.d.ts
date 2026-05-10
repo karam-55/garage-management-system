@@ -6,28 +6,28 @@ export declare class InvoicesController {
     findAll(): Promise<({
         customer: {
             name: string;
-            id: string;
             phone: string;
             secondaryPhone: string | null;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
         };
         vehicle: {
-            model: string;
-            id: string;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             plateNumber: string;
+            model: string;
             year: number;
             color: string;
             fuelType: string;
         };
         booking: {
-            id: string;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -39,45 +39,45 @@ export declare class InvoicesController {
             expectedFinishAt: Date | null;
         };
     } & {
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
         vehicleId: string;
         bookingId: string | null;
         invoiceNumber: string;
-        date: Date;
         totalAmount: number;
         discount: number;
         netAmount: number;
         paymentMethod: string;
+        date: Date;
     })[]>;
     findOne(id: string): Promise<{
         customer: {
             name: string;
-            id: string;
             phone: string;
             secondaryPhone: string | null;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
         };
         vehicle: {
-            model: string;
-            id: string;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
             plateNumber: string;
+            model: string;
             year: number;
             color: string;
             fuelType: string;
         };
         booking: {
-            id: string;
             notes: string | null;
+            id: string;
             createdAt: Date;
             updatedAt: Date;
             customerId: string;
@@ -89,49 +89,49 @@ export declare class InvoicesController {
             expectedFinishAt: Date | null;
         };
     } & {
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
         vehicleId: string;
         bookingId: string | null;
         invoiceNumber: string;
-        date: Date;
         totalAmount: number;
         discount: number;
         netAmount: number;
         paymentMethod: string;
+        date: Date;
     }>;
     create(createInvoiceDto: CreateInvoiceDto): Promise<{
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
         vehicleId: string;
         bookingId: string | null;
         invoiceNumber: string;
-        date: Date;
         totalAmount: number;
         discount: number;
         netAmount: number;
         paymentMethod: string;
+        date: Date;
     }>;
     update(id: string, updateInvoiceDto: UpdateInvoiceDto): Promise<{
-        id: string;
         notes: string | null;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
         customerId: string;
         vehicleId: string;
         bookingId: string | null;
         invoiceNumber: string;
-        date: Date;
         totalAmount: number;
         discount: number;
         netAmount: number;
         paymentMethod: string;
+        date: Date;
     }>;
     delete(id: string): Promise<{
         message: string;
