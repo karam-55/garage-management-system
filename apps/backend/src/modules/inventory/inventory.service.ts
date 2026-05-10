@@ -113,17 +113,17 @@ export class InventoryService {
   }
 
   async create(createInventoryDto: any) {
-    const { sku, minQuantity, unitPrice, garageId, ...rest } = createInventoryDto;
+    const { sku, minQuantity, unitPrice, garageId, name, nameAr, partNumber, category, quantity, maxStockLevel, unitCost, location, supplier } = createInventoryDto;
 
     // Map DTO fields to Prisma schema fields
-    const partNumber = sku || rest.partNumber;
-    const minStockLevel = minQuantity !== undefined ? minQuantity : rest.minStockLevel;
-    const sellingPrice = unitPrice !== undefined ? unitPrice : rest.sellingPrice;
+    const finalPartNumber = sku || partNumber;
+    const minStockLevel = minQuantity !== undefined ? minQuantity : 0;
+    const sellingPrice = unitPrice !== undefined ? unitPrice : 0;
 
     // Check if part number already exists
-    if (partNumber) {
+    if (finalPartNumber) {
       const existingPart = await this.prisma.partsInventory.findUnique({
-        where: { partNumber },
+        where: { partNumber: finalPartNumber },
       });
       if (existingPart) {
         throw new BadRequestException('Part number already exists');
@@ -132,25 +132,32 @@ export class InventoryService {
 
     const part = await this.prisma.partsInventory.create({
       data: {
-        partNumber,
+        partNumber: finalPartNumber,
         garageId,
+        name,
+        nameAr,
+        category,
+        quantity,
         minStockLevel,
+        maxStockLevel,
+        costPrice: unitCost || 0,
         sellingPrice,
-        ...rest,
+        location,
+        supplier,
       },
     });
 
     // Log initial stock movement
-    if (rest.quantity > 0) {
+    if (quantity > 0) {
       await this.prisma.stockMovement.create({
         data: {
           inventoryId: part.id,
           type: 'IN',
-          quantity: rest.quantity,
+          quantity: quantity,
           quantityBefore: 0,
-          quantityAfter: rest.quantity,
+          quantityAfter: quantity,
           referenceType: 'INITIAL_STOCK',
-                  },
+        },
       });
     }
 
