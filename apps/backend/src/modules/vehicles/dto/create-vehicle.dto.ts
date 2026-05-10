@@ -71,10 +71,9 @@ export class UpdateVehicleDto {
   @IsOptional()
   model?: string;
 
-  @IsInt()
+  @IsString()
   @IsOptional()
-  @Min(1900)
-  year?: number;
+  year?: string;
 
   @IsString()
   @IsOptional()
