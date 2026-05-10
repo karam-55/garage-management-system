@@ -4,7 +4,7 @@
   "description": "Garage Management System Backend API",
   "main": "dist/main.js",
   "scripts": {
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "start": "node dist/main.js",
     "dev": "ts-node src/main.ts",
     "prisma:generate": "prisma generate",
