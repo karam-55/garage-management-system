@@ -5,7 +5,7 @@ services:
     plan: free
     # prisma db push syncs schema without migration files; no --accept-data-loss = safe (refuses destructive changes)
     buildCommand: npm install && npx prisma generate && npx prisma db push && npm run build
-    startCommand: node dist/apps/backend/dist/main
+    startCommand: npm run start:prod
     envVars:
       - key: DATABASE_URL
         fromDatabase:
