@@ -29,14 +29,14 @@ export class InvoicesService {
 
   async create(createInvoiceDto: CreateInvoiceDto) {
     return this.prisma.invoice.create({
-      data: createInvoiceDto,
+      data: createInvoiceDto as any,
     });
   }
 
   async update(id: string, updateInvoiceDto: UpdateInvoiceDto) {
     return this.prisma.invoice.update({
       where: { id },
-      data: updateInvoiceDto,
+      data: updateInvoiceDto as any,
     });
   }
 

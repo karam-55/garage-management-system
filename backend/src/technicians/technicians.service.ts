@@ -25,14 +25,14 @@ export class TechniciansService {
 
   async create(createTechnicianDto: CreateTechnicianDto) {
     return this.prisma.technician.create({
-      data: createTechnicianDto,
+      data: createTechnicianDto as any,
     });
   }
 
   async update(id: string, updateTechnicianDto: UpdateTechnicianDto) {
     return this.prisma.technician.update({
       where: { id },
-      data: updateTechnicianDto,
+      data: updateTechnicianDto as any,
     });
   }
 

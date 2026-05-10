@@ -18,14 +18,14 @@ export class InventoryService {
 
   async create(createInventoryItemDto: CreateInventoryItemDto) {
     return this.prisma.inventoryItem.create({
-      data: createInventoryItemDto,
+      data: createInventoryItemDto as any,
     });
   }
 
   async update(id: string, updateInventoryItemDto: UpdateInventoryItemDto) {
     return this.prisma.inventoryItem.update({
       where: { id },
-      data: updateInventoryItemDto,
+      data: updateInventoryItemDto as any,
     });
   }
 

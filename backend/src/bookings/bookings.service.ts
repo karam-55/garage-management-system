@@ -31,14 +31,14 @@ export class BookingsService {
 
   async create(createBookingDto: CreateBookingDto) {
     return this.prisma.booking.create({
-      data: createBookingDto,
+      data: createBookingDto as any,
     });
   }
 
   async update(id: string, updateBookingDto: UpdateBookingDto) {
     return this.prisma.booking.update({
       where: { id },
-      data: updateBookingDto,
+      data: updateBookingDto as any,
     });
   }
 

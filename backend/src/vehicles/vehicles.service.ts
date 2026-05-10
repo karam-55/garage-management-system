@@ -31,14 +31,14 @@ export class VehiclesService {
 
   async create(createVehicleDto: CreateVehicleDto) {
     return this.prisma.vehicle.create({
-      data: createVehicleDto,
+      data: createVehicleDto as any,
     });
   }
 
   async update(id: string, updateVehicleDto: UpdateVehicleDto) {
     return this.prisma.vehicle.update({
       where: { id },
-      data: updateVehicleDto,
+      data: updateVehicleDto as any,
     });
   }
 

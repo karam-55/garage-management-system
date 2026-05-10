@@ -29,14 +29,14 @@ export class CustomersService {
 
   async create(createCustomerDto: CreateCustomerDto) {
     return this.prisma.customer.create({
-      data: createCustomerDto,
+      data: createCustomerDto as any,
     });
   }
 
   async update(id: string, updateCustomerDto: UpdateCustomerDto) {
     return this.prisma.customer.update({
       where: { id },
-      data: updateCustomerDto,
+      data: updateCustomerDto as any,
     });
   }
 
