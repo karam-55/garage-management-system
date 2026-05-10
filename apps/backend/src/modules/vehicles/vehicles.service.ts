@@ -28,10 +28,10 @@ export class VehiclesService {
     const { licensePlate, year, customerId, make, model, vin, color, mileage, fuelType, transmission, engineSize, bodyType, notes } = createVehicleDto;
 
     // Validate customer exists
-    const customer = await this.prisma.user.findUnique({
+    const customer = await this.prisma.customer.findUnique({
       where: { id: customerId },
     });
-    if (!customer || customer.role !== 'CUSTOMER') {
+    if (!customer) {
       throw new NotFoundException('Customer not found');
     }
 
