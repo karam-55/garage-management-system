@@ -52,13 +52,18 @@ export class CustomersService {
   }
 
   async create(createCustomerDto: any) {
-    const { password, ...rest } = createCustomerDto;
+    const { password, fullName, phone, email, ...rest } = createCustomerDto;
     const passwordHash = await bcrypt.hash(password || 'ChangeMe@123', 12);
-    return this.prisma.user.create({
+
+    // Create User record
+    const user = await this.prisma.user.create({
       data: {
-        ...rest,
+        email,
         passwordHash,
+        fullName,
+        phone,
         role: 'CUSTOMER',
+        ...rest,
       },
       select: {
         id: true,
@@ -71,6 +76,24 @@ export class CustomersService {
         createdAt: true,
       },
     });
+
+    // Split fullName into firstName and lastName
+    const nameParts = fullName.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    // Create Customer record (userId is optional)
+    const customer = await this.prisma.customer.create({
+      data: {
+        firstName,
+        lastName,
+        fullName,
+        phone,
+        email,
+      },
+    });
+
+    return user;
   }
 
   async update(id: string, updateCustomerDto: any) {
