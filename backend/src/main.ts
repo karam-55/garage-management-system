@@ -3,6 +3,10 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+  console.log('Starting application...');
+  console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+  console.log('PORT:', process.env.PORT);
+  
   try {
     const app = await NestFactory.create(AppModule);
     
@@ -24,6 +28,7 @@ async function bootstrap() {
     console.log(`Application is running on: http://localhost:${port}`);
   } catch (error) {
     console.error('Error starting application:', error);
+    console.error('Error stack:', error.stack);
     process.exit(1);
   }
 }
