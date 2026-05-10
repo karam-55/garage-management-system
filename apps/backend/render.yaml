@@ -22,9 +22,9 @@ services:
       - key: JWT_REFRESH_EXPIRES_IN
         value: 7d
       - key: CORS_ORIGIN
-        value: https://garage-frontend.vercel.app
+        value: https://garage-web-panel.pages.dev
       - key: SOCKET_CORS_ORIGIN
-        value: https://garage-frontend.vercel.app
+        value: https://garage-web-panel.pages.dev
       - key: WHATSAPP_API_KEY
         value: ""
       - key: WHATSAPP_PHONE_NUMBER_ID

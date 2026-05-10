@@ -1,0 +1,22 @@
+name = "garage-web-panel"
+compatibility_date = "2024-01-01"
+
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+[env.preview]
+vars = { ENVIRONMENT = "preview" }
+
+# Build configuration for Next.js
+[build]
+command = "npm run build"
+cwd = "."
+watch_dir = "src"
+
+# Site configuration
+[site]
+bucket = ".next"
+entry-point = "."
+
+# Environment variables (set in Cloudflare Dashboard)
+# NEXT_PUBLIC_API_URL = "https://garage-backend.onrender.com"
