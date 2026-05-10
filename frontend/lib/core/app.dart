@@ -13,23 +13,28 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      initialRoute: '/',
-      onGenerateRoute: (settings) {
-        final uri = Uri.parse(settings.name ?? '/');
-        
-        // Handle /track/:vehicleId
-        if (uri.pathSegments.length == 2 && uri.pathSegments[0] == 'track') {
-          final vehicleId = uri.pathSegments[1];
-          return MaterialPageRoute(
-            builder: (_) => TrackingScreen(vehicleId: vehicleId),
-          );
-        }
-        
-        // Default route
-        return MaterialPageRoute(
-          builder: (_) => const DashboardScreen(),
-        );
+      onGenerateRoute: _onGenerateRoute,
+      onGenerateInitialRoutes: (initialRoute) {
+        final settings = RouteSettings(name: initialRoute);
+        return [_onGenerateRoute(settings)!];
       },
+    );
+  }
+
+  Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
+    final uri = Uri.parse(settings.name ?? '/');
+    
+    // Handle /track/:vehicleId
+    if (uri.pathSegments.length == 2 && uri.pathSegments[0] == 'track') {
+      final vehicleId = uri.pathSegments[1];
+      return MaterialPageRoute(
+        builder: (_) => TrackingScreen(vehicleId: vehicleId),
+      );
+    }
+    
+    // Default route
+    return MaterialPageRoute(
+      builder: (_) => const DashboardScreen(),
     );
   }
 }
