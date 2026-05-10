@@ -1,4 +1,0 @@
-# Cloudflare Pages Redirects
-
-# Handle Next.js rewrites
-/api/*  /api/:splat  200

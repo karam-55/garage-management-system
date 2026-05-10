@@ -1,2 +1,0 @@
-# Redirect legacy QR path-param URLs to query-param version
-/qr/:token /qr?token=:token 301

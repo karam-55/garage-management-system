@@ -1,0 +1,135 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Customers
+model Customer {
+  id              String    @id @default(uuid())
+  name            String
+  phone           String    @unique
+  secondaryPhone  String?
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  vehicles        Vehicle[]
+  bookings        Booking[]
+  invoices        Invoice[]
+}
+
+// Vehicles
+model Vehicle {
+  id              String    @id @default(uuid())
+  customerId      String
+  plateNumber     String    @unique
+  model           String
+  year            Int
+  color           String
+  fuelType        String
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  customer        Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  bookings        Booking[]
+  invoices        Invoice[]
+  vehicleTracking VehicleTracking?
+}
+
+// Technicians
+model Technician {
+  id         String    @id @default(uuid())
+  name       String
+  phone      String    @unique
+  specialty  String?
+  notes      String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  bookings   Booking[]
+}
+
+// Bookings
+model Booking {
+  id                String      @id @default(uuid())
+  customerId        String
+  vehicleId         String
+  technicianId      String?
+  serviceType       String
+  status            BookingStatus @default(RECEIVED)
+  scheduledAt       DateTime
+  expectedFinishAt  DateTime?
+  notes             String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  customer          Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  vehicle           Vehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  technician        Technician? @relation(fields: [technicianId], references: [id], onDelete: SetNull)
+  invoices          Invoice[]
+}
+
+// Invoices
+model Invoice {
+  id            String    @id @default(uuid())
+  customerId    String
+  vehicleId     String
+  bookingId     String?
+  invoiceNumber String    @unique
+  date          DateTime  @default(now())
+  totalAmount   Float
+  discount      Float     @default(0)
+  netAmount     Float
+  paymentMethod String
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  customer      Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  vehicle       Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  booking       Booking?  @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+}
+
+// Inventory Items
+model InventoryItem {
+  id               String    @id @default(uuid())
+  name             String
+  code             String?   @unique
+  quantity         Int       @default(0)
+  purchasePrice    Float
+  salePrice        Float
+  minAlertQuantity Int       @default(5)
+  notes            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+// Notifications
+model Notification {
+  id         String   @id @default(uuid())
+  type       String
+  message    String
+  createdAt  DateTime @default(now())
+  isRead     Boolean  @default(false)
+}
+
+// Vehicle Tracking
+model VehicleTracking {
+  id            String   @id @default(uuid())
+  vehicleId     String   @unique
+  currentStatus String   @default("RECEIVED")
+  lastUpdateAt  DateTime @default(now())
+  trackingData  Json?
+  vehicle       Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+}
+
+enum BookingStatus {
+  RECEIVED
+  INSPECTION
+  IN_PROGRESS
+  WAITING_APPROVAL
+  DONE
+  CANCELED
+}
