@@ -147,19 +147,20 @@ export class InventoryService {
       },
     });
 
+    // TODO: Re-enable stock movement after fixing the issue
     // Log initial stock movement
-    if (quantity > 0) {
-      await this.prisma.stockMovement.create({
-        data: {
-          inventoryId: part.id,
-          type: 'IN',
-          quantity: quantity,
-          quantityBefore: 0,
-          quantityAfter: quantity,
-          referenceType: 'INITIAL_STOCK',
-        },
-      });
-    }
+    // if (quantity > 0) {
+    //   await this.prisma.stockMovement.create({
+    //     data: {
+    //       inventoryId: part.id,
+    //       type: 'IN',
+    //       quantity: quantity,
+    //       quantityBefore: 0,
+    //       quantityAfter: quantity,
+    //       referenceType: 'INITIAL_STOCK',
+    //     },
+    //   });
+    // }
 
     return part;
   }
