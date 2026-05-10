@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nes
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { InventoryService } from './inventory.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { CreateInventoryItemDto } from './dto/create-inventory.dto';
 
 @ApiTags('Inventory')
 @Controller('inventory')
@@ -39,7 +40,7 @@ export class InventoryController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async create(@Body() createInventoryDto: any) {
+  async create(@Body() createInventoryDto: CreateInventoryItemDto) {
     return this.inventoryService.create(createInventoryDto);
   }
 

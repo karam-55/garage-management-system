@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } f
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { MechanicsService } from './mechanics.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { CreateMechanicDto } from './dto/create-mechanic.dto';
 
 @ApiTags('Mechanics')
 @Controller('mechanics')
@@ -32,7 +33,7 @@ export class MechanicsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async create(@Body() createMechanicDto: any) {
+  async create(@Body() createMechanicDto: CreateMechanicDto) {
     return this.mechanicsService.create(createMechanicDto);
   }
 

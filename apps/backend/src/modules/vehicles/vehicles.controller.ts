@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nes
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { VehiclesService } from './vehicles.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { CreateVehicleDto } from './dto/create-vehicle.dto';
 
 @ApiTags('Vehicles')
 @Controller('vehicles')
@@ -25,7 +26,7 @@ export class VehiclesController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async create(@Body() createVehicleDto: any) {
+  async create(@Body() createVehicleDto: CreateVehicleDto) {
     return this.vehiclesService.create(createVehicleDto);
   }
 

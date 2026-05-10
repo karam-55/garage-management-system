@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } f
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { InvoicesService } from './invoices.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { CreateInvoiceDto } from './dto/create-invoice.dto';
 
 @ApiTags('Invoices')
 @Controller('invoices')
@@ -25,7 +26,7 @@ export class InvoicesController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async create(@Body() createInvoiceDto: any, @Request() req) {
+  async create(@Body() createInvoiceDto: CreateInvoiceDto, @Request() req) {
     return this.invoicesService.create({ ...createInvoiceDto, garageId: createInvoiceDto.garageId || req.user?.garageId });
   }
 
