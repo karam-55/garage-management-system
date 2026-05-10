@@ -20,9 +20,8 @@ export class CreateVehicleDto {
   @IsOptional()
   model?: string;
 
-  @IsInt()
+  @IsString()
   @IsOptional()
-  @Min(1900)
   year?: string;
 
   @IsString()
