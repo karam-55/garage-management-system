@@ -51,6 +51,22 @@ export class BookingsService {
   async create(createBookingDto: any, userId?: string) {
     const { serviceId, additionalServices, vehicleId, customerId, garageId, estimatedDurationMinutes, scheduledAt, notes, assignedMechanicId, pickupAddress, dropoffAddress } = createBookingDto;
 
+    // Find Customer record by User ID
+    let finalCustomerId = customerId;
+    if (customerId) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: customerId },
+      });
+      if (user && user.role === 'CUSTOMER') {
+        const customer = await this.prisma.customer.findUnique({
+          where: { phone: user.phone },
+        });
+        if (customer) {
+          finalCustomerId = customer.id;
+        }
+      }
+    }
+
     // Validate vehicle if provided
     if (vehicleId) {
       const vehicle = await this.prisma.vehicle.findUnique({ where: { id: vehicleId } });
@@ -77,7 +93,7 @@ export class BookingsService {
 
     const booking = await this.prisma.booking.create({
       data: {
-        customerId: customerId || userId,
+        customerId: finalCustomerId || userId,
         vehicleId: vehicleId || null,
         garageId: garageId || null,
         serviceId: serviceId || null,
