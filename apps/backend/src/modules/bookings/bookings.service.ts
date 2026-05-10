@@ -49,7 +49,7 @@ export class BookingsService {
   }
 
   async create(createBookingDto: any, userId?: string) {
-    const { serviceId, additionalServices, vehicleId, customerId, garageId, estimatedDurationMinutes, ...rest } = createBookingDto;
+    const { serviceId, additionalServices, vehicleId, customerId, garageId, estimatedDurationMinutes, scheduledAt, notes, assignedMechanicId, pickupAddress, dropoffAddress } = createBookingDto;
 
     // Validate vehicle if provided
     if (vehicleId) {
@@ -81,11 +81,13 @@ export class BookingsService {
         vehicleId: vehicleId || null,
         garageId: garageId || null,
         serviceId: serviceId || null,
+        assignedMechanicId: assignedMechanicId || null,
+        scheduledAt: scheduledAt || new Date(),
+        estimatedDurationMinutes: estimatedDurationMinutes || 60,
         qrToken: uuidv4(),
         qrExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
         status: 'PENDING' as any,
-        estimatedDurationMinutes: estimatedDurationMinutes || 60,
-        ...rest,
+        notes,
       },
       include: {
         customer: true,
