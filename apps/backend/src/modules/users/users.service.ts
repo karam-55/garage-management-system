@@ -27,7 +27,6 @@ export class UsersService {
       where,
       select: {
         id: true,
-        email: true,
         fullName: true,
         phone: true,
         role: true,
@@ -65,7 +64,6 @@ export class UsersService {
       where: { id: userId },
       select: {
         id: true,
-        email: true,
         fullName: true,
         phone: true,
         role: true,
@@ -87,12 +85,12 @@ export class UsersService {
   }
 
   async create(createUserDto: any) {
-    const { email, password, role, garageId, ...rest } = createUserDto;
+    const { phone, password, role, garageId, ...rest } = createUserDto;
 
-    // Check if email already exists
-    const existingUser = await this.prisma.user.findUnique({ where: { email } });
+    // Check if phone already exists
+    const existingUser = await this.prisma.user.findFirst({ where: { phone } });
     if (existingUser) {
-      throw new BadRequestException('Email already exists');
+      throw new BadRequestException('Phone number already exists');
     }
 
     // Hash password
@@ -100,7 +98,7 @@ export class UsersService {
 
     return this.prisma.user.create({
       data: {
-        email,
+        phone,
         passwordHash,
         role,
         garageId,
@@ -108,7 +106,6 @@ export class UsersService {
       },
       select: {
         id: true,
-        email: true,
         fullName: true,
         phone: true,
         role: true,
@@ -133,7 +130,6 @@ export class UsersService {
       data,
       select: {
         id: true,
-        email: true,
         fullName: true,
         phone: true,
         role: true,
@@ -180,7 +176,6 @@ export class UsersService {
       data: updateProfileDto,
       select: {
         id: true,
-        email: true,
         fullName: true,
         phone: true,
         avatarUrl: true,
