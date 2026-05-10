@@ -25,11 +25,12 @@ export class VehiclesService {
   }
 
   async create(createVehicleDto: any) {
-    const { licensePlate, ...rest } = createVehicleDto;
+    const { licensePlate, year, ...rest } = createVehicleDto;
     return this.prisma.vehicle.create({
       data: {
         ...rest,
         plate: licensePlate || rest.plate,
+        year: year ? parseInt(year) : null,
       },
     });
   }
