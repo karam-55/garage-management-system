@@ -9,7 +9,7 @@ export class CreateCustomerDto {
   @IsNotEmpty()
   fullName: string;
 
-  @IsPhoneNumber('SA')
+  @IsString()
   @IsNotEmpty()
   phone: string;
 
