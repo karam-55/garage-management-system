@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AppLayout from '../components/layouts/AppLayout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import apiClient from '../lib/api-client';
 
 const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -12,7 +13,7 @@ const Dashboard: React.FC = () => {
     completedBookings: 0,
   });
   const [recentBookings, setRecentBookings] = useState<any[]>([]);
-  const [alerts, setAlerts] = useState<any[]>([]);
+  const [alerts] = useState<any[]>([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -21,23 +22,33 @@ const Dashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      // Mock data for now
-      setStats({
-        todayBookings: 12,
-        activeVehicles: 8,
-        totalRevenue: 15400,
-        completedBookings: 45,
-      });
-      setRecentBookings([
-        { id: '1', customer: 'أحمد محمد', vehicle: 'Toyota Camry', status: 'IN_PROGRESS', time: '10:30' },
-        { id: '2', customer: 'خالد علي', vehicle: 'Honda Accord', status: 'PENDING', time: '09:15' },
-        { id: '3', customer: 'سعيد أحمد', vehicle: 'BMW X5', status: 'COMPLETED', time: '08:45' },
+      const [bookingsRes, reportsRes] = await Promise.allSettled([
+        apiClient.get('/bookings'),
+        apiClient.get('/reports/daily-revenue'),
       ]);
-      setAlerts([
-        { id: '1', type: 'warning', message: 'قطعة "فرامل Toyota" منخفضة المخزون (5 قطع)' },
-        { id: '2', type: 'error', message: 'فاتورة INV-2024-003 متأخرة الدفع' },
-        { id: '3', type: 'info', message: 'فني جديد "محمد علي" انضم للفريق' },
-      ]);
+
+      if (bookingsRes.status === 'fulfilled') {
+        const bookings = bookingsRes.value.data?.data || bookingsRes.value.data || [];
+        const arr = Array.isArray(bookings) ? bookings : [];
+        setRecentBookings(arr.slice(0, 5).map((b: any) => ({
+          id: b.id,
+          customer: b.customer?.fullName || b.customerName || 'عميل',
+          vehicle: b.vehicle ? `${b.vehicle.make} ${b.vehicle.model}` : 'سيارة',
+          status: b.status,
+          time: b.scheduledAt ? new Date(b.scheduledAt).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : '',
+        })));
+        setStats(prev => ({
+          ...prev,
+          todayBookings: arr.length,
+          activeVehicles: arr.filter((b: any) => b.status === 'IN_PROGRESS').length,
+          completedBookings: arr.filter((b: any) => b.status === 'COMPLETED').length,
+        }));
+      }
+
+      if (reportsRes.status === 'fulfilled') {
+        const revenue = reportsRes.value.data?.totalRevenue || 0;
+        setStats(prev => ({ ...prev, totalRevenue: revenue }));
+      }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -177,7 +188,7 @@ const Dashboard: React.FC = () => {
               </div>
             </Card>
 
-            <Card title="التنبيهات" actions={<Button variant="outline" size="sm">عرض الكل</Button>}>
+            <Card title="التنبيهات" actions={<Button variant="outline" size="sm" onClick={() => window.location.hash = '#/notifications'}>عرض الكل</Button>}>
               <div className="space-y-3">
                 {alerts.map((alert) => (
                   <div key={alert.id} className={`flex items-start gap-3 p-4 rounded-xl border-l-4 ${getAlertColor(alert.type)}`}>

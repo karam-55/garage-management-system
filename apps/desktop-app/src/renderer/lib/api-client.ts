@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://garage-backend.onrender.com'; // Backend API URL
+const API_BASE_URL = 'https://garage-backend-5oyi.onrender.com';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

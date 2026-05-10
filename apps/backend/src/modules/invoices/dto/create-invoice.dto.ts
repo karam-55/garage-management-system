@@ -9,19 +9,27 @@ export class CreateInvoiceDto {
   customerId: string;
 
   @IsUUID()
-  garageId: string;
+  @IsOptional()
+  garageId?: string;
+
+  @IsUUID()
+  @IsOptional()
+  vehicleId?: string;
 
   @IsNumber()
+  @IsOptional()
   @Min(0)
-  subtotal: number;
+  subtotal?: number;
 
   @IsNumber()
+  @IsOptional()
   @Min(0)
-  taxAmount: number;
+  taxAmount?: number;
 
   @IsNumber()
+  @IsOptional()
   @Min(0)
-  discountAmount: number;
+  discountAmount?: number;
 
   @IsNumber()
   @Min(0)

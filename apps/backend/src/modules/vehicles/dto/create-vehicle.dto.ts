@@ -1,25 +1,29 @@
-import { IsString, IsNotEmpty, IsOptional, IsUUID, IsInt, Min, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsUUID, IsInt, Min } from 'class-validator';
 
 export class CreateVehicleDto {
   @IsUUID()
   customerId: string;
 
   @IsString()
-  @IsNotEmpty()
-  plate: string;
+  @IsOptional()
+  plate?: string;
 
   @IsString()
-  @IsNotEmpty()
-  make: string;
+  @IsOptional()
+  licensePlate?: string;
 
   @IsString()
-  @IsNotEmpty()
-  model: string;
+  @IsOptional()
+  make?: string;
+
+  @IsString()
+  @IsOptional()
+  model?: string;
 
   @IsInt()
   @IsOptional()
   @Min(1900)
-  year?: number;
+  year?: string;
 
   @IsString()
   @IsOptional()
@@ -29,10 +33,9 @@ export class CreateVehicleDto {
   @IsOptional()
   color?: string;
 
-  @IsInt()
+  @IsString()
   @IsOptional()
-  @Min(0)
-  mileage?: number;
+  mileage?: string;
 
   @IsString()
   @IsOptional()

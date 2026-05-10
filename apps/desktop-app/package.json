@@ -9,7 +9,10 @@
     "preview": "electron-vite preview",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist out",
+    "build:electron": "electron-vite build",
+    "build:windows": "electron-vite build && electron-builder --win",
+    "build:prod": "electron-vite build && electron-builder --win --publish never"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -53,8 +56,7 @@
       "node_modules/follow-redirects/**"
     ],
     "win": {
-      "target": ["nsis", "portable"],
-      "icon": "resources/icon.ico"
+      "target": ["nsis", "portable"]
     },
     "nsis": {
       "oneClick": false,

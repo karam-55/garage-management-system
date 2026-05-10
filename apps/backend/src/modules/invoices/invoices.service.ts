@@ -256,12 +256,8 @@ export class InvoicesService {
   }
 
   async remove(id: string) {
-    // Soft delete
-    return this.prisma.invoice.update({
+    return this.prisma.invoice.delete({
       where: { id },
-      data: {
-        status: 'CANCELLED' as any,
-      },
     });
   }
 

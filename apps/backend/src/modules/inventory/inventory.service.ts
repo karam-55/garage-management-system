@@ -113,7 +113,7 @@ export class InventoryService {
   }
 
   async create(createInventoryDto: any) {
-    const { partNumber, barcode, garageId, ...rest } = createInventoryDto;
+    const { partNumber, barcode, garageId, sku, minQuantity, unitPrice, ...rest } = createInventoryDto;
 
     // Check if part number already exists
     if (partNumber) {
@@ -137,9 +137,11 @@ export class InventoryService {
 
     const part = await this.prisma.partsInventory.create({
       data: {
-        partNumber,
-        barcode,
+        partNumber: partNumber || sku,
+        barcode: barcode || sku,
         garageId,
+        minStockLevel: minQuantity || rest.minStockLevel,
+        sellingPrice: unitPrice || rest.sellingPrice,
         ...rest,
       },
     });
@@ -216,13 +218,8 @@ export class InventoryService {
   }
 
   async remove(id: string) {
-    // Soft delete
-    return this.prisma.partsInventory.update({
+    return this.prisma.partsInventory.delete({
       where: { id },
-      data: {
-        isActive: false,
-        deletedAt: new Date(),
-      },
     });
   }
 

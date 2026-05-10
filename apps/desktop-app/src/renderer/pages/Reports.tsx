@@ -3,20 +3,33 @@ import AppLayout from '../components/layouts/AppLayout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Select from '../components/ui/Select';
+import apiClient from '../lib/api-client';
 
 const Reports: React.FC = () => {
   const [reportType, setReportType] = useState('');
   const [period, setPeriod] = useState('month');
   const [loading, setLoading] = useState(false);
+  const [reportData, setReportData] = useState<any>(null);
 
   const handleGenerateReport = async () => {
     if (!reportType) return;
     setLoading(true);
     try {
-      // Generate report logic
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    } catch (error) {
-      console.error('Error generating report:', error);
+      console.log('[API] Generating report:', reportType, period);
+      let endpoint = '/reports';
+      if (reportType === 'revenue') endpoint = '/reports/revenue';
+      else if (reportType === 'bookings') endpoint = '/reports/mechanic-performance';
+      else if (reportType === 'inventory') endpoint = '/reports/inventory';
+      else if (reportType === 'customers') endpoint = '/reports/customers';
+
+      const res = await apiClient.get(endpoint);
+      console.log('[API] Report data:', res.data);
+      setReportData(res.data);
+    } catch (error: any) {
+      console.error('[API] Error generating report:', error);
+      console.error('[API] Response:', error.response?.data);
+      const errorMessage = error.response?.data?.message || error.message || 'فشل إنشاء التقرير';
+      alert(`خطأ: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -94,7 +107,7 @@ const Reports: React.FC = () => {
                 </div>
               </Card>
 
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full" onClick={() => alert('سيتم تحميل التقرير')}>
                 📥 تحميل التقرير
               </Button>
             </div>

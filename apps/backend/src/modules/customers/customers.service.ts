@@ -85,9 +85,8 @@ export class CustomersService {
     if (!customer) {
       throw new NotFoundException('Customer not found');
     }
-    return this.prisma.user.update({
+    return this.prisma.user.delete({
       where: { id },
-      data: { deletedAt: new Date(), isActive: false },
     });
   }
 }

@@ -1,9 +1,6 @@
-import { IsEmail, IsNotEmpty, IsString, IsOptional, IsUUID, IsPhoneNumber } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsOptional, IsPhoneNumber } from 'class-validator';
 
 export class CreateCustomerDto {
-  @IsUUID()
-  userId: string;
-
   @IsString()
   @IsOptional()
   nationalId?: string;
@@ -19,6 +16,10 @@ export class CreateCustomerDto {
   @IsEmail()
   @IsOptional()
   email?: string;
+
+  @IsString()
+  @IsOptional()
+  password?: string;
 
   @IsString()
   @IsOptional()

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import apiClient from '../../lib/api-client';
 
 interface NavItem {
   id: string;
@@ -28,6 +29,21 @@ interface AppLayoutProps {
 const AppLayout: React.FC<AppLayoutProps> = ({ children, currentPage = 'dashboard' }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await apiClient.get('/notifications');
+      const data = res.data?.data || res.data || [];
+      setNotifications(Array.isArray(data) ? data.slice(0, 5) : []);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -59,6 +75,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, currentPage = 'dashboar
           {navItems.map((item) => (
             <button
               key={item.id}
+              onClick={() => { window.location.hash = '#' + item.path; }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all mb-1 ${
                 currentPage === item.id
                   ? 'bg-white/20 text-white shadow-lg'
@@ -84,15 +101,62 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, currentPage = 'dashboar
             </div>
 
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => setNotificationsOpen(!notificationsOpen)}
-                className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setNotificationsOpen(!notificationsOpen)}
+                  className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                  <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+
+                {notificationsOpen && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50">
+                    <div className="p-4 border-b border-gray-100">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-bold text-gray-900">الإشعارات</h3>
+                        <button onClick={() => setNotificationsOpen(false)} className="text-gray-400 hover:text-gray-600">
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="p-4 max-h-64 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <p className="text-sm text-gray-500 text-center py-4">
+                          لا توجد إشعارات جديدة
+                        </p>
+                      ) : (
+                        <div className="space-y-2">
+                          {notifications.map((notification) => (
+                            <div
+                              key={notification.id}
+                              className={`p-3 rounded-lg ${!notification.read ? 'bg-blue-50' : 'bg-gray-50'}`}
+                            >
+                              <p className="text-sm font-medium text-gray-900">{notification.title}</p>
+                              <p className="text-xs text-gray-600 mt-1">{notification.message}</p>
+                              <p className="text-xs text-gray-400 mt-1">
+                                {notification.createdAt ? new Date(notification.createdAt).toLocaleDateString('ar-SA') : 'الآن'}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3 border-t border-gray-100">
+                      <button
+                        onClick={() => { window.location.hash = '#/notifications'; setNotificationsOpen(false); }}
+                        className="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        عرض جميع الإشعارات
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
@@ -105,7 +169,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children, currentPage = 'dashboar
               </div>
 
               <button
-                onClick={() => window.location.href = '/login'}
+                onClick={() => { localStorage.clear(); window.location.hash = '#/login'; }}
                 className="p-2 hover:bg-red-100 rounded-full transition-colors"
                 title="تسجيل الخروج"
               >

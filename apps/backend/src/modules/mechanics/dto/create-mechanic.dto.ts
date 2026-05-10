@@ -1,54 +1,49 @@
-import { IsString, IsNotEmpty, IsOptional, IsUUID, IsEnum, IsDateString, IsIn } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsIn, IsEmail, IsBoolean } from 'class-validator';
 
 export class CreateMechanicDto {
-  @IsUUID()
-  userId: string;
+  @IsString()
+  @IsNotEmpty()
+  fullName: string;
 
-  @IsUUID()
-  garageId: string;
+  @IsString()
+  @IsNotEmpty()
+  phone: string;
 
-  @IsIn(['BEGINNER', 'INTERMEDIATE', 'EXPERT', 'MASTER'])
+  @IsEmail()
   @IsOptional()
-  skillLevel?: 'BEGINNER' | 'INTERMEDIATE' | 'EXPERT' | 'MASTER';
-
-  @IsIn(['AVAILABLE', 'BUSY', 'ON_LEAVE', 'UNAVAILABLE'])
-  @IsOptional()
-  availabilityStatus?: 'AVAILABLE' | 'BUSY' | 'ON_LEAVE' | 'UNAVAILABLE';
+  email?: string;
 
   @IsString()
   @IsOptional()
-  avatarUrl?: string;
+  password?: string;
+
+  @IsString()
+  @IsOptional()
+  specializations?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
 }
 
 export class UpdateMechanicDto {
-  @IsIn(['BEGINNER', 'INTERMEDIATE', 'EXPERT', 'MASTER'])
+  @IsString()
   @IsOptional()
-  skillLevel?: 'BEGINNER' | 'INTERMEDIATE' | 'EXPERT' | 'MASTER';
-
-  @IsIn(['AVAILABLE', 'BUSY', 'ON_LEAVE', 'UNAVAILABLE'])
-  @IsOptional()
-  availabilityStatus?: 'AVAILABLE' | 'BUSY' | 'ON_LEAVE' | 'UNAVAILABLE';
+  fullName?: string;
 
   @IsString()
   @IsOptional()
-  avatarUrl?: string;
-}
+  phone?: string;
 
-export class CreateMechanicSpecializationDto {
-  @IsUUID()
-  mechanicId: string;
-
-  @IsUUID()
-  serviceId: string;
-
-  @IsIn(['BEGINNER', 'INTERMEDIATE', 'EXPERT', 'MASTER'])
-  skillLevel: 'BEGINNER' | 'INTERMEDIATE' | 'EXPERT' | 'MASTER';
+  @IsEmail()
+  @IsOptional()
+  email?: string;
 
   @IsString()
   @IsOptional()
-  certificateUrl?: string;
+  specializations?: string;
 
-  @IsString()
+  @IsBoolean()
   @IsOptional()
-  notes?: string;
+  isActive?: boolean;
 }

@@ -2,7 +2,8 @@ import { IsString, IsNotEmpty, IsOptional, IsUUID, IsNumber, Min, IsInt, IsIn } 
 
 export class CreateInventoryItemDto {
   @IsUUID()
-  garageId: string;
+  @IsOptional()
+  garageId?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -13,8 +14,12 @@ export class CreateInventoryItemDto {
   nameAr?: string;
 
   @IsString()
-  @IsNotEmpty()
-  partNumber: string;
+  @IsOptional()
+  sku?: string;
+
+  @IsString()
+  @IsOptional()
+  partNumber?: string;
 
   @IsString()
   @IsOptional()
@@ -33,20 +38,33 @@ export class CreateInventoryItemDto {
   quantity: number;
 
   @IsNumber()
+  @IsOptional()
   @Min(0)
-  minStockLevel: number;
+  minQuantity?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  minStockLevel?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  maxStockLevel?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  unitCost?: number;
 
   @IsNumber()
   @Min(0)
-  maxStockLevel: number;
+  unitPrice?: number;
 
   @IsNumber()
+  @IsOptional()
   @Min(0)
-  unitCost: number;
-
-  @IsNumber()
-  @Min(0)
-  sellingPrice: number;
+  sellingPrice?: number;
 
   @IsString()
   @IsOptional()

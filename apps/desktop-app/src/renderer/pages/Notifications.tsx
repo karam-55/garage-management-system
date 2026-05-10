@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AppLayout from '../components/layouts/AppLayout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import apiClient from '../lib/api-client';
 
 const Notifications: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -15,14 +16,20 @@ const Notifications: React.FC = () => {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      setNotifications([
-        { id: '1', type: 'info', title: 'حجز جديد', message: 'حجز جديد من أحمد محمد', read: false, time: 'منذ 5 دقائق' },
-        { id: '2', type: 'warning', title: 'تنبيه المخزون', message: 'قطعة "فرامل Toyota" منخفضة المخزون', read: false, time: 'منذ ساعة' },
-        { id: '3', type: 'success', title: 'دفع مكتمل', message: 'تم استلام دفع فاتورة INV-2024-001', read: true, time: 'منذ ساعتين' },
-        { id: '4', type: 'error', title: 'فاتورة متأخرة', message: 'فاتورة INV-2024-003 متأخرة الدفع', read: true, time: 'منذ يوم' },
-      ]);
+      console.log('[API] Fetching notifications');
+      const res = await apiClient.get('/notifications');
+      const data = res.data?.data || res.data || [];
+      setNotifications(Array.isArray(data) ? data.map((n: any) => ({
+        id: n.id,
+        type: n.type || 'info',
+        title: n.title || 'إشعار',
+        message: n.message || '',
+        read: n.read || false,
+        time: n.createdAt ? new Date(n.createdAt).toLocaleDateString('ar-SA') : 'الآن',
+      })) : []);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error('[API] Error fetching notifications:', error);
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
@@ -48,16 +55,39 @@ const Notifications: React.FC = () => {
     return colors[type] || 'border-gray-400 bg-gray-50';
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
+  const markAsRead = async (id: string) => {
+    try {
+      console.log('[API] Marking notification as read:', id);
+      await apiClient.put(`/notifications/${id}/read`);
+      setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
+    } catch (error) {
+      console.error('[API] Error marking notification as read:', error);
+    }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
+  const markAllAsRead = async () => {
+    try {
+      console.log('[API] Marking all notifications as read');
+      await apiClient.put('/notifications/mark-all-read');
+      setNotifications(notifications.map(n => ({ ...n, read: true })));
+    } catch (error) {
+      console.error('[API] Error marking all notifications as read:', error);
+    }
   };
 
-  const deleteNotification = (id: string) => {
-    setNotifications(notifications.filter(n => n.id !== id));
+  const deleteNotification = async (id: string) => {
+    try {
+      console.log('[API] Deleting notification:', id);
+      await apiClient.delete(`/notifications/${id}`);
+      console.log('[API] Notification deleted successfully');
+      setNotifications(notifications.filter(n => n.id !== id));
+      alert('تم حذف الإشعار بنجاح');
+    } catch (error: any) {
+      console.error('[API] Error deleting notification:', error);
+      console.error('[API] Response:', error.response?.data);
+      const errorMessage = error.response?.data?.message || error.message || 'فشل حذف الإشعار';
+      alert(`خطأ: ${errorMessage}`);
+    }
   };
 
   const filteredNotifications = filter === 'all' 

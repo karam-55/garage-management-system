@@ -4,6 +4,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
+import apiClient from '../lib/api-client';
 
 const Settings: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -19,13 +20,44 @@ const Settings: React.FC = () => {
     discountPercentage: 10,
   });
 
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      console.log('[API] Fetching settings');
+      const res = await apiClient.get('/settings');
+      const data = res.data?.data || res.data;
+      if (data) {
+        setSettings({
+          garageName: data.garageName || 'كراج المدينة',
+          garageAddress: data.garageAddress || '',
+          garagePhone: data.garagePhone || '',
+          garageEmail: data.garageEmail || '',
+          taxRate: data.taxRate || 15,
+          cancellationPolicy: data.cancellationPolicy || '',
+          discountEnabled: data.discountEnabled || true,
+          discountPercentage: data.discountPercentage || 10,
+        });
+      }
+    } catch (error) {
+      console.error('[API] Error fetching settings:', error);
+    }
+  };
+
   const handleSave = async () => {
     setLoading(true);
     try {
-      // Save settings logic
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    } catch (error) {
-      console.error('Error saving settings:', error);
+      console.log('[API] Saving settings:', settings);
+      await apiClient.put('/settings', settings);
+      console.log('[API] Settings saved successfully');
+      alert('تم حفظ الإعدادات بنجاح');
+    } catch (error: any) {
+      console.error('[API] Error saving settings:', error);
+      console.error('[API] Response:', error.response?.data);
+      const errorMessage = error.response?.data?.message || error.message || 'فشل حفظ الإعدادات';
+      alert(`خطأ: ${errorMessage}`);
     } finally {
       setLoading(false);
     }

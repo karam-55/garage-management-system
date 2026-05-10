@@ -25,8 +25,12 @@ export class VehiclesService {
   }
 
   async create(createVehicleDto: any) {
+    const { licensePlate, ...rest } = createVehicleDto;
     return this.prisma.vehicle.create({
-      data: createVehicleDto,
+      data: {
+        ...rest,
+        plate: licensePlate || rest.plate,
+      },
     });
   }
 

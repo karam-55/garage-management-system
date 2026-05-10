@@ -6,7 +6,8 @@ export class CreateBookingDto {
   customerId: string;
 
   @IsUUID()
-  garageId: string;
+  @IsOptional()
+  garageId?: string;
 
   @IsUUID()
   vehicleId: string;
@@ -23,8 +24,9 @@ export class CreateBookingDto {
   scheduledAt: string;
 
   @IsInt()
+  @IsOptional()
   @Min(1)
-  estimatedDurationMinutes: number;
+  estimatedDurationMinutes?: number;
 
   @IsString()
   @IsOptional()

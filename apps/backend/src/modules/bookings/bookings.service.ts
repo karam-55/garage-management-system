@@ -49,7 +49,7 @@ export class BookingsService {
   }
 
   async create(createBookingDto: any, userId?: string) {
-    const { serviceId, additionalServices, vehicleId, customerId, garageId, ...rest } = createBookingDto;
+    const { serviceId, additionalServices, vehicleId, customerId, garageId, estimatedDurationMinutes, ...rest } = createBookingDto;
 
     // Validate vehicle
     const vehicle = await this.prisma.vehicle.findUnique({ where: { id: vehicleId } });
@@ -57,27 +57,32 @@ export class BookingsService {
       throw new NotFoundException('Vehicle not found');
     }
 
-    // Validate service
-    const service = await this.prisma.service.findUnique({ where: { id: serviceId } });
-    if (!service) {
-      throw new NotFoundException('Service not found');
+    // Validate service if provided
+    if (serviceId) {
+      const service = await this.prisma.service.findUnique({ where: { id: serviceId } });
+      if (!service) {
+        throw new NotFoundException('Service not found');
+      }
     }
 
-    // Validate garage
-    const garage = await this.prisma.garage.findUnique({ where: { id: garageId } });
-    if (!garage) {
-      throw new NotFoundException('Garage not found');
+    // Validate garage if provided
+    if (garageId) {
+      const garage = await this.prisma.garage.findUnique({ where: { id: garageId } });
+      if (!garage) {
+        throw new NotFoundException('Garage not found');
+      }
     }
 
     const booking = await this.prisma.booking.create({
       data: {
         customerId: customerId || userId,
         vehicleId,
-        garageId,
-        serviceId,
+        garageId: garageId || null,
+        serviceId: serviceId || null,
         qrToken: uuidv4(),
         qrExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
         status: 'PENDING' as any,
+        estimatedDurationMinutes: estimatedDurationMinutes || 60,
         ...rest,
       },
       include: {
@@ -134,13 +139,8 @@ export class BookingsService {
   }
 
   async remove(id: string) {
-    // Soft delete
-    return this.prisma.booking.update({
+    return this.prisma.booking.delete({
       where: { id },
-      data: {
-        deletedAt: new Date(),
-        status: 'CANCELLED' as any,
-      },
     });
   }
 

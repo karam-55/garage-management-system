@@ -77,7 +77,7 @@ ipcMain.handle('api-get', async (_event, url: string, token?: string) => {
   try {
     return new Promise((resolve, reject) => {
       const options = {
-        hostname: 'garage-backend.onrender.com',
+        hostname: 'garage-backend-5oyi.onrender.com',
         port: 443,
         path: url,
         method: 'GET',
@@ -112,7 +112,7 @@ ipcMain.handle('api-post', async (_event, url: string, data: any, token?: string
     return new Promise((resolve, reject) => {
       const postData = JSON.stringify(data);
       const options = {
-        hostname: 'garage-backend.onrender.com',
+        hostname: 'garage-backend-5oyi.onrender.com',
         port: 443,
         path: url,
         method: 'POST',
@@ -149,7 +149,7 @@ ipcMain.handle('api-put', async (_event, url: string, data: any, token?: string)
     return new Promise((resolve, reject) => {
       const putData = JSON.stringify(data);
       const options = {
-        hostname: 'garage-backend.onrender.com',
+        hostname: 'garage-backend-5oyi.onrender.com',
         port: 443,
         path: url,
         method: 'PUT',
@@ -185,7 +185,7 @@ ipcMain.handle('api-delete', async (_event, url: string, token?: string) => {
   try {
     return new Promise((resolve, reject) => {
       const options = {
-        hostname: 'garage-backend.onrender.com',
+        hostname: 'garage-backend-5oyi.onrender.com',
         port: 443,
         path: url,
         method: 'DELETE',
@@ -220,7 +220,7 @@ ipcMain.handle('login', async (_event, credentials: { email: string; password: s
     return new Promise((resolve, reject) => {
       const postData = JSON.stringify(credentials);
       const options = {
-        hostname: 'garage-backend.onrender.com',
+        hostname: 'garage-backend-5oyi.onrender.com',
         port: 443,
         path: '/auth/login',
         method: 'POST',

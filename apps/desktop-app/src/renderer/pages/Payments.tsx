@@ -5,6 +5,7 @@ import Button from '../components/ui/Button';
 import Table from '../components/ui/Table';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
+import apiClient from '../lib/api-client';
 
 const Payments: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -20,11 +21,17 @@ const Payments: React.FC = () => {
   const fetchPayments = async () => {
     setLoading(true);
     try {
-      setPayments([
-        { id: '1', invoice: 'INV-2024-001', customer: 'أحمد محمد', amount: 450, method: 'CASH', status: 'COMPLETED', date: '2024-01-15' },
-        { id: '2', invoice: 'INV-2024-002', customer: 'خالد علي', amount: 320, method: 'CARD', status: 'PENDING', date: '2024-01-15' },
-        { id: '3', invoice: 'INV-2024-003', customer: 'سعيد أحمد', amount: 780, method: 'BANK_TRANSFER', status: 'FAILED', date: '2024-01-14' },
-      ]);
+      const res = await apiClient.get('/payments');
+      const data = res.data?.data || res.data || [];
+      setPayments(Array.isArray(data) ? data.map((p: any) => ({
+        id: p.id,
+        invoice: p.invoice?.invoiceNumber || p.invoiceId || '',
+        customer: p.customer?.fullName || 'عميل',
+        amount: Number(p.amount || 0).toFixed(2),
+        method: p.paymentMethod || '',
+        status: p.status,
+        date: p.paymentDate || p.createdAt ? new Date(p.paymentDate || p.createdAt).toLocaleDateString('ar-SA') : '',
+      })) : []);
     } catch (error) {
       console.error('Error fetching payments:', error);
     } finally {
