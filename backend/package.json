@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "prisma generate && tsc",
-    "start": "node dist/main.js",
+    "start": "ls -la && ls -la dist && node dist/main.js",
     "dev": "ts-node src/main.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"
