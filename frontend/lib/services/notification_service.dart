@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import '../utils/api_config.dart';
+import 'api_service.dart';
 
 class NotificationService {
-  final Dio _dio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl));
+  final ApiService _api = ApiService();
 
   Future<List<Map<String, dynamic>>> getNotifications() async {
     try {
-      final response = await _dio.get('/notifications');
+      final response = await _api.get('/notifications');
       return List<Map<String, dynamic>>.from(response.data);
     } catch (e) {
       return [];
@@ -15,11 +14,11 @@ class NotificationService {
   }
 
   Future<void> markAsRead(int id) async {
-    await _dio.patch('/notifications/$id', data: {'isRead': true});
+    await _api.put('/notifications/$id', {'isRead': true});
   }
 
   Future<void> deleteNotification(int id) async {
-    await _dio.delete('/notifications/$id');
+    await _api.delete('/notifications/$id');
   }
 }
 

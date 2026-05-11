@@ -133,3 +133,24 @@ enum BookingStatus {
   DONE
   CANCELED
 }
+
+enum EmployeeRole {
+  OWNER
+  MANAGER
+  RECEPTIONIST
+  MECHANIC
+  CASHIER
+}
+
+// Employees (Staff Login System)
+model Employee {
+  id         String       @id @default(uuid())
+  name       String
+  phone      String       @unique
+  password   String
+  role       EmployeeRole @default(RECEPTIONIST)
+  isActive   Boolean      @default(true)
+  notes      String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}

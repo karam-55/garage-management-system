@@ -10,6 +10,8 @@ import { InventoryModule } from './inventory/inventory.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { TrackingModule } from './tracking/tracking.module';
 import { WhatsAppModule } from './whatsapp/whatsapp.module';
+import { AuthModule } from './auth/auth.module';
+import { EmployeesModule } from './employees/employees.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { WhatsAppModule } from './whatsapp/whatsapp.module';
       isGlobal: true,
     }),
     PrismaModule,
+    AuthModule,
+    EmployeesModule,
     CustomersModule,
     VehiclesModule,
     TechniciansModule,

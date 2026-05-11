@@ -1,9 +1,10 @@
 class Booking {
   final String id;
   final String vehicleId;
+  final String? customerId;
   final String? technicianId;
-  final String serviceDescription;
-  final String status; // PENDING, IN_PROGRESS, COMPLETED, CANCELLED
+  final String serviceDescription; // maps to serviceType in backend
+  final String status;
   final DateTime scheduledDate;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -11,9 +12,10 @@ class Booking {
   Booking({
     required this.id,
     required this.vehicleId,
+    this.customerId,
     this.technicianId,
     required this.serviceDescription,
-    this.status = 'PENDING',
+    this.status = 'RECEIVED',
     required this.scheduledDate,
     required this.createdAt,
     required this.updatedAt,
@@ -21,27 +23,29 @@ class Booking {
 
   factory Booking.fromJson(Map<String, dynamic> json) {
     return Booking(
-      id: json['id'],
-      vehicleId: json['vehicleId'],
+      id: json['id'] ?? '',
+      vehicleId: json['vehicleId'] ?? '',
+      customerId: json['customerId'],
       technicianId: json['technicianId'],
-      serviceDescription: json['serviceDescription'],
-      status: json['status'] ?? 'PENDING',
-      scheduledDate: DateTime.parse(json['scheduledDate']),
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      // Backend uses 'serviceType', fallback to 'serviceDescription'
+      serviceDescription: json['serviceType'] ?? json['serviceDescription'] ?? '',
+      status: json['status'] ?? 'RECEIVED',
+      // Backend uses 'scheduledAt', fallback to 'scheduledDate'
+      scheduledDate: DateTime.parse(
+        json['scheduledAt'] ?? json['scheduledDate'] ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      updatedAt: DateTime.parse(json['updatedAt'] ?? DateTime.now().toIso8601String()),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'vehicleId': vehicleId,
-      'technicianId': technicianId,
-      'serviceDescription': serviceDescription,
+      if (customerId != null) 'customerId': customerId,
+      if (technicianId != null) 'technicianId': technicianId,
+      'serviceType': serviceDescription,
       'status': status,
-      'scheduledDate': scheduledDate.toIso8601String(),
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'scheduledAt': scheduledDate.toIso8601String(),
     };
   }
 }

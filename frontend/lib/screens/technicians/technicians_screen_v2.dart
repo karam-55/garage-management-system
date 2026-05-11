@@ -162,7 +162,7 @@ class _TechniciansScreenV2State extends ConsumerState<TechniciansScreenV2> {
       if (_searchQuery.isEmpty) return true;
       final q = _searchQuery.toLowerCase();
       return t.name.toLowerCase().contains(q) ||
-          t.specialization.toLowerCase().contains(q);
+          (t.specialization?.toLowerCase().contains(q) ?? false);
     }).toList();
 
     return Padding(
@@ -314,7 +314,6 @@ class _TechniciansScreenV2State extends ConsumerState<TechniciansScreenV2> {
           name: nameController.text,
           specialization: specController.text,
           phone: phoneController.text,
-          isAvailable: true,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
@@ -332,7 +331,7 @@ class _TechniciansScreenV2State extends ConsumerState<TechniciansScreenV2> {
 
   void _showEditDialog(Technician tech) {
     final nameController = TextEditingController(text: tech.name);
-    final specController = TextEditingController(text: tech.specialization);
+    final specController = TextEditingController(text: tech.specialization ?? '');
     final phoneController = TextEditingController(text: tech.phone);
 
     _showTechnicianDialog(
@@ -372,6 +371,7 @@ class _TechniciansScreenV2State extends ConsumerState<TechniciansScreenV2> {
       createdAt: tech.createdAt,
       updatedAt: DateTime.now(),
     );
+
     try {
       await ref.read(technicianServiceProvider).updateTechnician(tech.id, updated);
       ref.invalidate(techniciansProvider);
@@ -665,7 +665,7 @@ class _TechnicianRowState extends State<_TechnicianRow>
               ),
               Expanded(
                 flex: 2,
-                child: Text(t.specialization, style: AppTypography.bodyMedium),
+                child: Text(t.specialization ?? '—', style: AppTypography.bodyMedium),
               ),
               Expanded(
                 flex: 2,

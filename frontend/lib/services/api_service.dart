@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import '../utils/api_config.dart';
+import '../utils/token_storage.dart';
 
 class ApiService {
   final Dio _dio;
@@ -8,7 +9,17 @@ class ApiService {
     baseUrl: ApiConfig.baseUrl,
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
-  ));
+  )) {
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) {
+        final token = TokenStorage.getToken();
+        if (token != null) {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
+        return handler.next(options);
+      },
+    ));
+  }
 
   Future<Response> get(String path) async {
     try {

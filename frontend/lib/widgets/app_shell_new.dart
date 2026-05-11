@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/app_theme.dart';
+import '../models/employee.dart';
 import '../services/notification_service.dart';
+import '../state/auth_provider.dart';
 
 // Navigation Provider
 final currentPageProvider = StateProvider<int>((ref) => 0);
 final sidebarExpandedProvider = StateProvider<bool>((ref) => true);
 
 class AppShellNew extends ConsumerWidget {
-  const AppShellNew({super.key, required this.pages});
+  const AppShellNew({super.key, required this.pages, this.employee});
   final List<AppPage> pages;
+  final Employee? employee;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,12 +31,14 @@ class AppShellNew extends ConsumerWidget {
               pages: pages,
               currentIndex: currentPage,
               isExpanded: isExpanded,
+              employee: employee,
               onPageSelected: (index) {
                 ref.read(currentPageProvider.notifier).state = index;
               },
               onToggle: () {
                 ref.read(sidebarExpandedProvider.notifier).state = !isExpanded;
               },
+              onLogout: () => ref.read(authProvider.notifier).logout(),
             ),
           Expanded(
             child: Column(
@@ -134,15 +139,19 @@ class _Sidebar extends StatefulWidget {
   final List<AppPage> pages;
   final int currentIndex;
   final bool isExpanded;
+  final Employee? employee;
   final Function(int) onPageSelected;
   final VoidCallback onToggle;
+  final VoidCallback onLogout;
 
   const _Sidebar({
     required this.pages,
     required this.currentIndex,
     required this.isExpanded,
+    this.employee,
     required this.onPageSelected,
     required this.onToggle,
+    required this.onLogout,
   });
 
   @override
@@ -208,6 +217,8 @@ class _SidebarState extends State<_Sidebar> with SingleTickerProviderStateMixin 
           const SizedBox(height: 12),
           // User Profile
           if (widget.isExpanded) _buildUserProfile(),
+          if (widget.isExpanded) const SizedBox(height: 8),
+          if (widget.isExpanded) _buildLogoutButton(),
           const SizedBox(height: 12),
         ],
       ),
@@ -285,8 +296,11 @@ class _SidebarState extends State<_Sidebar> with SingleTickerProviderStateMixin 
   }
 
   Widget _buildUserProfile() {
+    final name = widget.employee?.name ?? 'مدير النظام';
+    final roleLabel = widget.employee?.role.label ?? 'مدير';
+    final initial = name.isNotEmpty ? name[0] : 'م';
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
         children: [
           Container(
@@ -298,10 +312,10 @@ class _SidebarState extends State<_Sidebar> with SingleTickerProviderStateMixin 
               ),
               borderRadius: AppBorders.radiusFull,
             ),
-            child: const Center(
+            child: Center(
               child: Text(
-                'م',
-                style: TextStyle(
+                initial,
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
@@ -314,13 +328,37 @@ class _SidebarState extends State<_Sidebar> with SingleTickerProviderStateMixin 
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('مدير النظام', style: AppTypography.labelMedium.copyWith(fontSize: 13)),
-                Text('مدير', style: AppTypography.bodySmall.copyWith(fontSize: 11)),
+                Text(name, style: AppTypography.labelMedium.copyWith(fontSize: 13)),
+                Text(roleLabel, style: AppTypography.bodySmall.copyWith(fontSize: 11, color: AppColors.textMuted)),
               ],
             ),
           ),
-          Icon(Icons.settings_outlined, size: 18, color: AppColors.textMuted),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLogoutButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: GestureDetector(
+        onTap: widget.onLogout,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+          decoration: BoxDecoration(
+            color: AppColors.error.withOpacity(0.08),
+            borderRadius: AppBorders.radiusMd,
+            border: Border.all(color: AppColors.error.withOpacity(0.2)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.logout, size: 18, color: AppColors.error),
+              const SizedBox(width: 10),
+              Text('تسجيل الخروج', style: AppTypography.labelSmall.copyWith(
+                color: AppColors.error, fontSize: 12)),
+            ],
+          ),
+        ),
       ),
     );
   }

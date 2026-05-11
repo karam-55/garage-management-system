@@ -121,7 +121,7 @@ class _MechanicLoginScreenState extends ConsumerState<MechanicLoginScreen> {
                                     Text(tech.name, style: AppTypography.bodyLarge.copyWith(
                                       fontWeight: FontWeight.w600)),
                                     const SizedBox(height: 4),
-                                    Text(tech.specialization ?? 'فني عام',
+                                    Text(tech.specialization ?? 'فني عام',  
                                       style: AppTypography.bodySmall.copyWith(
                                         color: AppColors.textMuted)),
                                   ],

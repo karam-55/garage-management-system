@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/app.dart';
 import 'core/app_theme.dart';
+import 'state/auth_provider.dart';
+import 'screens/auth/login_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,14 +14,15 @@ void main() {
   );
 }
 
-class AppWrapper extends StatefulWidget {
+class AppWrapper extends ConsumerStatefulWidget {
   const AppWrapper({super.key});
 
   @override
-  State<AppWrapper> createState() => _AppWrapperState();
+  ConsumerState<AppWrapper> createState() => _AppWrapperState();
 }
 
-class _AppWrapperState extends State<AppWrapper> with SingleTickerProviderStateMixin {
+class _AppWrapperState extends ConsumerState<AppWrapper>
+    with SingleTickerProviderStateMixin {
   bool _showSplash = true;
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
@@ -41,11 +44,7 @@ class _AppWrapperState extends State<AppWrapper> with SingleTickerProviderStateM
     _controller.forward();
 
     Future.delayed(const Duration(seconds: 2, milliseconds: 500), () {
-      if (mounted) {
-        setState(() {
-          _showSplash = false;
-        });
-      }
+      if (mounted) setState(() => _showSplash = false);
     });
   }
 
@@ -57,25 +56,25 @@ class _AppWrapperState extends State<AppWrapper> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
     return MaterialApp(
       title: 'AUTO RENEW',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
       home: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 800),
-        transitionBuilder: (child, animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
-        },
-        child: _showSplash
+        duration: const Duration(milliseconds: 600),
+        transitionBuilder: (child, animation) =>
+            FadeTransition(opacity: animation, child: child),
+        child: _showSplash || authState.isLoading
             ? _SplashScreen(
                 key: const ValueKey('splash'),
                 fadeAnimation: _fadeAnimation,
                 scaleAnimation: _scaleAnimation,
               )
-            : const MyApp(key: ValueKey('app')),
+            : authState.isLoggedIn
+                ? MyApp(key: const ValueKey('app'), employee: authState.employee)
+                : const LoginScreen(key: ValueKey('login')),
       ),
     );
   }

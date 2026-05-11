@@ -45,31 +45,55 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
   String _getStatusText(String? status) {
     switch (status) {
-      case 'PENDING':
-        return 'قيد الانتظار';
-      case 'IN_PROGRESS':
-        return 'جاري العمل';
-      case 'COMPLETED':
-        return 'مكتمل';
-      case 'CANCELLED':
-        return 'ملغي';
-      default:
-        return 'غير معروف';
+      case 'RECEIVED':       return 'تم الاستلام';
+      case 'INSPECTION':     return 'قيد الفحص';
+      case 'IN_PROGRESS':    return 'جاري العمل';
+      case 'WAITING_APPROVAL': return 'بانتظار الموافقة';
+      case 'DONE':           return 'مكتمل ✓';
+      case 'CANCELED':       return 'ملغي';
+      // legacy values
+      case 'PENDING':        return 'قيد الانتظار';
+      case 'COMPLETED':      return 'مكتمل ✓';
+      case 'CANCELLED':      return 'ملغي';
+      default:               return status ?? 'غير معروف';
     }
   }
 
   Color _getStatusColor(String? status) {
     switch (status) {
-      case 'PENDING':
-        return Colors.orange;
-      case 'IN_PROGRESS':
-        return Colors.blue;
-      case 'COMPLETED':
-        return Colors.green;
-      case 'CANCELLED':
-        return Colors.red;
-      default:
-        return Colors.grey;
+      case 'RECEIVED':         return const Color(0xFF3B82F6);
+      case 'INSPECTION':       return const Color(0xFFA855F7);
+      case 'IN_PROGRESS':      return const Color(0xFFF59E0B);
+      case 'WAITING_APPROVAL': return const Color(0xFFF97316);
+      case 'DONE':             return const Color(0xFF10B981);
+      case 'CANCELED':         return const Color(0xFFEF4444);
+      case 'PENDING':          return const Color(0xFFF59E0B);
+      case 'COMPLETED':        return const Color(0xFF10B981);
+      case 'CANCELLED':        return const Color(0xFFEF4444);
+      default:                 return Colors.grey;
+    }
+  }
+
+  IconData _getStatusIcon(String? status) {
+    switch (status) {
+      case 'RECEIVED':         return Icons.inbox;
+      case 'INSPECTION':       return Icons.search;
+      case 'IN_PROGRESS':      return Icons.build;
+      case 'WAITING_APPROVAL': return Icons.pending_actions;
+      case 'DONE':             return Icons.check_circle;
+      case 'CANCELED':         return Icons.cancel;
+      default:                 return Icons.info;
+    }
+  }
+
+  int _getStatusStep(String? status) {
+    switch (status) {
+      case 'RECEIVED':         return 0;
+      case 'INSPECTION':       return 1;
+      case 'IN_PROGRESS':      return 2;
+      case 'WAITING_APPROVAL': return 3;
+      case 'DONE':             return 4;
+      default:                 return 0;
     }
   }
 
@@ -109,80 +133,150 @@ class _TrackingScreenState extends State<TrackingScreen> {
   Widget _buildTrackingWidget() {
     final vehicle = vehicleData!;
     final customer = vehicle['customer'];
-    final tracking = vehicle['vehicleTracking'];
     final bookings = vehicle['bookings'] as List? ?? [];
     final latestBooking = bookings.isNotEmpty ? bookings.first : null;
+    final currentStatus = latestBooking?['status'] ?? 'RECEIVED';
 
     return Directionality(
       textDirection: TextDirection.rtl,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
-            _buildHeader(),
-            const SizedBox(height: 24),
-
-            // Vehicle Info Card
-            _buildVehicleInfoCard(vehicle, customer),
-            const SizedBox(height: 16),
-
-            // Current Status Card
-            _buildStatusCard(tracking, latestBooking),
-            const SizedBox(height: 16),
-
-            // Services/Booking Details
-            if (latestBooking != null)
-              _buildBookingCard(latestBooking),
-
-            const SizedBox(height: 24),
-
-            // Contact Info
-            _buildContactCard(customer),
+            _buildHeader(currentStatus),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildStatusTimeline(currentStatus),
+                  const SizedBox(height: 16),
+                  _buildVehicleInfoCard(vehicle, customer),
+                  const SizedBox(height: 16),
+                  if (latestBooking != null) ...[
+                    _buildBookingCard(latestBooking),
+                    const SizedBox(height: 16),
+                  ],
+                  _buildContactCard(customer),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(String status) {
+    final color = _getStatusColor(status);
+    final icon = _getStatusIcon(status);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 52, 20, 24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1976D2), Color(0xFF0D47A1)],
+        gradient: LinearGradient(
+          colors: [color, color.withOpacity(0.7)],
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
         ),
-        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
-          const Icon(
-            Icons.local_car_wash,
-            size: 48,
-            color: Colors.white,
-          ),
-          const SizedBox(height: 12),
+          Icon(icon, size: 56, color: Colors.white),
+          const SizedBox(height: 14),
           const Text(
-            'نظام تتبع السيارات',
+            'AUTO RENEW',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.white70,
+              letterSpacing: 3,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            _getStatusText(status),
+            style: const TextStyle(
+              fontSize: 26,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            'تتبع حالة سيارتك في الورشة',
+            'حالة سيارتك الحالية في الورشة',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               color: Colors.white.withOpacity(0.8),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStatusTimeline(String currentStatus) {
+    const steps = ['RECEIVED', 'INSPECTION', 'IN_PROGRESS', 'WAITING_APPROVAL', 'DONE'];
+    const labels = ['استلام', 'فحص', 'عمل', 'موافقة', 'إنجاز'];
+    final currentStep = _getStatusStep(currentStatus);
+
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(
+              children: [
+                Icon(Icons.timeline, color: Color(0xFF1976D2)),
+                SizedBox(width: 8),
+                Text('مسار الخدمة', style: TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: List.generate(steps.length, (i) {
+                final done = i <= currentStep;
+                final active = i == currentStep;
+                return Expanded(
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 32, height: 32,
+                        decoration: BoxDecoration(
+                          color: done
+                              ? _getStatusColor(steps[i])
+                              : Colors.grey.shade200,
+                          shape: BoxShape.circle,
+                          border: active ? Border.all(
+                            color: _getStatusColor(steps[i]),
+                            width: 3) : null,
+                        ),
+                        child: Icon(
+                          done ? Icons.check : Icons.circle,
+                          size: done ? 18 : 8,
+                          color: done ? Colors.white : Colors.grey.shade400,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(labels[i],
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: active ? FontWeight.bold : FontWeight.normal,
+                          color: done ? _getStatusColor(steps[i]) : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -223,7 +317,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
   }
 
   Widget _buildStatusCard(Map<String, dynamic>? tracking, Map<String, dynamic>? booking) {
-    final status = tracking?['status'] ?? booking?['status'] ?? 'PENDING';
+    final status = tracking?['currentStatus'] ?? tracking?['status'] ?? booking?['status'] ?? 'RECEIVED';
     final statusText = _getStatusText(status);
     final statusColor = _getStatusColor(status);
 
@@ -301,9 +395,13 @@ class _TrackingScreenState extends State<TrackingScreen> {
               ],
             ),
             const Divider(height: 24),
-            _buildInfoRow('الوصف:', booking['serviceDescription'] ?? '-'),
-            _buildInfoRow('التاريخ:', _formatDate(booking['scheduledDate'])),
+            _buildInfoRow('الخدمة:', booking['serviceType'] ?? booking['serviceDescription'] ?? '-'),
+            _buildInfoRow('التاريخ:', _formatDate(booking['scheduledAt'] ?? booking['scheduledDate'])),
             _buildInfoRow('الحالة:', _getStatusText(booking['status'])),
+            if (booking['notes'] != null && booking['notes'].toString().isNotEmpty)
+              _buildInfoRow('ملاحظات:', booking['notes']),
+            if (booking['technician'] != null)
+              _buildInfoRow('الفني:', booking['technician']['name'] ?? '-'),
           ],
         ),
       ),

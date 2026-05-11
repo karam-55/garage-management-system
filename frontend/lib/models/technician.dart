@@ -1,43 +1,43 @@
 class Technician {
   final String id;
   final String name;
-  final String specialization;
+  final String? specialization; // backend field: specialty
   final String phone;
   final bool isAvailable;
+  final String? notes;
   final DateTime createdAt;
   final DateTime updatedAt;
 
   Technician({
     required this.id,
     required this.name,
-    required this.specialization,
+    this.specialization,
     required this.phone,
     this.isAvailable = true,
+    this.notes,
     required this.createdAt,
     required this.updatedAt,
   });
 
   factory Technician.fromJson(Map<String, dynamic> json) {
     return Technician(
-      id: json['id'],
-      name: json['name'],
-      specialization: json['specialization'],
-      phone: json['phone'],
-      isAvailable: json['isAvailable'] ?? true,
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      // Backend uses 'specialty', support both
+      specialization: json['specialty'] ?? json['specialization'],
+      phone: json['phone'] ?? '',
+      notes: json['notes'],
+      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      updatedAt: DateTime.parse(json['updatedAt'] ?? DateTime.now().toIso8601String()),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'name': name,
-      'specialization': specialization,
       'phone': phone,
-      'isAvailable': isAvailable,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      if (specialization != null) 'specialty': specialization,
+      if (notes != null) 'notes': notes,
     };
   }
 }
