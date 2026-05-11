@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../customers/customers_screen.dart';
 import '../vehicles/vehicles_screen.dart';
+import '../mechanic/mechanic_dashboard_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -95,6 +96,18 @@ class DashboardScreen extends ConsumerWidget {
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('قريباً')),
+              );
+            },
+          ),
+          _buildMenuCard(
+            context,
+            icon: Icons.handyman,
+            title: 'الميكانيكي',
+            color: Colors.deepOrange,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MechanicDashboardScreen()),
               );
             },
           ),

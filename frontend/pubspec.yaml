@@ -16,8 +16,9 @@ dependencies:
   # HTTP Client
   dio: ^5.4.0
   
-  # QR Code (mobile only)
+  # QR Code
   qr_flutter: ^4.1.0
+  mobile_scanner: ^3.5.5
   
   # UI Components
   cupertino_icons: ^1.0.6
