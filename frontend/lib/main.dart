@@ -48,7 +48,8 @@ class _AppWrapperState extends ConsumerState<AppWrapper>
     );
     _controller.forward();
 
-    Future.delayed(const Duration(seconds: 2, milliseconds: 500), () {
+    // Show splash for max 500ms, then check auth state
+    Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) setState(() => _showSplash = false);
     });
   }
