@@ -6,7 +6,7 @@ final customerServiceProvider = Provider<CustomerService>((ref) {
   return CustomerService();
 });
 
-final customersProvider = FutureProvider.autoDispose<List<Customer>>((ref) async {
+final customersProvider = FutureProvider<List<Customer>>((ref) async {
   final service = ref.watch(customerServiceProvider);
   return await service.getAllCustomers();
 });

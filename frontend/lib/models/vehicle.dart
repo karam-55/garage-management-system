@@ -2,7 +2,7 @@ import 'customer.dart';
 
 class Vehicle {
   final String id;
-  final String customerId;
+  final String? customerId;
   final String plateNumber;
   final String model;
   final int year;
@@ -15,7 +15,7 @@ class Vehicle {
 
   Vehicle({
     required this.id,
-    required this.customerId,
+    this.customerId,
     required this.plateNumber,
     required this.model,
     required this.year,

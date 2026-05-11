@@ -248,7 +248,7 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
                         const SizedBox(width: 8),
                         _buildActionButton(
                           icon: Icons.person_add,
-                          label: vehicle.customerId.isEmpty ? 'اسناد' : 'تغيير',
+                          label: (vehicle.customerId == null || vehicle.customerId!.isEmpty) ? 'اسناد' : 'تغيير',
                           color: const Color(0xFFFF9800),
                           onPressed: () => _showAssignCustomerDialog(context, vehicle),
                         ),
