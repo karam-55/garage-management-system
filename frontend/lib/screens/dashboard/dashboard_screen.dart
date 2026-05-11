@@ -4,6 +4,10 @@ import '../../state/dashboard_provider.dart';
 import '../../state/theme_provider.dart';
 import '../customers/customers_screen.dart';
 import '../vehicles/vehicles_screen.dart';
+import '../technicians/technicians_screen.dart';
+import '../bookings/bookings_screen.dart';
+import '../invoices/invoices_screen.dart';
+import '../inventory/inventory_screen.dart';
 import '../mechanic/mechanic_dashboard_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -98,10 +102,42 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 _buildQuickAction(
                   context,
+                  icon: Icons.build,
+                  title: 'الفنيين',
+                  subtitle: 'إدارة الفنيين',
+                  color: Colors.orange,
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TechniciansScreen())),
+                ),
+                _buildQuickAction(
+                  context,
+                  icon: Icons.calendar_today,
+                  title: 'الحجوزات',
+                  subtitle: 'إدارة الحجوزات',
+                  color: Colors.purple,
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BookingsScreen())),
+                ),
+                _buildQuickAction(
+                  context,
+                  icon: Icons.receipt,
+                  title: 'الفواتير',
+                  subtitle: 'الفواتير والمدفوعات',
+                  color: Colors.red,
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const InvoicesScreen())),
+                ),
+                _buildQuickAction(
+                  context,
+                  icon: Icons.inventory,
+                  title: 'المخزون',
+                  subtitle: 'إدارة المخزون',
+                  color: Colors.teal,
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const InventoryScreen())),
+                ),
+                _buildQuickAction(
+                  context,
                   icon: Icons.handyman,
                   title: 'الميكانيكي',
                   subtitle: 'إدارة الصيانة',
-                  color: Colors.orange,
+                  color: Colors.deepOrange,
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MechanicDashboardScreen())),
                 ),
                 _buildQuickAction(
