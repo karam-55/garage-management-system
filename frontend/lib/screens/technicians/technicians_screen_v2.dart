@@ -321,10 +321,10 @@ class _TechniciansScreenV2State extends ConsumerState<TechniciansScreenV2> {
         try {
           await ref.read(technicianServiceProvider).createTechnician(newTech);
           ref.invalidate(techniciansProvider);
-          Navigator.pop(context);
           showSuccessToast(context, 'تم إضافة الفني بنجاح!');
         } catch (e) {
           showErrorToast(context, 'خطأ: \$e');
+          rethrow;
         }
       },
     );
@@ -353,10 +353,10 @@ class _TechniciansScreenV2State extends ConsumerState<TechniciansScreenV2> {
         try {
           await ref.read(technicianServiceProvider).updateTechnician(tech.id, updated);
           ref.invalidate(techniciansProvider);
-          Navigator.pop(context);
           showSuccessToast(context, 'تم تحديث الفني بنجاح!');
         } catch (e) {
           showErrorToast(context, 'خطأ: \$e');
+          rethrow;
         }
       },
     );
@@ -430,7 +430,7 @@ class _TechniciansScreenV2State extends ConsumerState<TechniciansScreenV2> {
     required TextEditingController nameController,
     required TextEditingController specController,
     required TextEditingController phoneController,
-    required VoidCallback onSave,
+    required Future<void> Function() onSave,
   }) {
     showDialog(
       context: context,
@@ -449,7 +449,7 @@ class _TechniciansScreenV2State extends ConsumerState<TechniciansScreenV2> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _dialogHeader(title),
+                _dialogHeader(context, title),
                 Flexible(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(24),
@@ -466,7 +466,14 @@ class _TechniciansScreenV2State extends ConsumerState<TechniciansScreenV2> {
                     ),
                   ),
                 ),
-                _dialogFooter(onSave),
+                _dialogFooter(context, () async {
+                  try {
+                    await onSave();
+                    if (mounted) Navigator.pop(context);
+                  } catch (_) {
+                    // Error already shown, dialog stays open
+                  }
+                }),
               ],
             ),
           ),
@@ -475,7 +482,7 @@ class _TechniciansScreenV2State extends ConsumerState<TechniciansScreenV2> {
     );
   }
 
-  Widget _dialogHeader(String title) {
+  Widget _dialogHeader(BuildContext context, String title) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 20, 16, 12),
       decoration: BoxDecoration(
@@ -504,7 +511,7 @@ class _TechniciansScreenV2State extends ConsumerState<TechniciansScreenV2> {
     );
   }
 
-  Widget _dialogFooter(VoidCallback onSave) {
+  Widget _dialogFooter(BuildContext context, VoidCallback onSave) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
       child: Row(

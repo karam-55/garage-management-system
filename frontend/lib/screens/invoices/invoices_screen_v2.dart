@@ -316,10 +316,10 @@ class _InvoicesScreenV2State extends ConsumerState<InvoicesScreenV2> {
         try {
           await ref.read(invoiceServiceProvider).createInvoice(newInvoice);
           ref.invalidate(invoicesProvider);
-          Navigator.pop(context);
           showSuccessToast(context, 'تم إضافة الفاتورة بنجاح!');
         } catch (e) {
           showErrorToast(context, 'خطأ: \$e');
+          rethrow;
         }
       },
     );
@@ -390,7 +390,7 @@ class _InvoicesScreenV2State extends ConsumerState<InvoicesScreenV2> {
     required String title,
     required TextEditingController bookingIdController,
     required TextEditingController amountController,
-    required VoidCallback onSave,
+    required Future<void> Function() onSave,
   }) {
     showDialog(
       context: context,
@@ -409,7 +409,7 @@ class _InvoicesScreenV2State extends ConsumerState<InvoicesScreenV2> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _dialogHeader(title),
+                _dialogHeader(context, title),
                 Flexible(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(24),
@@ -424,7 +424,14 @@ class _InvoicesScreenV2State extends ConsumerState<InvoicesScreenV2> {
                     ),
                   ),
                 ),
-                _dialogFooter(onSave),
+                _dialogFooter(context, () async {
+                  try {
+                    await onSave();
+                    if (mounted) Navigator.pop(context);
+                  } catch (_) {
+                    // Error already shown, dialog stays open
+                  }
+                }),
               ],
             ),
           ),
@@ -433,7 +440,7 @@ class _InvoicesScreenV2State extends ConsumerState<InvoicesScreenV2> {
     );
   }
 
-  Widget _dialogHeader(String title) {
+  Widget _dialogHeader(BuildContext context, String title) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 20, 16, 12),
       decoration: BoxDecoration(
@@ -462,7 +469,7 @@ class _InvoicesScreenV2State extends ConsumerState<InvoicesScreenV2> {
     );
   }
 
-  Widget _dialogFooter(VoidCallback onSave) {
+  Widget _dialogFooter(BuildContext context, VoidCallback onSave) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
       child: Row(

@@ -317,10 +317,10 @@ class _InventoryScreenV2State extends ConsumerState<InventoryScreenV2> {
         try {
           await ref.read(inventoryServiceProvider).createItem(newItem);
           ref.invalidate(inventoryProvider);
-          Navigator.pop(context);
           showSuccessToast(context, 'تم إضافة القطعة بنجاح!');
         } catch (e) {
           showErrorToast(context, 'خطأ: \$e');
+          rethrow;
         }
       },
     );
@@ -348,10 +348,10 @@ class _InventoryScreenV2State extends ConsumerState<InventoryScreenV2> {
         try {
           await ref.read(inventoryServiceProvider).updateItem(item.id, updated);
           ref.invalidate(inventoryProvider);
-          Navigator.pop(context);
           showSuccessToast(context, 'تم تحديث القطعة بنجاح!');
         } catch (e) {
           showErrorToast(context, 'خطأ: \$e');
+          rethrow;
         }
       },
     );
@@ -405,7 +405,7 @@ class _InventoryScreenV2State extends ConsumerState<InventoryScreenV2> {
     required TextEditingController nameController,
     required TextEditingController qtyController,
     required TextEditingController priceController,
-    required VoidCallback onSave,
+    required Future<void> Function() onSave,
   }) {
     showDialog(
       context: context,
@@ -424,7 +424,7 @@ class _InventoryScreenV2State extends ConsumerState<InventoryScreenV2> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _dialogHeader(title),
+                _dialogHeader(context, title),
                 Flexible(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(24),
@@ -442,7 +442,14 @@ class _InventoryScreenV2State extends ConsumerState<InventoryScreenV2> {
                     ),
                   ),
                 ),
-                _dialogFooter(onSave),
+                _dialogFooter(context, () async {
+                  try {
+                    await onSave();
+                    if (mounted) Navigator.pop(context);
+                  } catch (_) {
+                    // Error already shown, dialog stays open
+                  }
+                }),
               ],
             ),
           ),
@@ -451,7 +458,7 @@ class _InventoryScreenV2State extends ConsumerState<InventoryScreenV2> {
     );
   }
 
-  Widget _dialogHeader(String title) {
+  Widget _dialogHeader(BuildContext context, String title) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 20, 16, 12),
       decoration: BoxDecoration(
@@ -480,7 +487,7 @@ class _InventoryScreenV2State extends ConsumerState<InventoryScreenV2> {
     );
   }
 
-  Widget _dialogFooter(VoidCallback onSave) {
+  Widget _dialogFooter(BuildContext context, VoidCallback onSave) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
       child: Row(

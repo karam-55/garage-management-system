@@ -346,10 +346,10 @@ class _BookingsScreenV2State extends ConsumerState<BookingsScreenV2> {
         try {
           await ref.read(bookingServiceProvider).createBooking(newBooking);
           ref.invalidate(bookingsProvider);
-          Navigator.pop(context);
           showSuccessToast(context, 'تم إضافة الحجز بنجاح!');
         } catch (e) {
           showErrorToast(context, 'خطأ: \$e');
+          rethrow;
         }
       },
     );
@@ -378,10 +378,10 @@ class _BookingsScreenV2State extends ConsumerState<BookingsScreenV2> {
         try {
           await ref.read(bookingServiceProvider).updateBooking(booking.id, updated);
           ref.invalidate(bookingsProvider);
-          Navigator.pop(context);
           showSuccessToast(context, 'تم تحديث الحجز بنجاح!');
         } catch (e) {
           showErrorToast(context, 'خطأ: \$e');
+          rethrow;
         }
       },
     );
@@ -488,7 +488,7 @@ class _BookingsScreenV2State extends ConsumerState<BookingsScreenV2> {
     required TextEditingController vehicleIdController,
     required DateTime initialDate,
     required String initialStatus,
-    required Function(DateTime, String) onSave,
+    required Future<void> Function(DateTime, String) onSave,
   }) {
     DateTime selectedDate = initialDate;
     String selectedStatus = initialStatus;
@@ -511,7 +511,7 @@ class _BookingsScreenV2State extends ConsumerState<BookingsScreenV2> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _dialogHeader(title),
+                  _dialogHeader(context, title),
                   Flexible(
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.all(24),
@@ -601,9 +601,14 @@ class _BookingsScreenV2State extends ConsumerState<BookingsScreenV2> {
                       ),
                     ),
                   ),
-                  _dialogFooter(() {
+                  _dialogFooter(context, () async {
                     if (serviceController.text.isEmpty || vehicleIdController.text.isEmpty) return;
-                    onSave(selectedDate, selectedStatus);
+                    try {
+                      await onSave(selectedDate, selectedStatus);
+                      if (mounted) Navigator.pop(context);
+                    } catch (_) {
+                      // Error already shown, dialog stays open
+                    }
                   }),
                 ],
               ),
@@ -652,7 +657,7 @@ class _BookingsScreenV2State extends ConsumerState<BookingsScreenV2> {
     );
   }
 
-  Widget _dialogHeader(String title) {
+  Widget _dialogHeader(BuildContext context, String title) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 20, 16, 12),
       decoration: BoxDecoration(
@@ -681,7 +686,7 @@ class _BookingsScreenV2State extends ConsumerState<BookingsScreenV2> {
     );
   }
 
-  Widget _dialogFooter(VoidCallback onSave) {
+  Widget _dialogFooter(BuildContext context, VoidCallback onSave) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
       child: Row(

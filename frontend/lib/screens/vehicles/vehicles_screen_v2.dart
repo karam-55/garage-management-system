@@ -343,10 +343,10 @@ class _VehiclesScreenV2State extends ConsumerState<VehiclesScreenV2> {
         try {
           await ref.read(vehicleServiceProvider).createVehicle(newVehicle);
           ref.invalidate(vehiclesProvider);
-          Navigator.pop(context);
           showSuccessToast(context, 'تم إضافة السيارة بنجاح!');
         } catch (e) {
           showErrorToast(context, 'خطأ: $e');
+          rethrow;
         }
       },
     );
@@ -383,10 +383,10 @@ class _VehiclesScreenV2State extends ConsumerState<VehiclesScreenV2> {
         try {
           await ref.read(vehicleServiceProvider).updateVehicle(vehicle.id, updated);
           ref.invalidate(vehiclesProvider);
-          Navigator.pop(context);
           showSuccessToast(context, 'تم تحديث السيارة بنجاح!');
         } catch (e) {
           showErrorToast(context, 'خطأ: $e');
+          rethrow;
         }
       },
     );
@@ -399,7 +399,7 @@ class _VehiclesScreenV2State extends ConsumerState<VehiclesScreenV2> {
     required TextEditingController yearController,
     required TextEditingController colorController,
     required TextEditingController fuelController,
-    required VoidCallback onSave,
+    required Future<void> Function() onSave,
   }) {
     showDialog(
       context: context,
@@ -477,7 +477,14 @@ class _VehiclesScreenV2State extends ConsumerState<VehiclesScreenV2> {
                       ),
                       const SizedBox(width: 8),
                       GestureDetector(
-                        onTap: onSave,
+                        onTap: () async {
+                          try {
+                            await onSave();
+                            if (mounted) Navigator.pop(context);
+                          } catch (_) {
+                            // Error already shown, dialog stays open
+                          }
+                        },
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                           decoration: BoxDecoration(
