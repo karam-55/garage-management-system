@@ -4,6 +4,7 @@ import 'core/app.dart';
 import 'core/app_theme.dart';
 import 'state/auth_provider.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/tracking/tracking_screen.dart';
 import 'utils/token_storage.dart';
 
 void main() async {
@@ -36,6 +37,23 @@ class _AppWrapperState extends ConsumerState<AppWrapper>
   bool get _isPublicTracking {
     final route = WidgetsBinding.instance.platformDispatcher.defaultRouteName;
     return route.startsWith('/track');
+  }
+
+  /// Extract vehicleId and token from tracking URL
+  ({String vehicleId, String? token})? _parseTrackingRoute() {
+    final route = WidgetsBinding.instance.platformDispatcher.defaultRouteName;
+    if (!route.startsWith('/track')) return null;
+
+    try {
+      final uri = Uri.parse(route);
+      if (uri.pathSegments.length == 2 && uri.pathSegments[0] == 'track') {
+        return (
+          vehicleId: uri.pathSegments[1],
+          token: uri.queryParameters['token'],
+        );
+      }
+    } catch (_) {}
+    return null;
   }
 
   @override
@@ -75,12 +93,18 @@ class _AppWrapperState extends ConsumerState<AppWrapper>
 
     // Public tracking page (/track/:vehicleId?token=...) bypasses auth entirely
     if (_isPublicTracking) {
-      return MaterialApp(
-        title: 'AUTO RENEW',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.darkTheme,
-        home: const MyApp(employee: null),
-      );
+      final trackingData = _parseTrackingRoute();
+      if (trackingData != null) {
+        return MaterialApp(
+          title: 'AUTO RENEW',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.darkTheme,
+          home: TrackingScreen(
+            vehicleId: trackingData.vehicleId,
+            token: trackingData.token,
+          ),
+        );
+      }
     }
 
     return MaterialApp(

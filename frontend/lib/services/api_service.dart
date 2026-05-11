@@ -26,6 +26,12 @@ class ApiService {
         )) {
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
+        // Skip Authorization header for public tracking routes
+        final path = options.path;
+        if (path.contains('/track')) {
+          return handler.next(options);
+        }
+
         final token = TokenStorage.getToken();
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
@@ -33,6 +39,11 @@ class ApiService {
         return handler.next(options);
       },
       onError: (DioException error, handler) async {
+        // Skip auto-logout for public tracking routes
+        if (error.requestOptions.path.contains('/track')) {
+          return handler.next(error);
+        }
+
         if (error.response?.statusCode == 401) {
           // Token is invalid / expired – clear it and notify auth layer
           await TokenStorage.clearToken();

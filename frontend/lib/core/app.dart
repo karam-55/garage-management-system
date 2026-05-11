@@ -125,7 +125,7 @@ class MyApp extends ConsumerWidget {
   Route<dynamic>? _onGenerateRoute(RouteSettings settings, List<AppPage> pages) {
     final uri = Uri.parse(settings.name ?? '/');
 
-    // Handle /track/:vehicleId (public - no auth needed)
+    // Handle /track/:vehicleId (public - no auth needed) - MUST BE FIRST
     if (uri.pathSegments.length == 2 && uri.pathSegments[0] == 'track') {
       final vehicleId = uri.pathSegments[1];
       final token = uri.queryParameters['token'];
@@ -134,7 +134,14 @@ class MyApp extends ConsumerWidget {
       );
     }
 
-    // Default route
+    // If employee is null and not a public route, should not happen but handle gracefully
+    if (employee == null) {
+      return MaterialPageRoute(
+        builder: (_) => TrackingScreen(vehicleId: '', token: null),
+      );
+    }
+
+    // Default route - authenticated app
     return MaterialPageRoute(
       builder: (_) => AppShellNew(pages: pages, employee: employee),
     );
