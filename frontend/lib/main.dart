@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/app.dart';
-import 'state/theme_provider.dart';
 
 void main() {
   runApp(
@@ -11,14 +10,14 @@ void main() {
   );
 }
 
-class AppWrapper extends ConsumerStatefulWidget {
+class AppWrapper extends StatefulWidget {
   const AppWrapper({super.key});
 
   @override
-  ConsumerState<AppWrapper> createState() => _AppWrapperState();
+  State<AppWrapper> createState() => _AppWrapperState();
 }
 
-class _AppWrapperState extends ConsumerState<AppWrapper> {
+class _AppWrapperState extends State<AppWrapper> {
   bool _showSplash = true;
 
   @override
@@ -35,37 +34,19 @@ class _AppWrapperState extends ConsumerState<AppWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    final themeMode = ref.watch(themeModeProvider);
-
     return MaterialApp(
       title: 'AUTO RENEW',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.light,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF667eea),
-          brightness: Brightness.light,
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: const Color(0xFF0F172A),
+        colorScheme: ColorScheme.dark(
+          primary: const Color(0xFF6366F1),
+          secondary: const Color(0xFF10B981),
+          surface: const Color(0xFF1E293B),
+          background: const Color(0xFF0F172A),
         ),
         useMaterial3: true,
-        cardTheme: const CardThemeData(
-          elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-        ),
       ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF667eea),
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-        cardTheme: const CardThemeData(
-          elevation: 8,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-        ),
-        scaffoldBackgroundColor: const Color(0xFF1a1a2e),
-      ),
-      themeMode: themeMode,
       home: AnimatedSwitcher(
         duration: const Duration(milliseconds: 600),
         transitionBuilder: (child, animation) {

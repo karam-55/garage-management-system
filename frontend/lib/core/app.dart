@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:garage_management/screens/dashboard/dashboard_screen.dart';
+import 'package:garage_management/screens/dashboard/dashboard_screen_new.dart';
 import 'package:garage_management/screens/tracking/tracking_screen.dart';
 
 class MyApp extends StatelessWidget {
@@ -8,9 +8,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Garage Management System',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+      title: 'AUTO RENEW',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: const Color(0xFF0F172A),
+        colorScheme: ColorScheme.dark(
+          primary: const Color(0xFF6366F1),
+          secondary: const Color(0xFF10B981),
+          surface: const Color(0xFF1E293B),
+          background: const Color(0xFF0F172A),
+        ),
         useMaterial3: true,
       ),
       onGenerateRoute: _onGenerateRoute,
@@ -34,7 +41,7 @@ class MyApp extends StatelessWidget {
     
     // Default route
     return MaterialPageRoute(
-      builder: (_) => const DashboardScreen(),
+      builder: (_) => const DashboardScreenNew(),
     );
   }
 }
