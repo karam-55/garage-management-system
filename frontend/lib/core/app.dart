@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:garage_management/screens/dashboard/dashboard_screen_new.dart';
+import 'package:garage_management/widgets/app_shell.dart';
 import 'package:garage_management/screens/tracking/tracking_screen.dart';
 
 class MyApp extends StatelessWidget {
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
     
     // Default route
     return MaterialPageRoute(
-      builder: (_) => const DashboardScreenNew(),
+      builder: (_) => const AppShell(),
     );
   }
 }
