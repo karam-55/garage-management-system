@@ -50,7 +50,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     print('[AuthProvider] Token loaded: ${token != null ? "EXISTS" : "NULL"}');
 
     if (token == null) {
-      print('[AuthProvider] No token found, setting isLoggedIn=false');
+      print('[AuthProvider] No token found, setting isLoggedIn=false, isLoading=false');
       state = const AuthState(isLoading: false, isLoggedIn: false);
       return;
     }
@@ -65,7 +65,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return;
       }
       // getProfile() returned null → 401 was received, token already cleared
-      print('[AuthProvider] Profile is null, setting isLoggedIn=false');
+      print('[AuthProvider] Profile is null, setting isLoggedIn=false, isLoading=false');
       state = const AuthState(isLoading: false, isLoggedIn: false);
     } on DioException catch (e) {
       // Network error / timeout:
@@ -77,7 +77,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       print('[AuthProvider] Exception: $e');
       state = const AuthState(isLoading: false, isLoggedIn: false);
     }
-    print('[AuthProvider] _init completed');
+    print('[AuthProvider] _init completed, isLoading should be false');
   }
 
   Future<void> login(String phone, String password) async {
