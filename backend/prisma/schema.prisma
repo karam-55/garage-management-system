@@ -63,7 +63,7 @@ model Booking {
   serviceType        String
   services           Json?
   additionalServices Json?
-  qrToken            String?     @unique
+  qrToken            String?
   qrUrl              String?
   status             BookingStatus @default(RECEIVED)
   scheduledAt        DateTime

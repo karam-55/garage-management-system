@@ -6,6 +6,9 @@ export declare class TechniciansController {
     findAll(): Promise<({
         bookings: {
             id: string;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
             customerId: string;
             vehicleId: string;
             technicianId: string | null;
@@ -17,22 +20,22 @@ export declare class TechniciansController {
             status: import(".prisma/client").$Enums.BookingStatus;
             scheduledAt: Date;
             expectedFinishAt: Date | null;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
         }[];
     } & {
         id: string;
+        name: string;
+        phone: string;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
-        phone: string;
         specialty: string | null;
     })[]>;
     findOne(id: string): Promise<{
         bookings: {
             id: string;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
             customerId: string;
             vehicleId: string;
             technicianId: string | null;
@@ -44,35 +47,32 @@ export declare class TechniciansController {
             status: import(".prisma/client").$Enums.BookingStatus;
             scheduledAt: Date;
             expectedFinishAt: Date | null;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
         }[];
     } & {
         id: string;
+        name: string;
+        phone: string;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
-        phone: string;
         specialty: string | null;
     }>;
     create(createTechnicianDto: CreateTechnicianDto): Promise<{
         id: string;
+        name: string;
+        phone: string;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
-        phone: string;
         specialty: string | null;
     }>;
     update(id: string, updateTechnicianDto: UpdateTechnicianDto): Promise<{
         id: string;
+        name: string;
+        phone: string;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
-        phone: string;
         specialty: string | null;
     }>;
     delete(id: string): Promise<{

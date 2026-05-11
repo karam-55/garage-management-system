@@ -5,21 +5,28 @@ export declare class TrackingController {
     trackVehicle(vehicleId: string, token?: string): Promise<{
         customer: {
             id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
             name: string;
             phone: string;
             secondaryPhone: string | null;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+        };
+        vehicleTracking: {
+            id: string;
+            vehicleId: string;
+            currentStatus: string;
+            lastUpdateAt: Date;
+            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
         };
         bookings: ({
             invoices: {
                 id: string;
-                customerId: string;
-                vehicleId: string;
                 notes: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                customerId: string;
+                vehicleId: string;
                 bookingId: string | null;
                 invoiceNumber: string;
                 date: Date;
@@ -30,6 +37,9 @@ export declare class TrackingController {
             }[];
         } & {
             id: string;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
             customerId: string;
             vehicleId: string;
             technicianId: string | null;
@@ -41,23 +51,13 @@ export declare class TrackingController {
             status: import(".prisma/client").$Enums.BookingStatus;
             scheduledAt: Date;
             expectedFinishAt: Date | null;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
         })[];
-        vehicleTracking: {
-            id: string;
-            vehicleId: string;
-            currentStatus: string;
-            lastUpdateAt: Date;
-            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
-        };
     } & {
         id: string;
-        customerId: string | null;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
+        customerId: string | null;
         plateNumber: string;
         model: string;
         year: number;

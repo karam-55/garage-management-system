@@ -6,19 +6,19 @@ export declare class BookingsController {
     findAll(): Promise<({
         customer: {
             id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
             name: string;
             phone: string;
             secondaryPhone: string | null;
-        };
-        vehicle: {
-            id: string;
-            customerId: string | null;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
+        };
+        vehicle: {
+            id: string;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string | null;
             plateNumber: string;
             model: string;
             year: number;
@@ -28,20 +28,20 @@ export declare class BookingsController {
         };
         technician: {
             id: string;
+            name: string;
+            phone: string;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
-            phone: string;
             specialty: string | null;
         };
         invoices: {
             id: string;
-            customerId: string;
-            vehicleId: string;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
+            customerId: string;
+            vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
             date: Date;
@@ -52,6 +52,9 @@ export declare class BookingsController {
         }[];
     } & {
         id: string;
+        notes: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         customerId: string;
         vehicleId: string;
         technicianId: string | null;
@@ -63,26 +66,23 @@ export declare class BookingsController {
         status: import(".prisma/client").$Enums.BookingStatus;
         scheduledAt: Date;
         expectedFinishAt: Date | null;
-        notes: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     })[]>;
     findByTechnician(technicianId: string): Promise<({
         customer: {
             id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
             name: string;
             phone: string;
             secondaryPhone: string | null;
-        };
-        vehicle: {
-            id: string;
-            customerId: string | null;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
+        };
+        vehicle: {
+            id: string;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string | null;
             plateNumber: string;
             model: string;
             year: number;
@@ -92,20 +92,20 @@ export declare class BookingsController {
         };
         technician: {
             id: string;
+            name: string;
+            phone: string;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
-            phone: string;
             specialty: string | null;
         };
         invoices: {
             id: string;
-            customerId: string;
-            vehicleId: string;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
+            customerId: string;
+            vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
             date: Date;
@@ -116,6 +116,9 @@ export declare class BookingsController {
         }[];
     } & {
         id: string;
+        notes: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         customerId: string;
         vehicleId: string;
         technicianId: string | null;
@@ -127,26 +130,23 @@ export declare class BookingsController {
         status: import(".prisma/client").$Enums.BookingStatus;
         scheduledAt: Date;
         expectedFinishAt: Date | null;
-        notes: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     })[]>;
     findOne(id: string): Promise<{
         customer: {
             id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
             name: string;
             phone: string;
             secondaryPhone: string | null;
-        };
-        vehicle: {
-            id: string;
-            customerId: string | null;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
+        };
+        vehicle: {
+            id: string;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string | null;
             plateNumber: string;
             model: string;
             year: number;
@@ -156,20 +156,20 @@ export declare class BookingsController {
         };
         technician: {
             id: string;
+            name: string;
+            phone: string;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
-            phone: string;
             specialty: string | null;
         };
         invoices: {
             id: string;
-            customerId: string;
-            vehicleId: string;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
+            customerId: string;
+            vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
             date: Date;
@@ -180,6 +180,9 @@ export declare class BookingsController {
         }[];
     } & {
         id: string;
+        notes: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         customerId: string;
         vehicleId: string;
         technicianId: string | null;
@@ -191,26 +194,23 @@ export declare class BookingsController {
         status: import(".prisma/client").$Enums.BookingStatus;
         scheduledAt: Date;
         expectedFinishAt: Date | null;
-        notes: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     create(createBookingDto: CreateBookingDto): Promise<{
         customer: {
             id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
             name: string;
             phone: string;
             secondaryPhone: string | null;
-        };
-        vehicle: {
-            id: string;
-            customerId: string | null;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
+        };
+        vehicle: {
+            id: string;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string | null;
             plateNumber: string;
             model: string;
             year: number;
@@ -220,6 +220,9 @@ export declare class BookingsController {
         };
     } & {
         id: string;
+        notes: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         customerId: string;
         vehicleId: string;
         technicianId: string | null;
@@ -231,26 +234,23 @@ export declare class BookingsController {
         status: import(".prisma/client").$Enums.BookingStatus;
         scheduledAt: Date;
         expectedFinishAt: Date | null;
-        notes: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     update(id: string, updateBookingDto: UpdateBookingDto): Promise<{
         customer: {
             id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
             name: string;
             phone: string;
             secondaryPhone: string | null;
-        };
-        vehicle: {
-            id: string;
-            customerId: string | null;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
+        };
+        vehicle: {
+            id: string;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string | null;
             plateNumber: string;
             model: string;
             year: number;
@@ -260,20 +260,20 @@ export declare class BookingsController {
         };
         technician: {
             id: string;
+            name: string;
+            phone: string;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
-            name: string;
-            phone: string;
             specialty: string | null;
         };
         invoices: {
             id: string;
-            customerId: string;
-            vehicleId: string;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
+            customerId: string;
+            vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
             date: Date;
@@ -284,6 +284,9 @@ export declare class BookingsController {
         }[];
     } & {
         id: string;
+        notes: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         customerId: string;
         vehicleId: string;
         technicianId: string | null;
@@ -295,12 +298,12 @@ export declare class BookingsController {
         status: import(".prisma/client").$Enums.BookingStatus;
         scheduledAt: Date;
         expectedFinishAt: Date | null;
-        notes: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     addAdditionalService(id: string, dto: AddAdditionalServiceDto): Promise<{
         id: string;
+        notes: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         customerId: string;
         vehicleId: string;
         technicianId: string | null;
@@ -312,9 +315,6 @@ export declare class BookingsController {
         status: import(".prisma/client").$Enums.BookingStatus;
         scheduledAt: Date;
         expectedFinishAt: Date | null;
-        notes: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     delete(id: string): Promise<{
         message: string;

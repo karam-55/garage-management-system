@@ -5,10 +5,10 @@ export declare class InventoryController {
     constructor(inventoryService: InventoryService);
     findAll(): Promise<{
         id: string;
+        name: string;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
         code: string | null;
         quantity: number;
         purchasePrice: number;
@@ -17,10 +17,10 @@ export declare class InventoryController {
     }[]>;
     findOne(id: string): Promise<{
         id: string;
+        name: string;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
         code: string | null;
         quantity: number;
         purchasePrice: number;
@@ -29,10 +29,10 @@ export declare class InventoryController {
     }>;
     create(createInventoryItemDto: CreateInventoryItemDto): Promise<{
         id: string;
+        name: string;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
         code: string | null;
         quantity: number;
         purchasePrice: number;
@@ -41,10 +41,10 @@ export declare class InventoryController {
     }>;
     update(id: string, updateInventoryItemDto: UpdateInventoryItemDto): Promise<{
         id: string;
+        name: string;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
         code: string | null;
         quantity: number;
         purchasePrice: number;

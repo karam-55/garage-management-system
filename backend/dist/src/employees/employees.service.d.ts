@@ -7,37 +7,37 @@ export declare class EmployeesService implements OnModuleInit {
     onModuleInit(): Promise<void>;
     findAll(): Promise<{
         id: string;
+        name: string;
+        phone: string;
         notes: string;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
-        phone: string;
         role: import(".prisma/client").$Enums.EmployeeRole;
         isActive: boolean;
     }[]>;
     findOne(id: string): Promise<{
         id: string;
+        name: string;
+        phone: string;
         notes: string;
         createdAt: Date;
         updatedAt: Date;
-        name: string;
-        phone: string;
         role: import(".prisma/client").$Enums.EmployeeRole;
         isActive: boolean;
     }>;
     create(dto: CreateEmployeeDto): Promise<{
         id: string;
-        createdAt: Date;
         name: string;
         phone: string;
+        createdAt: Date;
         role: import(".prisma/client").$Enums.EmployeeRole;
         isActive: boolean;
     }>;
     update(id: string, dto: UpdateEmployeeDto): Promise<{
         id: string;
-        updatedAt: Date;
         name: string;
         phone: string;
+        updatedAt: Date;
         role: import(".prisma/client").$Enums.EmployeeRole;
         isActive: boolean;
     }>;
