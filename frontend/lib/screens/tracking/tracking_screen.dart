@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../utils/api_config.dart';
@@ -33,21 +34,25 @@ class _TrackingScreenState extends State<TrackingScreen> {
       final url = token != null
           ? '/track/${widget.vehicleId}?token=$token'
           : '/track/${widget.vehicleId}';
+      debugPrint('[TrackingScreen] Fetching: ${ApiConfig.baseUrl}$url');
       final response = await dio.get(url);
+      debugPrint('[TrackingScreen] Response: ${response.statusCode}');
       setState(() {
         vehicleData = response.data;
         isLoading = false;
       });
     } on DioException catch (e) {
+      debugPrint('[TrackingScreen] DioError: ${e.response?.statusCode} - ${e.message}');
       setState(() {
         error = e.response?.data?['message'] ??
             e.response?.data?['error'] ??
-            'فشل في تحميل بيانات السيارة';
+            'فشل في تحميل بيانات السيارة (${e.response?.statusCode ?? 'network'})';
         isLoading = false;
       });
     } catch (e) {
+      debugPrint('[TrackingScreen] Error: $e');
       setState(() {
-        error = 'حدث خطأ غير متوقع';
+        error = 'حدث خطأ غير متوقع: $e';
         isLoading = false;
       });
     }

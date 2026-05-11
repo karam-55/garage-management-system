@@ -32,6 +32,12 @@ class _AppWrapperState extends ConsumerState<AppWrapper>
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
 
+  /// Returns true if the current URL is a public tracking page (/track/...)
+  bool get _isPublicTracking {
+    final route = WidgetsBinding.instance.platformDispatcher.defaultRouteName;
+    return route.startsWith('/track');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -47,9 +53,14 @@ class _AppWrapperState extends ConsumerState<AppWrapper>
     );
     _controller.forward();
 
-    Future.delayed(const Duration(seconds: 2, milliseconds: 500), () {
-      if (mounted) setState(() => _showSplash = false);
-    });
+    // Skip splash for public tracking pages so they load instantly
+    if (_isPublicTracking) {
+      _showSplash = false;
+    } else {
+      Future.delayed(const Duration(seconds: 2, milliseconds: 500), () {
+        if (mounted) setState(() => _showSplash = false);
+      });
+    }
   }
 
   @override
@@ -61,6 +72,16 @@ class _AppWrapperState extends ConsumerState<AppWrapper>
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+
+    // Public tracking page (/track/:vehicleId?token=...) bypasses auth entirely
+    if (_isPublicTracking) {
+      return MaterialApp(
+        title: 'AUTO RENEW',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.darkTheme,
+        home: const MyApp(employee: null),
+      );
+    }
 
     return MaterialApp(
       title: 'AUTO RENEW',

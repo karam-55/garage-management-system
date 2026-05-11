@@ -8,36 +8,50 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var TrackingService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TrackingService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma.service");
-let TrackingService = class TrackingService {
+let TrackingService = TrackingService_1 = class TrackingService {
     constructor(prisma) {
         this.prisma = prisma;
+        this.logger = new common_1.Logger(TrackingService_1.name);
     }
     async trackVehicle(vehicleId, token) {
-        const vehicle = await this.prisma.vehicle.findUnique({
-            where: { id: vehicleId },
-            include: {
-                customer: true,
-                vehicleTracking: true,
-                bookings: {
-                    where: token
-                        ? { qrToken: token }
-                        : { status: { not: 'CANCELED' } },
-                    orderBy: { scheduledAt: 'desc' },
-                    take: 1,
-                    include: { invoices: true },
+        this.logger.log(`trackVehicle called: vehicleId=${vehicleId}, token=${token ? 'present' : 'missing'}`);
+        try {
+            const vehicle = await this.prisma.vehicle.findUnique({
+                where: { id: vehicleId },
+                include: {
+                    customer: true,
+                    vehicleTracking: true,
+                    bookings: {
+                        where: token
+                            ? { qrToken: token }
+                            : { status: { not: 'CANCELED' } },
+                        orderBy: { scheduledAt: 'desc' },
+                        take: 1,
+                        include: { invoices: true },
+                    },
                 },
-            },
-        });
-        if (!vehicle)
-            return null;
-        if (token && vehicle.bookings.length === 0) {
-            return null;
+            });
+            if (!vehicle) {
+                this.logger.warn(`Vehicle not found: ${vehicleId}`);
+                return null;
+            }
+            const bookings = vehicle.bookings;
+            this.logger.log(`Vehicle found. Bookings count: ${bookings.length}`);
+            if (token && bookings.length === 0) {
+                this.logger.warn(`Token provided but no matching booking found for vehicle ${vehicleId}`);
+                return null;
+            }
+            return vehicle;
         }
-        return vehicle;
+        catch (error) {
+            this.logger.error(`trackVehicle error: ${error.message}`);
+            throw error;
+        }
     }
     async approveAdditionalService(vehicleId, token, serviceId, approve) {
         const booking = await this.prisma.booking.findFirst({
@@ -55,7 +69,7 @@ let TrackingService = class TrackingService {
     }
 };
 exports.TrackingService = TrackingService;
-exports.TrackingService = TrackingService = __decorate([
+exports.TrackingService = TrackingService = TrackingService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], TrackingService);

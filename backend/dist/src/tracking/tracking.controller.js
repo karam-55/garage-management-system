@@ -11,23 +11,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var TrackingController_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TrackingController = void 0;
 const common_1 = require("@nestjs/common");
 const tracking_service_1 = require("./tracking.service");
 const public_decorator_1 = require("../auth/public.decorator");
-let TrackingController = class TrackingController {
+let TrackingController = TrackingController_1 = class TrackingController {
     constructor(trackingService) {
         this.trackingService = trackingService;
+        this.logger = new common_1.Logger(TrackingController_1.name);
     }
     async trackVehicle(vehicleId, token) {
+        this.logger.log(`GET /track/${vehicleId}?token=${token ? '***' : 'missing'}`);
         const trackingData = await this.trackingService.trackVehicle(vehicleId, token);
         if (!trackingData) {
+            this.logger.warn(`Track request failed for vehicle ${vehicleId}: not found or invalid token`);
             throw new common_1.HttpException('السيارة غير موجودة أو رمز QR غير صالح', common_1.HttpStatus.NOT_FOUND);
         }
+        this.logger.log(`Track request succeeded for vehicle ${vehicleId}`);
         return trackingData;
     }
     async approveService(vehicleId, token, body) {
+        this.logger.log(`POST /track/${vehicleId}/approve-service`);
         if (!token)
             throw new common_1.HttpException('رمز QR مطلوب', common_1.HttpStatus.BAD_REQUEST);
         return this.trackingService.approveAdditionalService(vehicleId, token, body.serviceId, body.approve);
@@ -53,7 +59,7 @@ __decorate([
     __metadata("design:paramtypes", [String, String, Object]),
     __metadata("design:returntype", Promise)
 ], TrackingController.prototype, "approveService", null);
-exports.TrackingController = TrackingController = __decorate([
+exports.TrackingController = TrackingController = TrackingController_1 = __decorate([
     (0, common_1.Controller)('track'),
     __metadata("design:paramtypes", [tracking_service_1.TrackingService])
 ], TrackingController);

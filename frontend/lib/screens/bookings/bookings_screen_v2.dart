@@ -846,7 +846,8 @@ class _BookingRowState extends State<_BookingRow>
 
     showDialog(
       context: context,
-      builder: (_) => Dialog(
+      useRootNavigator: true,
+      builder: (dialogContext) => Dialog(
         backgroundColor: Colors.transparent,
         child: Container(
           constraints: const BoxConstraints(maxWidth: 340),
@@ -859,8 +860,18 @@ class _BookingRowState extends State<_BookingRow>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('رمز QR للسيارة',
-                  style: AppTypography.headingSmall.copyWith(fontSize: 16)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('رمز QR للسيارة',
+                      style: AppTypography.headingSmall.copyWith(fontSize: 16)),
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 20),
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    splashRadius: 20,
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(12),
@@ -875,9 +886,13 @@ class _BookingRowState extends State<_BookingRow>
                 ),
               ),
               const SizedBox(height: 12),
-              Text(widget.booking.serviceDescription,
-                  style: AppTypography.bodySmall,
-                  textAlign: TextAlign.center),
+              SelectableText(
+                qrUrl,
+                style: AppTypography.bodySmall
+                    .copyWith(color: AppColors.textMuted, fontSize: 10),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+              ),
               const SizedBox(height: 4),
               Text('امسح لمتابعة حالة السيارة',
                   style: AppTypography.bodySmall
@@ -885,7 +900,7 @@ class _BookingRowState extends State<_BookingRow>
                   textAlign: TextAlign.center),
               const SizedBox(height: 16),
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.of(dialogContext).pop(),
                 child: const Text('إغلاق'),
               ),
             ],

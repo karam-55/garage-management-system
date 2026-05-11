@@ -1,31 +1,25 @@
 import { PrismaService } from '../prisma.service';
 export declare class TrackingService {
     private prisma;
+    private readonly logger;
     constructor(prisma: PrismaService);
     trackVehicle(vehicleId: string, token?: string): Promise<{
         customer: {
             id: string;
-            name: string;
-            phone: string;
-            secondaryPhone: string | null;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
-        };
-        vehicleTracking: {
-            id: string;
-            vehicleId: string;
-            currentStatus: string;
-            lastUpdateAt: Date;
-            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
+            name: string;
+            phone: string;
+            secondaryPhone: string | null;
         };
         bookings: ({
             invoices: {
                 id: string;
+                customerId: string;
                 notes: string | null;
                 createdAt: Date;
                 updatedAt: Date;
-                customerId: string;
                 vehicleId: string;
                 bookingId: string | null;
                 invoiceNumber: string;
@@ -37,10 +31,11 @@ export declare class TrackingService {
             }[];
         } & {
             id: string;
+            customerId: string;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
-            customerId: string;
+            scheduledAt: Date;
             vehicleId: string;
             technicianId: string | null;
             serviceType: string;
@@ -49,21 +44,27 @@ export declare class TrackingService {
             qrToken: string | null;
             qrUrl: string | null;
             status: import(".prisma/client").$Enums.BookingStatus;
-            scheduledAt: Date;
             expectedFinishAt: Date | null;
         })[];
+        vehicleTracking: {
+            id: string;
+            vehicleId: string;
+            currentStatus: string;
+            lastUpdateAt: Date;
+            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
+        };
     } & {
         id: string;
-        notes: string | null;
-        createdAt: Date;
-        updatedAt: Date;
-        customerId: string | null;
         plateNumber: string;
+        customerId: string | null;
         model: string;
         year: number;
         color: string;
         fuelType: string;
         chassisNumber: string | null;
+        notes: string | null;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
     approveAdditionalService(vehicleId: string, token: string, serviceId: string, approve: boolean): Promise<{
         success: boolean;

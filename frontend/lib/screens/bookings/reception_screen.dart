@@ -732,9 +732,38 @@ ${vehicle != null ? '<div class="row"><span class="label">السيارة:</span>
 </body></html>''';
 
     try {
-      final encoded = base64Encode(utf8.encode(htmlContent));
-      html.window.open('data:text/html;base64,$encoded', '_blank');
-    } catch (_) {}
+      // Use a hidden iframe for reliable cross-browser printing
+      final iframe = html.IFrameElement()
+        ..style.width = '0'
+        ..style.height = '0'
+        ..style.border = 'none'
+        ..style.position = 'absolute'
+        ..style.left = '-9999px'
+        ..srcdoc = htmlContent;
+
+      html.document.body!.append(iframe);
+
+      // Wait for iframe to load then print and cleanup
+      Future.delayed(const Duration(milliseconds: 600), () {
+        try {
+          final cw = iframe.contentWindow as html.Window?;
+          if (cw != null) {
+            cw.print();
+          } else {
+            // Fallback to new tab if iframe print fails
+            final encoded = base64Encode(utf8.encode(htmlContent));
+            html.window.open('data:text/html;base64,$encoded', '_blank');
+          }
+        } catch (_) {
+          final encoded = base64Encode(utf8.encode(htmlContent));
+          html.window.open('data:text/html;base64,$encoded', '_blank');
+        }
+        // Cleanup iframe after printing
+        Future.delayed(const Duration(seconds: 2), () => iframe.remove());
+      });
+    } catch (e) {
+      debugPrint('Print error: $e');
+    }
   }
 
   // ── Bottom Bar ────────────────────────────────────────────────────────────
