@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/app_theme.dart';
+import '../services/notification_service.dart';
 
 // Navigation Provider
 final currentPageProvider = StateProvider<int>((ref) => 0);
@@ -506,12 +507,12 @@ class _TopBar extends StatelessWidget {
           _TopBarAction(
             icon: Icons.notifications_outlined,
             badge: 3,
-            onTap: () {},
+            onTap: () => showInfoToast(context, 'لا يوجد إشعارات جديدة'),
           ),
           const SizedBox(width: 8),
           _TopBarAction(
             icon: Icons.mail_outline,
-            onTap: () {},
+            onTap: () => showInfoToast(context, 'صندوق البريد فارغ'),
           ),
         ],
       ),

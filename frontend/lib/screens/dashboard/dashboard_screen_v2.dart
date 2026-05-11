@@ -2,13 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/app_theme.dart';
 import '../../state/dashboard_provider.dart';
+import '../../services/notification_service.dart';
+import '../../widgets/app_shell_new.dart';
 import '../../widgets/shimmer_loading.dart';
 
-class DashboardScreenV2 extends ConsumerWidget {
+class DashboardScreenV2 extends ConsumerStatefulWidget {
   const DashboardScreenV2({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DashboardScreenV2> createState() => _DashboardScreenV2State();
+}
+
+class _DashboardScreenV2State extends ConsumerState<DashboardScreenV2> {
+  @override
+  Widget build(BuildContext context) {
     final statsAsync = ref.watch(dashboardStatsProvider);
     final size = MediaQuery.of(context).size;
     final isWide = size.width > 1200;
@@ -137,7 +144,7 @@ class DashboardScreenV2 extends ConsumerWidget {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () {},
+        onTap: () => showInfoToast(context, 'سيتوفر قريباً!'),
         child: AnimatedContainer(
           duration: AppAnimations.normal,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -296,7 +303,7 @@ class DashboardScreenV2 extends ConsumerWidget {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () {},
+        onTap: () => showInfoToast(context, 'سيتوفر قريباً!'),
         child: AnimatedContainer(
           duration: AppAnimations.fast,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
@@ -365,13 +372,6 @@ class DashboardScreenV2 extends ConsumerWidget {
                 'الوصول السريع',
                 style: AppTypography.headingSmall.copyWith(fontSize: 16),
               ),
-              GestureDetector(
-                onTap: () {},
-                child: Text(
-                  'عرض الكل',
-                  style: AppTypography.labelSmall.copyWith(color: AppColors.primary),
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -387,37 +387,37 @@ class DashboardScreenV2 extends ConsumerWidget {
                 icon: Icons.person_add_outlined,
                 label: 'عميل جديد',
                 color: AppColors.accentBlue,
-                onTap: () {},
+                onTap: () => ref.read(currentPageProvider.notifier).state = 1,
               ),
               _QuickActionTile(
                 icon: Icons.directions_car_outlined,
                 label: 'سيارة جديدة',
                 color: AppColors.secondary,
-                onTap: () {},
+                onTap: () => ref.read(currentPageProvider.notifier).state = 2,
               ),
               _QuickActionTile(
                 icon: Icons.build_outlined,
                 label: 'حجز صيانة',
                 color: AppColors.accentOrange,
-                onTap: () {},
+                onTap: () => ref.read(currentPageProvider.notifier).state = 4,
               ),
               _QuickActionTile(
                 icon: Icons.receipt_outlined,
                 label: 'فاتورة جديدة',
                 color: AppColors.accentRed,
-                onTap: () {},
+                onTap: () => ref.read(currentPageProvider.notifier).state = 5,
               ),
               _QuickActionTile(
                 icon: Icons.inventory_2_outlined,
                 label: 'قطعة غيار',
                 color: AppColors.accentCyan,
-                onTap: () {},
+                onTap: () => ref.read(currentPageProvider.notifier).state = 6,
               ),
               _QuickActionTile(
                 icon: Icons.qr_code_outlined,
                 label: 'تتبع السيارة',
                 color: AppColors.accentPurple,
-                onTap: () {},
+                onTap: () => _showTrackDialog(context),
               ),
             ],
           ),
@@ -564,6 +564,86 @@ class DashboardScreenV2 extends ConsumerWidget {
       ],
     );
   }
+
+  void _showTrackDialog(BuildContext context) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 440),
+          decoration: BoxDecoration(
+            color: AppColors.bgSecondary,
+            borderRadius: AppBorders.radiusXl,
+            border: Border.all(color: AppColors.border.withOpacity(0.4)),
+            boxShadow: [AppShadows.xl],
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('تتبع السيارة', style: AppTypography.headingSmall.copyWith(fontSize: 18)),
+              const SizedBox(height: 8),
+              Text('أدخل معرف السيارة أو رقم اللوحة', style: AppTypography.bodyMedium),
+              const SizedBox(height: 20),
+              TextField(
+                controller: controller,
+                style: AppTypography.bodyMedium,
+                decoration: InputDecoration(
+                  hintText: 'معرف السيارة...',
+                  hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textMuted),
+                  prefixIcon: Icon(Icons.qr_code, size: 20, color: AppColors.textMuted),
+                  filled: true,
+                  fillColor: AppColors.bgPrimary,
+                  border: OutlineInputBorder(
+                    borderRadius: AppBorders.radiusMd,
+                    borderSide: BorderSide(color: AppColors.border.withOpacity(0.4)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: AppBorders.radiusMd,
+                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('إلغاء', style: AppTypography.labelMedium.copyWith(
+                        color: AppColors.textTertiary)),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      if (controller.text.isNotEmpty) {
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, '/track/${controller.text}');
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: AppColors.gradientPrimary),
+                        borderRadius: AppBorders.radiusMd,
+                        boxShadow: [AppShadows.glow(AppColors.primary)],
+                      ),
+                      child: Text('تتبع', style: AppTypography.labelLarge.copyWith(
+                        color: Colors.white, fontSize: 13)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 // ============================================================
@@ -658,7 +738,7 @@ class _StatCardState extends State<_StatCard>
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
-            onTap: () {},
+            onTap: () => showInfoToast(context, widget.title),
             child: AnimatedContainer(
               duration: AppAnimations.normal,
               padding: const EdgeInsets.all(24),

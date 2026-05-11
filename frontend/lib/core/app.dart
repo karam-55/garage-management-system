@@ -3,10 +3,10 @@ import 'package:garage_management/widgets/app_shell_new.dart';
 import 'package:garage_management/screens/dashboard/dashboard_screen_v2.dart';
 import 'package:garage_management/screens/customers/customers_screen_v2.dart';
 import 'package:garage_management/screens/vehicles/vehicles_screen_v2.dart';
-import 'package:garage_management/screens/technicians/technicians_screen.dart';
-import 'package:garage_management/screens/bookings/bookings_screen.dart';
-import 'package:garage_management/screens/invoices/invoices_screen.dart';
-import 'package:garage_management/screens/inventory/inventory_screen.dart';
+import 'package:garage_management/screens/technicians/technicians_screen_v2.dart';
+import 'package:garage_management/screens/bookings/bookings_screen_v2.dart';
+import 'package:garage_management/screens/invoices/invoices_screen_v2.dart';
+import 'package:garage_management/screens/inventory/inventory_screen_v2.dart';
 import 'package:garage_management/screens/tracking/tracking_screen.dart';
 
 class MyApp extends StatelessWidget {
@@ -35,25 +35,25 @@ class MyApp extends StatelessWidget {
       title: 'الفنيين',
       icon: Icons.build_outlined,
       activeIcon: Icons.build,
-      page: TechniciansScreen(),
+      page: TechniciansScreenV2(),
     ),
     AppPage(
       title: 'الحجوزات',
       icon: Icons.calendar_today_outlined,
       activeIcon: Icons.calendar_today,
-      page: BookingsScreen(),
+      page: BookingsScreenV2(),
     ),
     AppPage(
       title: 'الفواتير',
       icon: Icons.receipt_outlined,
       activeIcon: Icons.receipt,
-      page: InvoicesScreen(),
+      page: InvoicesScreenV2(),
     ),
     AppPage(
       title: 'المخزون',
       icon: Icons.inventory_2_outlined,
       activeIcon: Icons.inventory_2,
-      page: InventoryScreen(),
+      page: InventoryScreenV2(),
     ),
   ];
 
