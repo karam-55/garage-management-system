@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../state/dashboard_provider.dart';
+import '../../state/theme_provider.dart';
 import '../customers/customers_screen.dart';
 import '../vehicles/vehicles_screen.dart';
 import '../mechanic/mechanic_dashboard_screen.dart';
@@ -21,6 +22,19 @@ class DashboardScreen extends ConsumerWidget {
             expandedHeight: 120,
             floating: true,
             pinned: true,
+            actions: [
+              IconButton(
+                icon: Icon(
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Icons.light_mode
+                      : Icons.dark_mode,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  ref.read(themeModeProvider.notifier).toggleTheme();
+                },
+              ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               title: const Text(
                 'لوحة التحكم',

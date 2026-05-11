@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/customer.dart';
 import '../../state/customer_provider.dart';
+import '../../services/notification_service.dart';
 
 class CustomersScreen extends ConsumerStatefulWidget {
   const CustomersScreen({super.key});
@@ -128,10 +129,9 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                 await ref.read(customerServiceProvider).createCustomer(newCustomer);
                 ref.invalidate(customersProvider);
                 Navigator.pop(context);
+                showSuccessToast(context, 'تم إضافة العميل بنجاح!');
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error: $e')),
-                );
+                showErrorToast(context, 'خطأ: $e');
               }
             },
             child: const Text('حفظ'),
@@ -186,10 +186,9 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                 await ref.read(customerServiceProvider).updateCustomer(customer.id, updatedCustomer);
                 ref.invalidate(customersProvider);
                 Navigator.pop(context);
+                showSuccessToast(context, 'تم تحديث العميل بنجاح!');
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error: $e')),
-                );
+                showErrorToast(context, 'خطأ: $e');
               }
             },
             child: const Text('حفظ'),
@@ -216,10 +215,9 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                 await ref.read(customerServiceProvider).deleteCustomer(customer.id);
                 ref.invalidate(customersProvider);
                 Navigator.pop(context);
+                showSuccessToast(context, 'تم حذف العميل بنجاح!');
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error: $e')),
-                );
+                showErrorToast(context, 'خطأ: $e');
               }
             },
             child: const Text('حذف'),
