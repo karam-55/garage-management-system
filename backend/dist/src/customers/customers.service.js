@@ -8,13 +8,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var CustomersService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CustomersService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma.service");
-let CustomersService = class CustomersService {
+let CustomersService = CustomersService_1 = class CustomersService {
     constructor(prisma) {
         this.prisma = prisma;
+        this.logger = new common_1.Logger(CustomersService_1.name);
     }
     async findAll() {
         return this.prisma.customer.findMany({
@@ -36,9 +38,21 @@ let CustomersService = class CustomersService {
         });
     }
     async create(createCustomerDto) {
-        return this.prisma.customer.create({
-            data: createCustomerDto,
-        });
+        this.logger.log(`Creating customer: ${createCustomerDto.phone}`);
+        try {
+            const customer = await this.prisma.customer.create({
+                data: createCustomerDto,
+            });
+            this.logger.log(`Customer created: ${customer.id}`);
+            return customer;
+        }
+        catch (error) {
+            this.logger.error(`Failed to create customer: ${error.message} (code: ${error.code})`);
+            if (error.code === 'P2002') {
+                throw new common_1.ConflictException(`رقم الهاتف ${createCustomerDto.phone} مسجل مسبقاً`);
+            }
+            throw new common_1.InternalServerErrorException(`فشل إنشاء العميل: ${error.message}`);
+        }
     }
     async update(id, updateCustomerDto) {
         return this.prisma.customer.update({
@@ -53,7 +67,7 @@ let CustomersService = class CustomersService {
     }
 };
 exports.CustomersService = CustomersService;
-exports.CustomersService = CustomersService = __decorate([
+exports.CustomersService = CustomersService = CustomersService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], CustomersService);

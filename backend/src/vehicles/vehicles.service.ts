@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, ConflictException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateVehicleDto, UpdateVehicleDto } from './vehicles.dto';
 
 @Injectable()
 export class VehiclesService {
+  private readonly logger = new Logger(VehiclesService.name);
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
@@ -30,12 +31,20 @@ export class VehiclesService {
   }
 
   async create(createVehicleDto: CreateVehicleDto) {
-    const data: any = { ...createVehicleDto };
-    // Remove empty customerId to allow null in DB
-    if (!data.customerId || data.customerId === '') {
-      delete data.customerId;
+    this.logger.log(`Creating vehicle: ${createVehicleDto.plateNumber}`);
+    try {
+      const data: any = { ...createVehicleDto };
+      if (!data.customerId || data.customerId === '') delete data.customerId;
+      const vehicle = await this.prisma.vehicle.create({ data });
+      this.logger.log(`Vehicle created: ${vehicle.id}`);
+      return vehicle;
+    } catch (error) {
+      this.logger.error(`Failed to create vehicle: ${error.message} (code: ${error.code})`);
+      if (error.code === 'P2002') {
+        throw new ConflictException(`رقم اللوحة ${createVehicleDto.plateNumber} مسجل مسبقاً`);
+      }
+      throw new InternalServerErrorException(`فشل إنشاء السيارة: ${error.message}`);
     }
-    return this.prisma.vehicle.create({ data });
   }
 
   async update(id: string, updateVehicleDto: UpdateVehicleDto) {

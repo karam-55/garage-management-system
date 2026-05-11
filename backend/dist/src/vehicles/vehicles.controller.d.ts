@@ -13,13 +13,6 @@ export declare class VehiclesController {
             createdAt: Date;
             updatedAt: Date;
         };
-        vehicleTracking: {
-            id: string;
-            vehicleId: string;
-            currentStatus: string;
-            lastUpdateAt: Date;
-            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
-        };
         bookings: {
             id: string;
             notes: string | null;
@@ -52,6 +45,13 @@ export declare class VehiclesController {
             netAmount: number;
             paymentMethod: string;
         }[];
+        vehicleTracking: {
+            id: string;
+            vehicleId: string;
+            currentStatus: string;
+            lastUpdateAt: Date;
+            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
+        };
     } & {
         id: string;
         notes: string | null;
@@ -75,13 +75,6 @@ export declare class VehiclesController {
             createdAt: Date;
             updatedAt: Date;
         };
-        vehicleTracking: {
-            id: string;
-            vehicleId: string;
-            currentStatus: string;
-            lastUpdateAt: Date;
-            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
-        };
         bookings: {
             id: string;
             notes: string | null;
@@ -114,6 +107,13 @@ export declare class VehiclesController {
             netAmount: number;
             paymentMethod: string;
         }[];
+        vehicleTracking: {
+            id: string;
+            vehicleId: string;
+            currentStatus: string;
+            lastUpdateAt: Date;
+            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
+        };
     } & {
         id: string;
         notes: string | null;

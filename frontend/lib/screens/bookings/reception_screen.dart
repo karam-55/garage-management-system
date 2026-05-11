@@ -182,7 +182,20 @@ class _ReceptionScreenState extends ConsumerState<ReceptionScreen> {
         _step = 3;
       });
     } catch (e) {
-      if (mounted) showErrorToast(context, 'خطأ: $e');
+      String msg = e.toString();
+      try {
+        // Extract server error message from DioException
+        final dynamic de = e;
+        final serverMsg = de.response?.data;
+        if (serverMsg is Map) {
+          msg = serverMsg['message']?.toString() ??
+              serverMsg['error']?.toString() ??
+              msg;
+        } else if (serverMsg is String) {
+          msg = serverMsg;
+        }
+      } catch (_) {}
+      if (mounted) showErrorToast(context, msg);
     } finally {
       setState(() => _saving = false);
     }

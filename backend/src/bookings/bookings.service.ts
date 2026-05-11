@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma.service';
 import { AddAdditionalServiceDto, CreateBookingDto, UpdateBookingDto } from './bookings.dto';
 
 @Injectable()
 export class BookingsService {
+  private readonly logger = new Logger(BookingsService.name);
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
@@ -45,25 +46,52 @@ export class BookingsService {
   }
 
   async create(createBookingDto: CreateBookingDto) {
-    const qrToken = randomUUID();
-    const frontendUrl = process.env.FRONTEND_URL || '';
-    const qrUrl = frontendUrl
-      ? `${frontendUrl}/track/${createBookingDto.vehicleId}?token=${qrToken}`
-      : '';
+    this.logger.log(`Creating booking for vehicle: ${createBookingDto.vehicleId}, customer: ${createBookingDto.customerId}`);
+    try {
+      const qrToken = randomUUID();
+      const frontendUrl = process.env.FRONTEND_URL || '';
+      const qrUrl = frontendUrl
+        ? `${frontendUrl}/track/${createBookingDto.vehicleId}?token=${qrToken}`
+        : '';
 
-    return this.prisma.booking.create({
-      data: {
-        ...(createBookingDto as any),
+      // Explicit field mapping to avoid Prisma type issues
+      const data: any = {
+        customerId: createBookingDto.customerId,
+        vehicleId: createBookingDto.vehicleId,
+        serviceType: createBookingDto.serviceType,
+        scheduledAt: new Date(createBookingDto.scheduledAt),
+        status: 'RECEIVED',
+        services: (createBookingDto.services && createBookingDto.services.length > 0)
+          ? createBookingDto.services
+          : [],
+        additionalServices: [],
         qrToken,
         qrUrl,
-        services: createBookingDto.services ?? [],
-        additionalServices: [],
-      },
-      include: {
-        customer: true,
-        vehicle: true,
-      },
-    });
+      };
+
+      if (createBookingDto.technicianId) data.technicianId = createBookingDto.technicianId;
+      if (createBookingDto.notes) data.notes = createBookingDto.notes;
+      if (createBookingDto.expectedFinishAt) {
+        data.expectedFinishAt = new Date(createBookingDto.expectedFinishAt);
+      }
+
+      this.logger.log(`Booking data prepared, inserting into DB...`);
+
+      const booking = await this.prisma.booking.create({
+        data,
+        include: { customer: true, vehicle: true },
+      });
+
+      this.logger.log(`Booking created successfully: ${booking.id}`);
+      return booking;
+    } catch (error) {
+      this.logger.error(`Failed to create booking: ${error.message}`);
+      this.logger.error(`Error code: ${error.code}`);
+      this.logger.error(`Stack: ${error.stack}`);
+      throw new InternalServerErrorException(
+        `فشل إنشاء الحجز: ${error.message ?? error}`
+      );
+    }
   }
 
   async update(id: string, updateBookingDto: UpdateBookingDto) {

@@ -2,6 +2,7 @@ import { PrismaService } from '../prisma.service';
 import { CreateCustomerDto, UpdateCustomerDto } from './customers.dto';
 export declare class CustomersService {
     private prisma;
+    private readonly logger;
     constructor(prisma: PrismaService);
     findAll(): Promise<({
         vehicles: {

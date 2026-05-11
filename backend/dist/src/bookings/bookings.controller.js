@@ -11,14 +11,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var BookingsController_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookingsController = void 0;
 const common_1 = require("@nestjs/common");
 const bookings_service_1 = require("./bookings.service");
 const bookings_dto_1 = require("./bookings.dto");
-let BookingsController = class BookingsController {
+let BookingsController = BookingsController_1 = class BookingsController {
     constructor(bookingsService) {
         this.bookingsService = bookingsService;
+        this.logger = new common_1.Logger(BookingsController_1.name);
     }
     async findAll() {
         return this.bookingsService.findAll();
@@ -34,7 +36,16 @@ let BookingsController = class BookingsController {
         return booking;
     }
     async create(createBookingDto) {
-        return this.bookingsService.create(createBookingDto);
+        this.logger.log(`POST /bookings - body: ${JSON.stringify(createBookingDto)}`);
+        try {
+            const result = await this.bookingsService.create(createBookingDto);
+            return result;
+        }
+        catch (error) {
+            this.logger.error(`POST /bookings failed: ${error.message}`);
+            this.logger.error(`Full error: ${JSON.stringify(error?.response ?? error.message)}`);
+            throw error;
+        }
     }
     async update(id, updateBookingDto) {
         const booking = await this.bookingsService.update(id, updateBookingDto);
@@ -105,7 +116,7 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], BookingsController.prototype, "delete", null);
-exports.BookingsController = BookingsController = __decorate([
+exports.BookingsController = BookingsController = BookingsController_1 = __decorate([
     (0, common_1.Controller)('bookings'),
     __metadata("design:paramtypes", [bookings_service_1.BookingsService])
 ], BookingsController);

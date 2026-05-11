@@ -27,6 +27,10 @@ export class CreateVehicleDto {
 
   @IsString()
   @IsOptional()
+  chassisNumber?: string;
+
+  @IsString()
+  @IsOptional()
   notes?: string;
 }
 
@@ -54,6 +58,10 @@ export class UpdateVehicleDto {
   @IsString()
   @IsOptional()
   fuelType?: string;
+
+  @IsString()
+  @IsOptional()
+  chassisNumber?: string;
 
   @IsString()
   @IsOptional()

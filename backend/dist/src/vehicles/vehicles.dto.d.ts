@@ -5,6 +5,7 @@ export declare class CreateVehicleDto {
     year: number;
     color: string;
     fuelType: string;
+    chassisNumber?: string;
     notes?: string;
 }
 export declare class UpdateVehicleDto {
@@ -14,5 +15,6 @@ export declare class UpdateVehicleDto {
     year?: number;
     color?: string;
     fuelType?: string;
+    chassisNumber?: string;
     notes?: string;
 }

@@ -2,6 +2,7 @@ import { PrismaService } from '../prisma.service';
 import { CreateVehicleDto, UpdateVehicleDto } from './vehicles.dto';
 export declare class VehiclesService {
     private prisma;
+    private readonly logger;
     constructor(prisma: PrismaService);
     findAll(): Promise<({
         customer: {
@@ -12,13 +13,6 @@ export declare class VehiclesService {
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
-        };
-        vehicleTracking: {
-            id: string;
-            vehicleId: string;
-            currentStatus: string;
-            lastUpdateAt: Date;
-            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
         };
         bookings: {
             id: string;
@@ -52,6 +46,13 @@ export declare class VehiclesService {
             netAmount: number;
             paymentMethod: string;
         }[];
+        vehicleTracking: {
+            id: string;
+            vehicleId: string;
+            currentStatus: string;
+            lastUpdateAt: Date;
+            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
+        };
     } & {
         id: string;
         notes: string | null;
@@ -75,13 +76,6 @@ export declare class VehiclesService {
             createdAt: Date;
             updatedAt: Date;
         };
-        vehicleTracking: {
-            id: string;
-            vehicleId: string;
-            currentStatus: string;
-            lastUpdateAt: Date;
-            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
-        };
         bookings: {
             id: string;
             notes: string | null;
@@ -114,6 +108,13 @@ export declare class VehiclesService {
             netAmount: number;
             paymentMethod: string;
         }[];
+        vehicleTracking: {
+            id: string;
+            vehicleId: string;
+            currentStatus: string;
+            lastUpdateAt: Date;
+            trackingData: import("@prisma/client/runtime/client").JsonValue | null;
+        };
     } & {
         id: string;
         notes: string | null;

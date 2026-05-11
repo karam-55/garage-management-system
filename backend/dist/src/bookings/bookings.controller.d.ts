@@ -2,6 +2,7 @@ import { BookingsService } from './bookings.service';
 import { AddAdditionalServiceDto, CreateBookingDto, UpdateBookingDto } from './bookings.dto';
 export declare class BookingsController {
     private readonly bookingsService;
+    private readonly logger;
     constructor(bookingsService: BookingsService);
     findAll(): Promise<({
         customer: {
@@ -13,6 +14,21 @@ export declare class BookingsController {
             createdAt: Date;
             updatedAt: Date;
         };
+        invoices: {
+            id: string;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string;
+            vehicleId: string;
+            bookingId: string | null;
+            invoiceNumber: string;
+            date: Date;
+            totalAmount: number;
+            discount: number;
+            netAmount: number;
+            paymentMethod: string;
+        }[];
         vehicle: {
             id: string;
             notes: string | null;
@@ -35,21 +51,6 @@ export declare class BookingsController {
             updatedAt: Date;
             specialty: string | null;
         };
-        invoices: {
-            id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            customerId: string;
-            vehicleId: string;
-            bookingId: string | null;
-            invoiceNumber: string;
-            date: Date;
-            totalAmount: number;
-            discount: number;
-            netAmount: number;
-            paymentMethod: string;
-        }[];
     } & {
         id: string;
         notes: string | null;
@@ -77,6 +78,21 @@ export declare class BookingsController {
             createdAt: Date;
             updatedAt: Date;
         };
+        invoices: {
+            id: string;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string;
+            vehicleId: string;
+            bookingId: string | null;
+            invoiceNumber: string;
+            date: Date;
+            totalAmount: number;
+            discount: number;
+            netAmount: number;
+            paymentMethod: string;
+        }[];
         vehicle: {
             id: string;
             notes: string | null;
@@ -99,21 +115,6 @@ export declare class BookingsController {
             updatedAt: Date;
             specialty: string | null;
         };
-        invoices: {
-            id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            customerId: string;
-            vehicleId: string;
-            bookingId: string | null;
-            invoiceNumber: string;
-            date: Date;
-            totalAmount: number;
-            discount: number;
-            netAmount: number;
-            paymentMethod: string;
-        }[];
     } & {
         id: string;
         notes: string | null;
@@ -141,6 +142,21 @@ export declare class BookingsController {
             createdAt: Date;
             updatedAt: Date;
         };
+        invoices: {
+            id: string;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string;
+            vehicleId: string;
+            bookingId: string | null;
+            invoiceNumber: string;
+            date: Date;
+            totalAmount: number;
+            discount: number;
+            netAmount: number;
+            paymentMethod: string;
+        }[];
         vehicle: {
             id: string;
             notes: string | null;
@@ -163,21 +179,6 @@ export declare class BookingsController {
             updatedAt: Date;
             specialty: string | null;
         };
-        invoices: {
-            id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            customerId: string;
-            vehicleId: string;
-            bookingId: string | null;
-            invoiceNumber: string;
-            date: Date;
-            totalAmount: number;
-            discount: number;
-            netAmount: number;
-            paymentMethod: string;
-        }[];
     } & {
         id: string;
         notes: string | null;
@@ -245,6 +246,21 @@ export declare class BookingsController {
             createdAt: Date;
             updatedAt: Date;
         };
+        invoices: {
+            id: string;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string;
+            vehicleId: string;
+            bookingId: string | null;
+            invoiceNumber: string;
+            date: Date;
+            totalAmount: number;
+            discount: number;
+            netAmount: number;
+            paymentMethod: string;
+        }[];
         vehicle: {
             id: string;
             notes: string | null;
@@ -267,21 +283,6 @@ export declare class BookingsController {
             updatedAt: Date;
             specialty: string | null;
         };
-        invoices: {
-            id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            customerId: string;
-            vehicleId: string;
-            bookingId: string | null;
-            invoiceNumber: string;
-            date: Date;
-            totalAmount: number;
-            discount: number;
-            netAmount: number;
-            paymentMethod: string;
-        }[];
     } & {
         id: string;
         notes: string | null;

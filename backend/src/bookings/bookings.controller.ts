@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { AddAdditionalServiceDto, CreateBookingDto, UpdateBookingDto } from './bookings.dto';
 
 @Controller('bookings')
 export class BookingsController {
+  private readonly logger = new Logger(BookingsController.name);
   constructor(private readonly bookingsService: BookingsService) {}
 
   @Get()
@@ -27,7 +28,15 @@ export class BookingsController {
 
   @Post()
   async create(@Body() createBookingDto: CreateBookingDto) {
-    return this.bookingsService.create(createBookingDto);
+    this.logger.log(`POST /bookings - body: ${JSON.stringify(createBookingDto)}`);
+    try {
+      const result = await this.bookingsService.create(createBookingDto);
+      return result;
+    } catch (error) {
+      this.logger.error(`POST /bookings failed: ${error.message}`);
+      this.logger.error(`Full error: ${JSON.stringify(error?.response ?? error.message)}`);
+      throw error;
+    }
   }
 
   @Put(':id')
