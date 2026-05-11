@@ -92425,8 +92425,8 @@ A.fd("[Main] Route: "+n.geu(n)+", isLoading: "+o+", isLoggedIn: "+s+", NO_SPLASH
 if(n.gkr().length===2&&n.gkr()[0]==="track"){r=n.gkr()[1]
 q=n.gMN().i(0,"token")
 A.fd("[Main] Public tracking route: "+r)
-return A.jz(new A.as_(r,q),p,t.z)}if(o){A.fd("[Main] Showing splash screen")
-return A.jz(new A.as0(this),p,t.z)}if(s){o=b.a
+return A.jz(new A.as_(r,q),p,t.z)
+}if(s){o=b.a
 A.fd("[Main] Showing app with employee: "+A.k(o==null?p:o.b))
 return A.jz(new A.as1(b),p,t.z)}A.fd("[Main] Showing login screen")
 return A.jz(new A.as2(),p,t.z)}}
