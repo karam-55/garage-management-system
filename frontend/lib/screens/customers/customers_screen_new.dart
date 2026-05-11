@@ -308,9 +308,7 @@ class _CustomersScreenNewState extends ConsumerState<CustomersScreenNew> {
           const SizedBox(height: 16),
           _buildTextField('الهاتف', Icons.phone_outlined),
           const SizedBox(height: 16),
-          _buildTextField('البريد الإلكتروني', Icons.email_outlined),
-          const SizedBox(height: 16),
-          _buildTextField('العنوان', Icons.location_on_outlined),
+          _buildTextField('ملاحظات', Icons.note_outlined),
         ],
       ),
       footer: Row(

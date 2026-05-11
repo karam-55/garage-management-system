@@ -337,8 +337,6 @@ class _TrackingScreenState extends State<TrackingScreen> {
             const Divider(height: 24),
             _buildInfoRow('الاسم:', customer['name'] ?? '-'),
             _buildInfoRow('الهاتف:', customer['phone'] ?? '-'),
-            if (customer['email'] != null)
-              _buildInfoRow('البريد:', customer['email']),
           ],
         ),
       ),
