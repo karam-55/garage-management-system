@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/employee.dart';
 import '../services/auth_service.dart';
+import '../services/api_service.dart';
 import '../utils/token_storage.dart';
 
 class AuthState {
@@ -18,9 +20,10 @@ class AuthState {
     Employee? employee,
     bool? isLoading,
     bool? isLoggedIn,
+    bool clearEmployee = false,
   }) {
     return AuthState(
-      employee: employee ?? this.employee,
+      employee: clearEmployee ? null : (employee ?? this.employee),
       isLoading: isLoading ?? this.isLoading,
       isLoggedIn: isLoggedIn ?? this.isLoggedIn,
     );
@@ -31,20 +34,40 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final AuthService _authService = AuthService();
 
   AuthNotifier() : super(const AuthState(isLoading: true)) {
+    // Register 401 callback: auto-logout when any API call returns 401
+    ApiService.setUnauthorizedCallback(() {
+      if (mounted && state.isLoggedIn) {
+        state = const AuthState(isLoggedIn: false);
+      }
+    });
     _init();
   }
 
   Future<void> _init() async {
+    // Token was already pre-loaded in main() — this is just a safeguard
     final token = await TokenStorage.loadToken();
-    if (token != null) {
+
+    if (token == null) {
+      state = const AuthState(isLoggedIn: false);
+      return;
+    }
+
+    try {
       final profile = await _authService.getProfile();
       if (profile != null) {
         state = AuthState(employee: profile, isLoggedIn: true);
         return;
       }
+      // getProfile() returned null → 401 was received, token already cleared
+      state = const AuthState(isLoggedIn: false);
+    } on DioException catch (_) {
+      // Network error / timeout:
+      // Keep the token intact — next launch will retry.
+      // Show login so user can proceed manually.
+      state = const AuthState(isLoggedIn: false);
+    } catch (_) {
+      state = const AuthState(isLoggedIn: false);
     }
-    await TokenStorage.clearToken();
-    state = const AuthState(isLoggedIn: false);
   }
 
   Future<void> login(String phone, String password) async {

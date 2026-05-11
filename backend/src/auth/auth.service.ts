@@ -35,11 +35,14 @@ export class AuthService {
 
     return {
       token,
+      access_token: token,
       employee: {
         id: employee.id,
         name: employee.name,
         phone: employee.phone,
         role: employee.role,
+        isActive: employee.isActive,
+        createdAt: employee.createdAt,
       },
     };
   }

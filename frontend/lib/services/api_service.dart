@@ -3,13 +3,27 @@ import '../utils/api_config.dart';
 import '../utils/token_storage.dart';
 
 class ApiService {
+  // ─── Singleton ────────────────────────────────────────────────
+  static final ApiService _instance = ApiService._internal();
+  factory ApiService() => _instance;
+
+  // Called by AuthNotifier to redirect to login on 401
+  static void Function()? _onUnauthorized;
+  static void setUnauthorizedCallback(void Function() cb) {
+    _onUnauthorized = cb;
+  }
+
+  // ─── Dio setup ────────────────────────────────────────────────
   final Dio _dio;
 
-  ApiService() : _dio = Dio(BaseOptions(
-    baseUrl: ApiConfig.baseUrl,
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 10),
-  )) {
+  ApiService._internal()
+      : _dio = Dio(BaseOptions(
+          baseUrl: ApiConfig.baseUrl,
+          // 30 s gives Render free-tier time to wake up
+          connectTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          headers: {'Content-Type': 'application/json'},
+        )) {
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
         final token = TokenStorage.getToken();
@@ -18,38 +32,28 @@ class ApiService {
         }
         return handler.next(options);
       },
+      onError: (DioException error, handler) async {
+        if (error.response?.statusCode == 401) {
+          // Token is invalid / expired – clear it and notify auth layer
+          await TokenStorage.clearToken();
+          _onUnauthorized?.call();
+        }
+        return handler.next(error);
+      },
     ));
   }
 
-  Future<Response> get(String path) async {
-    try {
-      return await _dio.get(path);
-    } catch (e) {
-      rethrow;
-    }
-  }
+  // ─── HTTP helpers ─────────────────────────────────────────────
+  Future<Response> get(String path) => _dio.get(path);
 
-  Future<Response> post(String path, dynamic data) async {
-    try {
-      return await _dio.post(path, data: data);
-    } catch (e) {
-      rethrow;
-    }
-  }
+  Future<Response> post(String path, dynamic data) =>
+      _dio.post(path, data: data);
 
-  Future<Response> put(String path, dynamic data) async {
-    try {
-      return await _dio.put(path, data: data);
-    } catch (e) {
-      rethrow;
-    }
-  }
+  Future<Response> put(String path, dynamic data) =>
+      _dio.put(path, data: data);
 
-  Future<Response> delete(String path) async {
-    try {
-      return await _dio.delete(path);
-    } catch (e) {
-      rethrow;
-    }
-  }
+  Future<Response> patch(String path, dynamic data) =>
+      _dio.patch(path, data: data);
+
+  Future<Response> delete(String path) => _dio.delete(path);
 }

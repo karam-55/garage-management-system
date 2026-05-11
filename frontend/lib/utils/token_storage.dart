@@ -5,9 +5,10 @@ class TokenStorage {
 
   static String? _cachedToken;
 
-  static void setToken(String token) {
+  static Future<void> setToken(String token) async {
     _cachedToken = token;
-    SharedPreferences.getInstance().then((prefs) => prefs.setString(_tokenKey, token));
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_tokenKey, token);
   }
 
   static String? getToken() => _cachedToken;

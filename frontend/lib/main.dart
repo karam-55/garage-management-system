@@ -4,9 +4,13 @@ import 'core/app.dart';
 import 'core/app_theme.dart';
 import 'state/auth_provider.dart';
 import 'screens/auth/login_screen.dart';
+import 'utils/token_storage.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Pre-load token into memory cache BEFORE runApp so ApiService
+  // interceptor has it available from the very first HTTP request.
+  await TokenStorage.loadToken();
   runApp(
     const ProviderScope(
       child: AppWrapper(),
