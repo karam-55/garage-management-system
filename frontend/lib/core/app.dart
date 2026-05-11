@@ -8,6 +8,7 @@ import 'package:garage_management/screens/bookings/bookings_screen_v2.dart';
 import 'package:garage_management/screens/invoices/invoices_screen_v2.dart';
 import 'package:garage_management/screens/inventory/inventory_screen_v2.dart';
 import 'package:garage_management/screens/tracking/tracking_screen.dart';
+import 'package:garage_management/screens/mechanic/mechanic_login_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -72,7 +73,14 @@ class MyApp extends StatelessWidget {
 
   Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
     final uri = Uri.parse(settings.name ?? '/');
-    
+
+    // Handle /mechanic
+    if (uri.pathSegments.isNotEmpty && uri.pathSegments[0] == 'mechanic') {
+      return MaterialPageRoute(
+        builder: (_) => const MechanicLoginScreen(),
+      );
+    }
+
     // Handle /track/:vehicleId
     if (uri.pathSegments.length == 2 && uri.pathSegments[0] == 'track') {
       final vehicleId = uri.pathSegments[1];
@@ -80,7 +88,7 @@ class MyApp extends StatelessWidget {
         builder: (_) => TrackingScreen(vehicleId: vehicleId),
       );
     }
-    
+
     // Default route
     return MaterialPageRoute(
       builder: (_) => AppShellNew(pages: _pages),

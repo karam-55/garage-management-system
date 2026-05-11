@@ -11,6 +11,11 @@ export class BookingsController {
     return this.bookingsService.findAll();
   }
 
+  @Get('technician/:technicianId')
+  async findByTechnician(@Param('technicianId') technicianId: string) {
+    return this.bookingsService.findByTechnician(technicianId);
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const booking = await this.bookingsService.findOne(id);

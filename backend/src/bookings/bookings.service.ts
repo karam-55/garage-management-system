@@ -29,6 +29,19 @@ export class BookingsService {
     });
   }
 
+  async findByTechnician(technicianId: string) {
+    return this.prisma.booking.findMany({
+      where: { technicianId },
+      include: {
+        customer: true,
+        vehicle: true,
+        technician: true,
+        invoices: true,
+      },
+      orderBy: { scheduledAt: 'desc' },
+    });
+  }
+
   async create(createBookingDto: CreateBookingDto) {
     return this.prisma.booking.create({
       data: createBookingDto as any,

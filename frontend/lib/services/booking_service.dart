@@ -10,6 +10,11 @@ class BookingService {
     return (response.data as List).map((json) => Booking.fromJson(json)).toList();
   }
 
+  Future<List<Booking>> getBookingsByTechnician(String technicianId) async {
+    final response = await _dio.get('/bookings/technician/$technicianId');
+    return (response.data as List).map((json) => Booking.fromJson(json)).toList();
+  }
+
   Future<Booking> createBooking(Booking booking) async {
     final response = await _dio.post('/bookings', data: booking.toJson());
     return Booking.fromJson(response.data);
