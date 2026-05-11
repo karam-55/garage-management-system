@@ -30,15 +30,23 @@ export class VehiclesService {
   }
 
   async create(createVehicleDto: CreateVehicleDto) {
-    return this.prisma.vehicle.create({
-      data: createVehicleDto as any,
-    });
+    const data: any = { ...createVehicleDto };
+    // Remove empty customerId to allow null in DB
+    if (!data.customerId || data.customerId === '') {
+      delete data.customerId;
+    }
+    return this.prisma.vehicle.create({ data });
   }
 
   async update(id: string, updateVehicleDto: UpdateVehicleDto) {
+    const data: any = { ...updateVehicleDto };
+    // Remove empty customerId to prevent invalid relation
+    if (data.customerId === '') {
+      data.customerId = null;
+    }
     return this.prisma.vehicle.update({
       where: { id },
-      data: updateVehicleDto as any,
+      data,
     });
   }
 
