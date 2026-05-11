@@ -33,29 +33,6 @@ class _AppWrapperState extends ConsumerState<AppWrapper>
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
 
-  /// Returns true if the current URL is a public tracking page (/track/...)
-  bool get _isPublicTracking {
-    final route = WidgetsBinding.instance.platformDispatcher.defaultRouteName;
-    return route.startsWith('/track');
-  }
-
-  /// Extract vehicleId and token from tracking URL
-  ({String vehicleId, String? token})? _parseTrackingRoute() {
-    final route = WidgetsBinding.instance.platformDispatcher.defaultRouteName;
-    if (!route.startsWith('/track')) return null;
-
-    try {
-      final uri = Uri.parse(route);
-      if (uri.pathSegments.length == 2 && uri.pathSegments[0] == 'track') {
-        return (
-          vehicleId: uri.pathSegments[1],
-          token: uri.queryParameters['token'],
-        );
-      }
-    } catch (_) {}
-    return null;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -71,14 +48,9 @@ class _AppWrapperState extends ConsumerState<AppWrapper>
     );
     _controller.forward();
 
-    // Skip splash for public tracking pages so they load instantly
-    if (_isPublicTracking) {
-      _showSplash = false;
-    } else {
-      Future.delayed(const Duration(seconds: 2, milliseconds: 500), () {
-        if (mounted) setState(() => _showSplash = false);
-      });
-    }
+    Future.delayed(const Duration(seconds: 2, milliseconds: 500), () {
+      if (mounted) setState(() => _showSplash = false);
+    });
   }
 
   @override
@@ -91,40 +63,44 @@ class _AppWrapperState extends ConsumerState<AppWrapper>
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
-    // Public tracking page (/track/:vehicleId?token=...) bypasses auth entirely
-    if (_isPublicTracking) {
-      final trackingData = _parseTrackingRoute();
-      if (trackingData != null) {
-        return MaterialApp(
-          title: 'AUTO RENEW',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.darkTheme,
-          home: TrackingScreen(
-            vehicleId: trackingData.vehicleId,
-            token: trackingData.token,
-          ),
-        );
-      }
-    }
-
     return MaterialApp(
       title: 'AUTO RENEW',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 600),
-        transitionBuilder: (child, animation) =>
-            FadeTransition(opacity: animation, child: child),
-        child: _showSplash || authState.isLoading
-            ? _SplashScreen(
-                key: const ValueKey('splash'),
-                fadeAnimation: _fadeAnimation,
-                scaleAnimation: _scaleAnimation,
-              )
-            : authState.isLoggedIn
-                ? MyApp(key: const ValueKey('app'), employee: authState.employee)
-                : const LoginScreen(key: ValueKey('login')),
-      ),
+      onGenerateRoute: (settings) => _onGenerateRoute(settings, authState),
+    );
+  }
+
+  Route<dynamic>? _onGenerateRoute(RouteSettings settings, authState) {
+    final uri = Uri.parse(settings.name ?? '/');
+
+    // Handle /track/:vehicleId (public - no auth needed) - MUST BE FIRST
+    if (uri.pathSegments.length == 2 && uri.pathSegments[0] == 'track') {
+      final vehicleId = uri.pathSegments[1];
+      final token = uri.queryParameters['token'];
+      return MaterialPageRoute(
+        builder: (_) => TrackingScreen(vehicleId: vehicleId, token: token),
+      );
+    }
+
+    // Check auth for all other routes
+    if (_showSplash || authState.isLoading) {
+      return MaterialPageRoute(
+        builder: (_) => _SplashScreen(
+          fadeAnimation: _fadeAnimation,
+          scaleAnimation: _scaleAnimation,
+        ),
+      );
+    }
+
+    if (authState.isLoggedIn) {
+      return MaterialPageRoute(
+        builder: (_) => MyApp(employee: authState.employee),
+      );
+    }
+
+    return MaterialPageRoute(
+      builder: (_) => const LoginScreen(),
     );
   }
 }
