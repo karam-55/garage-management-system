@@ -19,6 +19,8 @@ const inventory_module_1 = require("./inventory/inventory.module");
 const notifications_module_1 = require("./notifications/notifications.module");
 const tracking_module_1 = require("./tracking/tracking.module");
 const whatsapp_module_1 = require("./whatsapp/whatsapp.module");
+const auth_module_1 = require("./auth/auth.module");
+const employees_module_1 = require("./employees/employees.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -29,6 +31,8 @@ exports.AppModule = AppModule = __decorate([
                 isGlobal: true,
             }),
             prisma_module_1.PrismaModule,
+            auth_module_1.AuthModule,
+            employees_module_1.EmployeesModule,
             customers_module_1.CustomersModule,
             vehicles_module_1.VehiclesModule,
             technicians_module_1.TechniciansModule,

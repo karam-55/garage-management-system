@@ -1,5 +1,5 @@
 export declare class CreateVehicleDto {
-    customerId: string;
+    customerId?: string;
     plateNumber: string;
     model: string;
     year: number;

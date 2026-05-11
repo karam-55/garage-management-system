@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, HttpException, HttpStatus } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
-import { CreateBookingDto, UpdateBookingDto } from './bookings.dto';
+import { AddAdditionalServiceDto, CreateBookingDto, UpdateBookingDto } from './bookings.dto';
 
 @Controller('bookings')
 export class BookingsController {
@@ -37,6 +37,14 @@ export class BookingsController {
       throw new HttpException('Booking not found', HttpStatus.NOT_FOUND);
     }
     return booking;
+  }
+
+  @Post(':id/additional-service')
+  async addAdditionalService(
+    @Param('id') id: string,
+    @Body() dto: AddAdditionalServiceDto,
+  ) {
+    return this.bookingsService.addAdditionalService(id, dto);
   }
 
   @Delete(':id')

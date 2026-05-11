@@ -27,4 +27,12 @@ class BookingService {
   Future<void> deleteBooking(String id) async {
     await _api.delete('/bookings/$id');
   }
+
+  Future<void> addAdditionalService(
+      String bookingId, String name, double? estimatedPrice) async {
+    await _api.post('/bookings/$bookingId/additional-service', {
+      'name': name,
+      if (estimatedPrice != null) 'estimatedPrice': estimatedPrice,
+    });
+  }
 }

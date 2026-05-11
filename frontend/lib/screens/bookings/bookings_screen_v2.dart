@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../core/app_theme.dart';
 import '../../models/booking.dart';
 import '../../models/vehicle.dart';
 import '../../state/booking_provider.dart';
 import '../../state/vehicle_provider.dart';
 import '../../services/notification_service.dart';
+import 'reception_screen.dart';
 
 class BookingsScreenV2 extends ConsumerStatefulWidget {
   const BookingsScreenV2({super.key});
@@ -76,30 +78,57 @@ class _BookingsScreenV2State extends ConsumerState<BookingsScreenV2> {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: () => _showAddDialog(),
-            child: AnimatedContainer(
-              duration: AppAnimations.normal,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: AppColors.gradientPrimary,
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: _openReceptionScreen,
+                child: AnimatedContainer(
+                  duration: AppAnimations.normal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withOpacity(0.15),
+                    borderRadius: AppBorders.radiusMd,
+                    border: Border.all(color: AppColors.success.withOpacity(0.4)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.person_add_outlined, color: AppColors.success, size: 20),
+                      const SizedBox(width: 8),
+                      Text('استقبال عميل', style: AppTypography.labelLarge.copyWith(
+                        color: AppColors.success, fontSize: 13)),
+                    ],
+                  ),
                 ),
-                borderRadius: AppBorders.radiusMd,
-                boxShadow: [AppShadows.glow(AppColors.primary)],
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.add, color: Colors.white, size: 20),
-                  const SizedBox(width: 8),
-                  Text('حجز جديد', style: AppTypography.labelLarge.copyWith(
-                    color: Colors.white, fontSize: 13)),
-                ],
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () => _showAddDialog(),
+                child: AnimatedContainer(
+                  duration: AppAnimations.normal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: AppColors.gradientPrimary,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: AppBorders.radiusMd,
+                    boxShadow: [AppShadows.glow(AppColors.primary)],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.add, color: Colors.white, size: 20),
+                      const SizedBox(width: 8),
+                      Text('حجز جديد', style: AppTypography.labelLarge.copyWith(
+                        color: Colors.white, fontSize: 13)),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),
@@ -321,6 +350,16 @@ class _BookingsScreenV2State extends ConsumerState<BookingsScreenV2> {
       ],
     ),
   );
+
+  Future<void> _openReceptionScreen() async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => const ReceptionScreen()),
+    );
+    if (result == true) {
+      ref.invalidate(bookingsProvider);
+    }
+  }
 
   void _showAddDialog() {
     final serviceController = TextEditingController();
@@ -797,6 +836,65 @@ class _BookingRowState extends State<_BookingRow>
     return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
   }
 
+  void _showQrDialog(BuildContext context) {
+    final token = widget.booking.qrToken;
+    final vehicleId = widget.booking.vehicleId;
+    final qrUrl = token != null
+        ? '${Uri.base.origin}/track/$vehicleId?token=$token'
+        : null;
+    if (qrUrl == null) return;
+
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 340),
+          decoration: BoxDecoration(
+            color: AppColors.bgSecondary,
+            borderRadius: AppBorders.radiusXl,
+            border: Border.all(color: AppColors.border.withOpacity(0.4)),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('رمز QR للسيارة',
+                  style: AppTypography.headingSmall.copyWith(fontSize: 16)),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: AppBorders.radiusLg,
+                ),
+                child: QrImageView(
+                  data: qrUrl,
+                  version: QrVersions.auto,
+                  size: 200,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(widget.booking.serviceDescription,
+                  style: AppTypography.bodySmall,
+                  textAlign: TextAlign.center),
+              const SizedBox(height: 4),
+              Text('امسح لمتابعة حالة السيارة',
+                  style: AppTypography.bodySmall
+                      .copyWith(color: AppColors.textMuted),
+                  textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('إغلاق'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
@@ -873,10 +971,23 @@ class _BookingRowState extends State<_BookingRow>
                 ),
               ),
               SizedBox(
-                width: 80,
+                width: 112,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (widget.booking.qrToken != null)
+                      GestureDetector(
+                        onTap: () => _showQrDialog(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withOpacity(0.1),
+                            borderRadius: AppBorders.radiusSm,
+                          ),
+                          child: Icon(Icons.qr_code_2, size: 16, color: AppColors.success),
+                        ),
+                      ),
+                    if (widget.booking.qrToken != null) const SizedBox(width: 6),
                     GestureDetector(
                       onTap: widget.onEdit,
                       child: Container(

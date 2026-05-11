@@ -23,6 +23,9 @@ let BookingsController = class BookingsController {
     async findAll() {
         return this.bookingsService.findAll();
     }
+    async findByTechnician(technicianId) {
+        return this.bookingsService.findByTechnician(technicianId);
+    }
     async findOne(id) {
         const booking = await this.bookingsService.findOne(id);
         if (!booking) {
@@ -40,6 +43,9 @@ let BookingsController = class BookingsController {
         }
         return booking;
     }
+    async addAdditionalService(id, dto) {
+        return this.bookingsService.addAdditionalService(id, dto);
+    }
     async delete(id) {
         const booking = await this.bookingsService.delete(id);
         if (!booking) {
@@ -55,6 +61,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], BookingsController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('technician/:technicianId'),
+    __param(0, (0, common_1.Param)('technicianId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], BookingsController.prototype, "findByTechnician", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
@@ -77,6 +90,14 @@ __decorate([
     __metadata("design:paramtypes", [String, bookings_dto_1.UpdateBookingDto]),
     __metadata("design:returntype", Promise)
 ], BookingsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Post)(':id/additional-service'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, bookings_dto_1.AddAdditionalServiceDto]),
+    __metadata("design:returntype", Promise)
+], BookingsController.prototype, "addAdditionalService", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),

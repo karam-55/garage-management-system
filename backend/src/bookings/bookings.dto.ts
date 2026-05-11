@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNotEmpty, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsNotEmpty, IsDateString, IsArray } from 'class-validator';
 
 export class CreateBookingDto {
   @IsString()
@@ -16,6 +16,9 @@ export class CreateBookingDto {
   @IsString()
   @IsNotEmpty()
   serviceType: string;
+
+  @IsOptional()
+  services?: { name: string; price: number }[];
 
   @IsString()
   @IsOptional()
@@ -51,6 +54,12 @@ export class UpdateBookingDto {
   @IsOptional()
   serviceType?: string;
 
+  @IsOptional()
+  services?: { name: string; price: number }[];
+
+  @IsOptional()
+  additionalServices?: any[];
+
   @IsString()
   @IsOptional()
   status?: string;
@@ -66,4 +75,12 @@ export class UpdateBookingDto {
   @IsString()
   @IsOptional()
   notes?: string;
+}
+
+export class AddAdditionalServiceDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  estimatedPrice?: number;
 }

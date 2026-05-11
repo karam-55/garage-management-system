@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma.service';
-import { CreateBookingDto, UpdateBookingDto } from './bookings.dto';
+import { AddAdditionalServiceDto, CreateBookingDto, UpdateBookingDto } from './bookings.dto';
 
 @Injectable()
 export class BookingsService {
@@ -14,6 +15,7 @@ export class BookingsService {
         technician: true,
         invoices: true,
       },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -43,8 +45,24 @@ export class BookingsService {
   }
 
   async create(createBookingDto: CreateBookingDto) {
+    const qrToken = randomUUID();
+    const frontendUrl = process.env.FRONTEND_URL || '';
+    const qrUrl = frontendUrl
+      ? `${frontendUrl}/track/${createBookingDto.vehicleId}?token=${qrToken}`
+      : '';
+
     return this.prisma.booking.create({
-      data: createBookingDto as any,
+      data: {
+        ...(createBookingDto as any),
+        qrToken,
+        qrUrl,
+        services: createBookingDto.services ?? [],
+        additionalServices: [],
+      },
+      include: {
+        customer: true,
+        vehicle: true,
+      },
     });
   }
 
@@ -52,12 +70,37 @@ export class BookingsService {
     return this.prisma.booking.update({
       where: { id },
       data: updateBookingDto as any,
+      include: {
+        customer: true,
+        vehicle: true,
+        technician: true,
+        invoices: true,
+      },
     });
   }
 
   async delete(id: string) {
     return this.prisma.booking.delete({
       where: { id },
+    });
+  }
+
+  async addAdditionalService(bookingId: string, dto: AddAdditionalServiceDto) {
+    const booking = await this.prisma.booking.findUnique({ where: { id: bookingId } });
+    if (!booking) throw new NotFoundException('الحجز غير موجود');
+
+    const existing: any[] = ((booking as any).additionalServices as any[]) ?? [];
+    const newService = {
+      id: randomUUID(),
+      name: dto.name,
+      estimatedPrice: dto.estimatedPrice ?? null,
+      status: 'PENDING',
+      addedAt: new Date().toISOString(),
+    };
+
+    return this.prisma.booking.update({
+      where: { id: bookingId },
+      data: { additionalServices: [...existing, newService] } as any,
     });
   }
 }

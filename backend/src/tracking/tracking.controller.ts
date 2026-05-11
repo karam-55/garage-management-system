@@ -1,4 +1,4 @@
-import { Controller, Get, Param, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { TrackingService } from './tracking.service';
 import { Public } from '../auth/public.decorator';
 
@@ -8,11 +8,30 @@ export class TrackingController {
 
   @Public()
   @Get(':vehicleId')
-  async trackVehicle(@Param('vehicleId') vehicleId: string) {
-    const trackingData = await this.trackingService.trackVehicle(vehicleId);
+  async trackVehicle(
+    @Param('vehicleId') vehicleId: string,
+    @Query('token') token?: string,
+  ) {
+    const trackingData = await this.trackingService.trackVehicle(vehicleId, token);
     if (!trackingData) {
-      throw new HttpException('Vehicle not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('السيارة غير موجودة أو رمز QR غير صالح', HttpStatus.NOT_FOUND);
     }
     return trackingData;
+  }
+
+  @Public()
+  @Post(':vehicleId/approve-service')
+  async approveService(
+    @Param('vehicleId') vehicleId: string,
+    @Query('token') token: string,
+    @Body() body: { serviceId: string; approve: boolean },
+  ) {
+    if (!token) throw new HttpException('رمز QR مطلوب', HttpStatus.BAD_REQUEST);
+    return this.trackingService.approveAdditionalService(
+      vehicleId,
+      token,
+      body.serviceId,
+      body.approve,
+    );
   }
 }

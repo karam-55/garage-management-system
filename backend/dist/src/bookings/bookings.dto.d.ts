@@ -3,6 +3,10 @@ export declare class CreateBookingDto {
     vehicleId: string;
     technicianId?: string;
     serviceType: string;
+    services?: {
+        name: string;
+        price: number;
+    }[];
     status?: string;
     scheduledAt: string;
     expectedFinishAt?: string;
@@ -13,8 +17,17 @@ export declare class UpdateBookingDto {
     vehicleId?: string;
     technicianId?: string;
     serviceType?: string;
+    services?: {
+        name: string;
+        price: number;
+    }[];
+    additionalServices?: any[];
     status?: string;
     scheduledAt?: string;
     expectedFinishAt?: string;
     notes?: string;
+}
+export declare class AddAdditionalServiceDto {
+    name: string;
+    estimatedPrice?: number;
 }

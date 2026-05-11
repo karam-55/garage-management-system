@@ -8,6 +8,7 @@ class Booking {
   final DateTime scheduledDate;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? qrToken;
 
   Booking({
     required this.id,
@@ -19,6 +20,7 @@ class Booking {
     required this.scheduledDate,
     required this.createdAt,
     required this.updatedAt,
+    this.qrToken,
   });
 
   factory Booking.fromJson(Map<String, dynamic> json) {
@@ -27,14 +29,13 @@ class Booking {
       vehicleId: json['vehicleId'] ?? '',
       customerId: json['customerId'],
       technicianId: json['technicianId'],
-      // Backend uses 'serviceType', fallback to 'serviceDescription'
       serviceDescription: json['serviceType'] ?? json['serviceDescription'] ?? '',
       status: json['status'] ?? 'RECEIVED',
-      // Backend uses 'scheduledAt', fallback to 'scheduledDate'
       scheduledDate: DateTime.parse(
         json['scheduledAt'] ?? json['scheduledDate'] ?? DateTime.now().toIso8601String()),
       createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
       updatedAt: DateTime.parse(json['updatedAt'] ?? DateTime.now().toIso8601String()),
+      qrToken: json['qrToken'],
     );
   }
 

@@ -16,23 +16,42 @@ let TrackingService = class TrackingService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async trackVehicle(vehicleId) {
+    async trackVehicle(vehicleId, token) {
         const vehicle = await this.prisma.vehicle.findUnique({
             where: { id: vehicleId },
             include: {
                 customer: true,
                 vehicleTracking: true,
                 bookings: {
-                    where: { status: { not: 'CANCELED' } },
+                    where: token
+                        ? { qrToken: token }
+                        : { status: { not: 'CANCELED' } },
                     orderBy: { scheduledAt: 'desc' },
                     take: 1,
+                    include: { invoices: true },
                 },
             },
         });
-        if (!vehicle) {
+        if (!vehicle)
+            return null;
+        if (token && vehicle.bookings.length === 0) {
             return null;
         }
         return vehicle;
+    }
+    async approveAdditionalService(vehicleId, token, serviceId, approve) {
+        const booking = await this.prisma.booking.findFirst({
+            where: { vehicleId, qrToken: token },
+        });
+        if (!booking)
+            throw new common_1.UnauthorizedException('رمز QR غير صالح');
+        const services = booking.additionalServices ?? [];
+        const updated = services.map((s) => s.id === serviceId ? { ...s, status: approve ? 'APPROVED' : 'REJECTED' } : s);
+        await this.prisma.booking.update({
+            where: { id: booking.id },
+            data: { additionalServices: updated },
+        });
+        return { success: true, message: approve ? 'تمت الموافقة' : 'تم الرفض' };
     }
 };
 exports.TrackingService = TrackingService;

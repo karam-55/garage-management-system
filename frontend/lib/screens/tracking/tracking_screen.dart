@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../utils/api_config.dart';
 
 class TrackingScreen extends StatefulWidget {
   final String vehicleId;
-  
-  const TrackingScreen({super.key, required this.vehicleId});
+  final String? token;
+
+  const TrackingScreen({super.key, required this.vehicleId, this.token});
 
   @override
   State<TrackingScreen> createState() => _TrackingScreenState();
@@ -22,17 +24,25 @@ class _TrackingScreenState extends State<TrackingScreen> {
     _fetchVehicleData();
   }
 
+  final Map<String, bool> _approvalLoading = {};
+
   Future<void> _fetchVehicleData() async {
     try {
       final dio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl));
-      final response = await dio.get('/track/${widget.vehicleId}');
+      final token = widget.token;
+      final url = token != null
+          ? '/track/${widget.vehicleId}?token=$token'
+          : '/track/${widget.vehicleId}';
+      final response = await dio.get(url);
       setState(() {
         vehicleData = response.data;
         isLoading = false;
       });
     } on DioException catch (e) {
       setState(() {
-        error = e.response?.data?['message'] ?? 'فشل في تحميل بيانات السيارة';
+        error = e.response?.data?['message'] ??
+            e.response?.data?['error'] ??
+            'فشل في تحميل بيانات السيارة';
         isLoading = false;
       });
     } catch (e) {
@@ -40,6 +50,21 @@ class _TrackingScreenState extends State<TrackingScreen> {
         error = 'حدث خطأ غير متوقع';
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> _approveService(String serviceId, bool approve) async {
+    setState(() => _approvalLoading[serviceId] = true);
+    try {
+      final dio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl));
+      final token = widget.token;
+      await dio.post(
+        '/track/${widget.vehicleId}/approve-service?token=$token',
+        data: {'serviceId': serviceId, 'approve': approve},
+      );
+      await _fetchVehicleData();
+    } catch (_) {
+      setState(() => _approvalLoading[serviceId] = false);
     }
   }
 
@@ -136,6 +161,21 @@ class _TrackingScreenState extends State<TrackingScreen> {
     final bookings = vehicle['bookings'] as List? ?? [];
     final latestBooking = bookings.isNotEmpty ? bookings.first : null;
     final currentStatus = latestBooking?['status'] ?? 'RECEIVED';
+    final services = (latestBooking?['services'] as List?)
+            ?.cast<Map<String, dynamic>>() ??
+        [];
+    final additionalServices =
+        (latestBooking?['additionalServices'] as List?)
+            ?.cast<Map<String, dynamic>>() ??
+        [];
+    final invoices =
+        (latestBooking?['invoices'] as List?)?.cast<Map<String, dynamic>>() ??
+            [];
+    final qrToken = latestBooking?['qrToken'] as String?;
+    final vehicleId = vehicle['id'] as String?;
+    final qrUrl = qrToken != null && vehicleId != null
+        ? '${Uri.base.origin}/track/$vehicleId?token=$qrToken'
+        : null;
 
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -153,12 +193,29 @@ class _TrackingScreenState extends State<TrackingScreen> {
                   const SizedBox(height: 16),
                   _buildVehicleInfoCard(vehicle, customer),
                   const SizedBox(height: 16),
-                  if (latestBooking != null) ...[
-                    _buildBookingCard(latestBooking),
+                  _buildContactCard(customer),
+                  const SizedBox(height: 16),
+                  if (services.isNotEmpty) ...[
+                    _buildServicesCard(services),
                     const SizedBox(height: 16),
                   ],
-                  _buildContactCard(customer),
-                  const SizedBox(height: 24),
+                  if (additionalServices.isNotEmpty) ...[
+                    _buildAdditionalServicesCard(additionalServices),
+                    const SizedBox(height: 16),
+                  ],
+                  if (invoices.isNotEmpty) ...[
+                    _buildInvoiceCard(invoices.first),
+                    const SizedBox(height: 16),
+                  ],
+                  if (latestBooking != null && latestBooking['notes'] != null) ...[
+                    _buildNotesCard(latestBooking['notes']),
+                    const SizedBox(height: 16),
+                  ],
+                  if (qrUrl != null) ...[
+                    _buildQrCard(qrUrl),
+                    const SizedBox(height: 16),
+                  ],
+                  const SizedBox(height: 8),
                 ],
               ),
             ),
@@ -435,6 +492,325 @@ class _TrackingScreenState extends State<TrackingScreen> {
             const Divider(height: 24),
             _buildInfoRow('الاسم:', customer['name'] ?? '-'),
             _buildInfoRow('الهاتف:', customer['phone'] ?? '-'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildServicesCard(List<Map<String, dynamic>> services) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(children: [
+              Icon(Icons.build_circle_outlined, color: Color(0xFF1976D2)),
+              SizedBox(width: 8),
+              Text('الخدمات المطلوبة',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ]),
+            const Divider(height: 20),
+            ...services.map((s) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.check_circle,
+                          size: 16, color: Color(0xFF4CAF50)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                          child: Text(s['name'] ?? '-',
+                              style: const TextStyle(fontSize: 14))),
+                      if ((s['price'] as num?)?.toDouble() != 0.0 &&
+                          s['price'] != null)
+                        Text('${s['price']} ر.س',
+                            style: const TextStyle(
+                                fontSize: 13, color: Color(0xFF1976D2))),
+                    ],
+                  ),
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAdditionalServicesCard(List<Map<String, dynamic>> services) {
+    final hasPending = services.any((s) => s['status'] == 'PENDING');
+    return Card(
+      elevation: 3,
+      color: hasPending
+          ? const Color(0xFFFFF8E1)
+          : null,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: hasPending
+              ? const BorderSide(color: Color(0xFFF9A825), width: 1.5)
+              : BorderSide.none),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Icon(Icons.add_circle_outline,
+                  color: hasPending
+                      ? const Color(0xFFF9A825)
+                      : const Color(0xFF1976D2)),
+              const SizedBox(width: 8),
+              const Expanded(
+                  child: Text('خدمات إضافية (تحتاج موافقة)',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold))),
+              if (hasPending)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF9A825).withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text('يحتاج موافقتك',
+                      style: TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFFE65100),
+                          fontWeight: FontWeight.w600)),
+                ),
+            ]),
+            const Divider(height: 20),
+            ...services.map((s) {
+              final status = s['status'] as String? ?? 'PENDING';
+              final serviceId = s['id'] as String? ?? '';
+              final isPending = status == 'PENDING';
+              final isLoading = _approvalLoading[serviceId] == true;
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isPending
+                      ? Colors.white
+                      : status == 'APPROVED'
+                          ? const Color(0xFFE8F5E9)
+                          : const Color(0xFFFFEBEE),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isPending
+                        ? const Color(0xFFFFB300)
+                        : status == 'APPROVED'
+                            ? const Color(0xFF81C784)
+                            : const Color(0xFFEF9A9A),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Text(s['name'] ?? '-',
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600))),
+                        if (s['estimatedPrice'] != null)
+                          Text('~${s['estimatedPrice']} ر.س',
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFF1976D2))),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    if (isPending && widget.token != null)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: isLoading
+                                  ? null
+                                  : () => _approveService(serviceId, true),
+                              icon: isLoading
+                                  ? const SizedBox(
+                                      width: 14,
+                                      height: 14,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2))
+                                  : const Icon(Icons.check, size: 16),
+                              label: const Text('موافقة',
+                                  style: TextStyle(fontSize: 13)),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF4CAF50),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(8)),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: isLoading
+                                  ? null
+                                  : () => _approveService(serviceId, false),
+                              icon: const Icon(Icons.close, size: 16),
+                              label: const Text('رفض',
+                                  style: TextStyle(fontSize: 13)),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFFEF5350),
+                                side: const BorderSide(
+                                    color: Color(0xFFEF5350)),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(8)),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      Row(
+                        children: [
+                          Icon(
+                            status == 'APPROVED'
+                                ? Icons.check_circle
+                                : Icons.cancel,
+                            size: 16,
+                            color: status == 'APPROVED'
+                                ? const Color(0xFF4CAF50)
+                                : const Color(0xFFEF5350),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            status == 'APPROVED' ? 'تمت الموافقة' : 'تم الرفض',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: status == 'APPROVED'
+                                  ? const Color(0xFF4CAF50)
+                                  : const Color(0xFFEF5350),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInvoiceCard(Map<String, dynamic> invoice) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Row(children: [
+              Icon(Icons.receipt_long, color: Color(0xFF1976D2)),
+              SizedBox(width: 8),
+              Text('الفاتورة',
+                  style:
+                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ]),
+            const Divider(height: 20),
+            if (invoice['invoiceNumber'] != null)
+              _buildInfoRow('رقم الفاتورة:', invoice['invoiceNumber']),
+            if (invoice['totalAmount'] != null)
+              _buildInfoRow(
+                  'المبلغ الإجمالي:', '${invoice['totalAmount']} ر.س'),
+            if (invoice['status'] != null)
+              _buildInfoRow(
+                  'حالة الدفع:',
+                  invoice['status'] == 'PAID'
+                      ? 'مدفوعة ✓'
+                      : invoice['status'] == 'PENDING'
+                          ? 'غير مدفوعة'
+                          : invoice['status']),
+            if (invoice['paidAt'] != null)
+              _buildInfoRow(
+                  'تاريخ الدفع:', _formatDate(invoice['paidAt'])),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotesCard(String notes) {
+    return Card(
+      elevation: 2,
+      color: const Color(0xFFF3E5F5),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.notes, color: Color(0xFF7B1FA2), size: 22),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('ملاحظات',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF7B1FA2))),
+                  const SizedBox(height: 4),
+                  Text(notes,
+                      style: const TextStyle(fontSize: 13)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQrCard(String qrUrl) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            const Row(children: [
+              Icon(Icons.qr_code_2, color: Color(0xFF1976D2)),
+              SizedBox(width: 8),
+              Text('رمز QR للتتبع',
+                  style:
+                      TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ]),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: QrImageView(
+                data: qrUrl,
+                version: QrVersions.auto,
+                size: 160,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text('شارك هذا الرمز لمتابعة حالة سيارتك',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 11, color: Colors.grey)),
           ],
         ),
       ),

@@ -4,38 +4,13 @@ export declare class CustomersController {
     private readonly customersService;
     constructor(customersService: CustomersService);
     findAll(): Promise<({
-        vehicles: {
-            id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            customerId: string;
-            plateNumber: string;
-            model: string;
-            year: number;
-            color: string;
-            fuelType: string;
-        }[];
-        bookings: {
-            id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            customerId: string;
-            vehicleId: string;
-            technicianId: string | null;
-            serviceType: string;
-            status: import(".prisma/client").$Enums.BookingStatus;
-            scheduledAt: Date;
-            expectedFinishAt: Date | null;
-        }[];
         invoices: {
             id: string;
+            customerId: string;
+            vehicleId: string;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
-            customerId: string;
-            vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
             date: Date;
@@ -44,48 +19,53 @@ export declare class CustomersController {
             netAmount: number;
             paymentMethod: string;
         }[];
+        vehicles: {
+            id: string;
+            customerId: string | null;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            plateNumber: string;
+            model: string;
+            year: number;
+            color: string;
+            fuelType: string;
+            chassisNumber: string | null;
+        }[];
+        bookings: {
+            id: string;
+            customerId: string;
+            vehicleId: string;
+            technicianId: string | null;
+            serviceType: string;
+            services: import("@prisma/client/runtime/client").JsonValue | null;
+            additionalServices: import("@prisma/client/runtime/client").JsonValue | null;
+            qrToken: string | null;
+            qrUrl: string | null;
+            status: import(".prisma/client").$Enums.BookingStatus;
+            scheduledAt: Date;
+            expectedFinishAt: Date | null;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+        }[];
     } & {
         id: string;
-        name: string;
-        phone: string;
-        secondaryPhone: string | null;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
+        phone: string;
+        secondaryPhone: string | null;
     })[]>;
     findOne(id: string): Promise<{
-        vehicles: {
-            id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            customerId: string;
-            plateNumber: string;
-            model: string;
-            year: number;
-            color: string;
-            fuelType: string;
-        }[];
-        bookings: {
-            id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            customerId: string;
-            vehicleId: string;
-            technicianId: string | null;
-            serviceType: string;
-            status: import(".prisma/client").$Enums.BookingStatus;
-            scheduledAt: Date;
-            expectedFinishAt: Date | null;
-        }[];
         invoices: {
             id: string;
+            customerId: string;
+            vehicleId: string;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
-            customerId: string;
-            vehicleId: string;
             bookingId: string | null;
             invoiceNumber: string;
             date: Date;
@@ -94,32 +74,62 @@ export declare class CustomersController {
             netAmount: number;
             paymentMethod: string;
         }[];
+        vehicles: {
+            id: string;
+            customerId: string | null;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            plateNumber: string;
+            model: string;
+            year: number;
+            color: string;
+            fuelType: string;
+            chassisNumber: string | null;
+        }[];
+        bookings: {
+            id: string;
+            customerId: string;
+            vehicleId: string;
+            technicianId: string | null;
+            serviceType: string;
+            services: import("@prisma/client/runtime/client").JsonValue | null;
+            additionalServices: import("@prisma/client/runtime/client").JsonValue | null;
+            qrToken: string | null;
+            qrUrl: string | null;
+            status: import(".prisma/client").$Enums.BookingStatus;
+            scheduledAt: Date;
+            expectedFinishAt: Date | null;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+        }[];
     } & {
         id: string;
-        name: string;
-        phone: string;
-        secondaryPhone: string | null;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
+        phone: string;
+        secondaryPhone: string | null;
     }>;
     create(createCustomerDto: CreateCustomerDto): Promise<{
         id: string;
-        name: string;
-        phone: string;
-        secondaryPhone: string | null;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
+        phone: string;
+        secondaryPhone: string | null;
     }>;
     update(id: string, updateCustomerDto: UpdateCustomerDto): Promise<{
         id: string;
-        name: string;
-        phone: string;
-        secondaryPhone: string | null;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
+        phone: string;
+        secondaryPhone: string | null;
     }>;
     delete(id: string): Promise<{
         message: string;

@@ -4,47 +4,52 @@ export declare class InvoicesService {
     private prisma;
     constructor(prisma: PrismaService);
     findAll(): Promise<({
-        customer: {
+        booking: {
             id: string;
-            name: string;
-            phone: string;
-            secondaryPhone: string | null;
+            customerId: string;
+            vehicleId: string;
+            technicianId: string | null;
+            serviceType: string;
+            services: import("@prisma/client/runtime/client").JsonValue | null;
+            additionalServices: import("@prisma/client/runtime/client").JsonValue | null;
+            qrToken: string | null;
+            qrUrl: string | null;
+            status: import(".prisma/client").$Enums.BookingStatus;
+            scheduledAt: Date;
+            expectedFinishAt: Date | null;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
         };
-        vehicle: {
+        customer: {
             id: string;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
-            customerId: string;
+            name: string;
+            phone: string;
+            secondaryPhone: string | null;
+        };
+        vehicle: {
+            id: string;
+            customerId: string | null;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
             plateNumber: string;
             model: string;
             year: number;
             color: string;
             fuelType: string;
-        };
-        booking: {
-            id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            customerId: string;
-            vehicleId: string;
-            technicianId: string | null;
-            serviceType: string;
-            status: import(".prisma/client").$Enums.BookingStatus;
-            scheduledAt: Date;
-            expectedFinishAt: Date | null;
+            chassisNumber: string | null;
         };
     } & {
         id: string;
+        customerId: string;
+        vehicleId: string;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
-        customerId: string;
-        vehicleId: string;
         bookingId: string | null;
         invoiceNumber: string;
         date: Date;
@@ -54,47 +59,52 @@ export declare class InvoicesService {
         paymentMethod: string;
     })[]>;
     findOne(id: string): Promise<{
-        customer: {
+        booking: {
             id: string;
-            name: string;
-            phone: string;
-            secondaryPhone: string | null;
+            customerId: string;
+            vehicleId: string;
+            technicianId: string | null;
+            serviceType: string;
+            services: import("@prisma/client/runtime/client").JsonValue | null;
+            additionalServices: import("@prisma/client/runtime/client").JsonValue | null;
+            qrToken: string | null;
+            qrUrl: string | null;
+            status: import(".prisma/client").$Enums.BookingStatus;
+            scheduledAt: Date;
+            expectedFinishAt: Date | null;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
         };
-        vehicle: {
+        customer: {
             id: string;
             notes: string | null;
             createdAt: Date;
             updatedAt: Date;
-            customerId: string;
+            name: string;
+            phone: string;
+            secondaryPhone: string | null;
+        };
+        vehicle: {
+            id: string;
+            customerId: string | null;
+            notes: string | null;
+            createdAt: Date;
+            updatedAt: Date;
             plateNumber: string;
             model: string;
             year: number;
             color: string;
             fuelType: string;
-        };
-        booking: {
-            id: string;
-            notes: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            customerId: string;
-            vehicleId: string;
-            technicianId: string | null;
-            serviceType: string;
-            status: import(".prisma/client").$Enums.BookingStatus;
-            scheduledAt: Date;
-            expectedFinishAt: Date | null;
+            chassisNumber: string | null;
         };
     } & {
         id: string;
+        customerId: string;
+        vehicleId: string;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
-        customerId: string;
-        vehicleId: string;
         bookingId: string | null;
         invoiceNumber: string;
         date: Date;
@@ -105,11 +115,11 @@ export declare class InvoicesService {
     }>;
     create(createInvoiceDto: CreateInvoiceDto): Promise<{
         id: string;
+        customerId: string;
+        vehicleId: string;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
-        customerId: string;
-        vehicleId: string;
         bookingId: string | null;
         invoiceNumber: string;
         date: Date;
@@ -120,11 +130,11 @@ export declare class InvoicesService {
     }>;
     update(id: string, updateInvoiceDto: UpdateInvoiceDto): Promise<{
         id: string;
+        customerId: string;
+        vehicleId: string;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
-        customerId: string;
-        vehicleId: string;
         bookingId: string | null;
         invoiceNumber: string;
         date: Date;
@@ -135,11 +145,11 @@ export declare class InvoicesService {
     }>;
     delete(id: string): Promise<{
         id: string;
+        customerId: string;
+        vehicleId: string;
         notes: string | null;
         createdAt: Date;
         updatedAt: Date;
-        customerId: string;
-        vehicleId: string;
         bookingId: string | null;
         invoiceNumber: string;
         date: Date;

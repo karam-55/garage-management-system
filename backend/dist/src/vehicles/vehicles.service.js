@@ -38,14 +38,20 @@ let VehiclesService = class VehiclesService {
         });
     }
     async create(createVehicleDto) {
-        return this.prisma.vehicle.create({
-            data: createVehicleDto,
-        });
+        const data = { ...createVehicleDto };
+        if (!data.customerId || data.customerId === '') {
+            delete data.customerId;
+        }
+        return this.prisma.vehicle.create({ data });
     }
     async update(id, updateVehicleDto) {
+        const data = { ...updateVehicleDto };
+        if (data.customerId === '') {
+            data.customerId = null;
+        }
         return this.prisma.vehicle.update({
             where: { id },
-            data: updateVehicleDto,
+            data,
         });
     }
     async delete(id) {

@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateBookingDto = exports.CreateBookingDto = void 0;
+exports.AddAdditionalServiceDto = exports.UpdateBookingDto = exports.CreateBookingDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateBookingDto {
 }
@@ -34,6 +34,10 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateBookingDto.prototype, "serviceType", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateBookingDto.prototype, "services", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
@@ -78,6 +82,14 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateBookingDto.prototype, "serviceType", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], UpdateBookingDto.prototype, "services", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], UpdateBookingDto.prototype, "additionalServices", void 0);
+__decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -97,4 +109,12 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateBookingDto.prototype, "notes", void 0);
+class AddAdditionalServiceDto {
+}
+exports.AddAdditionalServiceDto = AddAdditionalServiceDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], AddAdditionalServiceDto.prototype, "name", void 0);
 //# sourceMappingURL=bookings.dto.js.map

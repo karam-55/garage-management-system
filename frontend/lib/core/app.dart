@@ -128,8 +128,9 @@ class MyApp extends ConsumerWidget {
     // Handle /track/:vehicleId (public - no auth needed)
     if (uri.pathSegments.length == 2 && uri.pathSegments[0] == 'track') {
       final vehicleId = uri.pathSegments[1];
+      final token = uri.queryParameters['token'];
       return MaterialPageRoute(
-        builder: (_) => TrackingScreen(vehicleId: vehicleId),
+        builder: (_) => TrackingScreen(vehicleId: vehicleId, token: token),
       );
     }
 
