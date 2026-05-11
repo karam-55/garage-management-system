@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
 import { PrismaModule } from './prisma/prisma.module';
 import { CustomersModule } from './customers/customers.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
@@ -13,7 +12,6 @@ import { TrackingModule } from './tracking/tracking.module';
 import { WhatsAppModule } from './whatsapp/whatsapp.module';
 import { AuthModule } from './auth/auth.module';
 import { EmployeesModule } from './employees/employees.module';
-import { AuthGuard, RolesGuard } from './auth/auth.guard';
 
 @Module({
   imports: [
@@ -32,16 +30,6 @@ import { AuthGuard, RolesGuard } from './auth/auth.guard';
     NotificationsModule,
     TrackingModule,
     WhatsAppModule,
-  ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
   ],
 })
 export class AppModule {}
