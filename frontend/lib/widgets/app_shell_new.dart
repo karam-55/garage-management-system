@@ -104,27 +104,39 @@ class AppShellNew extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: pages.asMap().entries.map((entry) {
-              final index = entry.key;
-              final page = entry.value;
-              final isActive = index == currentPage;
-              return ListTile(
-                leading: Icon(
-                  isActive ? page.activeIcon ?? page.icon : page.icon,
-                  color: isActive ? AppColors.primary : AppColors.textTertiary,
-                ),
-                title: Text(
-                  page.title,
-                  style: AppTypography.labelMedium.copyWith(
-                    color: isActive ? AppColors.primary : AppColors.textSecondary,
+            children: [
+              ...pages.asMap().entries.map((entry) {
+                final index = entry.key;
+                final page = entry.value;
+                final isActive = index == currentPage;
+                return ListTile(
+                  leading: Icon(
+                    isActive ? page.activeIcon ?? page.icon : page.icon,
+                    color: isActive ? AppColors.primary : AppColors.textTertiary,
                   ),
-                ),
+                  title: Text(
+                    page.title,
+                    style: AppTypography.labelMedium.copyWith(
+                      color: isActive ? AppColors.primary : AppColors.textSecondary,
+                    ),
+                  ),
+                  onTap: () {
+                    ref.read(currentPageProvider.notifier).state = index;
+                    Navigator.pop(context);
+                  },
+                );
+              }),
+              const Divider(),
+              ListTile(
+                leading: Icon(Icons.logout, color: AppColors.error),
+                title: Text('تسجيل الخروج', style: AppTypography.labelMedium.copyWith(
+                  color: AppColors.error)),
                 onTap: () {
-                  ref.read(currentPageProvider.notifier).state = index;
                   Navigator.pop(context);
+                  ref.read(authProvider.notifier).logout();
                 },
-              );
-            }).toList(),
+              ),
+            ],
           ),
         ),
       ),
