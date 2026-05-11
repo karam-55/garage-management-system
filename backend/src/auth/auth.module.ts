@@ -1,11 +1,10 @@
-import { Module, Global } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { AuthGuard, RolesGuard } from './auth.guard';
 import { PrismaModule } from '../prisma/prisma.module';
 
-@Global()
 @Module({
   imports: [PrismaModule],
   controllers: [AuthController],
