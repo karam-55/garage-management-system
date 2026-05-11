@@ -511,11 +511,13 @@ class _BookingsScreenV2State extends ConsumerState<BookingsScreenV2> {
       onConfirm: () async {
         try {
           await ref.read(bookingServiceProvider).deleteBooking(booking.id);
+          // Close dialog first
+          if (mounted) Navigator.of(context, rootNavigator: true).pop();
+          // Then refresh data
           ref.invalidate(bookingsProvider);
-          Navigator.pop(context);
-          showSuccessToast(context, 'تم حذف الحجز بنجاح!');
+          if (mounted) showSuccessToast(context, 'تم حذف الحجز بنجاح!');
         } catch (e) {
-          showErrorToast(context, 'خطأ: \$e');
+          if (mounted) showErrorToast(context, 'خطأ: $e');
         }
       },
     );
@@ -675,7 +677,7 @@ class _BookingsScreenV2State extends ConsumerState<BookingsScreenV2> {
         content: Text(message, style: AppTypography.bodyMedium),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
             child: Text('إلغاء', style: AppTypography.labelMedium.copyWith(
                 color: AppColors.textTertiary)),
           ),

@@ -73,11 +73,13 @@ class _AppWrapperState extends ConsumerState<AppWrapper>
 
   Route<dynamic>? _onGenerateRoute(RouteSettings settings, authState) {
     final uri = Uri.parse(settings.name ?? '/');
+    print('[Main] Route: ${uri.path}, isLoading: ${authState.isLoading}, isLoggedIn: ${authState.isLoggedIn}, _showSplash: $_showSplash');
 
     // Handle /track/:vehicleId (public - no auth needed) - MUST BE FIRST
     if (uri.pathSegments.length == 2 && uri.pathSegments[0] == 'track') {
       final vehicleId = uri.pathSegments[1];
       final token = uri.queryParameters['token'];
+      print('[Main] Public tracking route: $vehicleId');
       return MaterialPageRoute(
         builder: (_) => TrackingScreen(vehicleId: vehicleId, token: token),
       );
@@ -85,6 +87,7 @@ class _AppWrapperState extends ConsumerState<AppWrapper>
 
     // Check auth for all other routes
     if (_showSplash || authState.isLoading) {
+      print('[Main] Showing splash screen');
       return MaterialPageRoute(
         builder: (_) => _SplashScreen(
           fadeAnimation: _fadeAnimation,
@@ -94,11 +97,13 @@ class _AppWrapperState extends ConsumerState<AppWrapper>
     }
 
     if (authState.isLoggedIn) {
+      print('[Main] Showing app with employee: ${authState.employee?.name}');
       return MaterialPageRoute(
         builder: (_) => MyApp(employee: authState.employee),
       );
     }
 
+    print('[Main] Showing login screen');
     return MaterialPageRoute(
       builder: (_) => const LoginScreen(),
     );

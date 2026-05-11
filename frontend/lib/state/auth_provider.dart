@@ -44,39 +44,52 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> _init() async {
+    print('[AuthProvider] _init started');
     // Token was already pre-loaded in main() — this is just a safeguard
     final token = await TokenStorage.loadToken();
+    print('[AuthProvider] Token loaded: ${token != null ? "EXISTS" : "NULL"}');
 
     if (token == null) {
-      state = const AuthState(isLoggedIn: false);
+      print('[AuthProvider] No token found, setting isLoggedIn=false');
+      state = const AuthState(isLoading: false, isLoggedIn: false);
       return;
     }
 
     try {
+      print('[AuthProvider] Calling getProfile...');
       final profile = await _authService.getProfile();
+      print('[AuthProvider] getProfile returned: ${profile != null ? "SUCCESS" : "NULL"}');
       if (profile != null) {
-        state = AuthState(employee: profile, isLoggedIn: true);
+        state = AuthState(employee: profile, isLoading: false, isLoggedIn: true);
+        print('[AuthProvider] Login successful');
         return;
       }
       // getProfile() returned null → 401 was received, token already cleared
-      state = const AuthState(isLoggedIn: false);
-    } on DioException catch (_) {
+      print('[AuthProvider] Profile is null, setting isLoggedIn=false');
+      state = const AuthState(isLoading: false, isLoggedIn: false);
+    } on DioException catch (e) {
       // Network error / timeout:
       // Keep the token intact — next launch will retry.
       // Show login so user can proceed manually.
-      state = const AuthState(isLoggedIn: false);
-    } catch (_) {
-      state = const AuthState(isLoggedIn: false);
+      print('[AuthProvider] DioException: ${e.message}');
+      state = const AuthState(isLoading: false, isLoggedIn: false);
+    } catch (e) {
+      print('[AuthProvider] Exception: $e');
+      state = const AuthState(isLoading: false, isLoggedIn: false);
     }
+    print('[AuthProvider] _init completed');
   }
 
   Future<void> login(String phone, String password) async {
+    print('[AuthProvider] login started');
     state = state.copyWith(isLoading: true);
     try {
       final result = await _authService.login(phone, password);
-      state = AuthState(employee: result.employee, isLoggedIn: true);
+      state = AuthState(employee: result.employee, isLoading: false, isLoggedIn: true);
+      print('[AuthProvider] login successful');
     } catch (e) {
       state = state.copyWith(isLoading: false);
+      print('[AuthProvider] login failed: $e');
       rethrow;
     }
   }
