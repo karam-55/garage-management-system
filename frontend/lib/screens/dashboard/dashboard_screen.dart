@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/transitions.dart';
 import '../../state/dashboard_provider.dart';
 import '../../state/theme_provider.dart';
+import '../../widgets/custom_loader.dart';
+import '../../widgets/shimmer_loading.dart';
 import '../customers/customers_screen.dart';
 import '../vehicles/vehicles_screen.dart';
 import '../technicians/technicians_screen.dart';
@@ -59,8 +62,54 @@ class DashboardScreen extends ConsumerWidget {
           // Stats Cards
           SliverToBoxAdapter(
             child: statsAsync.when(
-              data: (stats) => _buildStatsSection(context, stats),
-              loading: () => const Center(child: CircularProgressIndicator()),
+              data: (stats) => FadeInAnimation(
+                delay: const Duration(milliseconds: 100),
+                child: _buildStatsSection(context, stats),
+              ),
+              loading: () => Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    ShimmerLoading(
+                      child: Container(
+                        height: 140,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ShimmerLoading(
+                            child: Container(
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ShimmerLoading(
+                            child: Container(
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
               error: (error, stack) => Center(child: Text('خطأ: $error')),
             ),
           ),
@@ -90,7 +139,7 @@ class DashboardScreen extends ConsumerWidget {
                   title: 'العملاء',
                   subtitle: 'إدارة العملاء',
                   color: Colors.blue,
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CustomersScreen())),
+                  onTap: () => Navigator.push(context, slideRightRoute(const CustomersScreen())),
                 ),
                 _buildQuickAction(
                   context,
@@ -98,7 +147,7 @@ class DashboardScreen extends ConsumerWidget {
                   title: 'السيارات',
                   subtitle: 'تسجيل السيارات',
                   color: Colors.green,
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VehiclesScreen())),
+                  onTap: () => Navigator.push(context, slideRightRoute(const VehiclesScreen())),
                 ),
                 _buildQuickAction(
                   context,
@@ -106,7 +155,7 @@ class DashboardScreen extends ConsumerWidget {
                   title: 'الفنيين',
                   subtitle: 'إدارة الفنيين',
                   color: Colors.orange,
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TechniciansScreen())),
+                  onTap: () => Navigator.push(context, slideRightRoute(const TechniciansScreen())),
                 ),
                 _buildQuickAction(
                   context,
@@ -114,7 +163,7 @@ class DashboardScreen extends ConsumerWidget {
                   title: 'الحجوزات',
                   subtitle: 'إدارة الحجوزات',
                   color: Colors.purple,
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BookingsScreen())),
+                  onTap: () => Navigator.push(context, slideRightRoute(const BookingsScreen())),
                 ),
                 _buildQuickAction(
                   context,
@@ -122,7 +171,7 @@ class DashboardScreen extends ConsumerWidget {
                   title: 'الفواتير',
                   subtitle: 'الفواتير والمدفوعات',
                   color: Colors.red,
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const InvoicesScreen())),
+                  onTap: () => Navigator.push(context, slideRightRoute(const InvoicesScreen())),
                 ),
                 _buildQuickAction(
                   context,
@@ -130,7 +179,7 @@ class DashboardScreen extends ConsumerWidget {
                   title: 'المخزون',
                   subtitle: 'إدارة المخزون',
                   color: Colors.teal,
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const InventoryScreen())),
+                  onTap: () => Navigator.push(context, slideRightRoute(const InventoryScreen())),
                 ),
                 _buildQuickAction(
                   context,
@@ -138,7 +187,7 @@ class DashboardScreen extends ConsumerWidget {
                   title: 'الميكانيكي',
                   subtitle: 'إدارة الصيانة',
                   color: Colors.deepOrange,
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MechanicDashboardScreen())),
+                  onTap: () => Navigator.push(context, slideRightRoute(const MechanicDashboardScreen())),
                 ),
                 _buildQuickAction(
                   context,
