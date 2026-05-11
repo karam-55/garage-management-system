@@ -47,6 +47,7 @@ class Booking {
       'serviceType': serviceDescription,
       'status': status,
       'scheduledAt': scheduledDate.toIso8601String(),
+      'services': [],
     };
   }
 }

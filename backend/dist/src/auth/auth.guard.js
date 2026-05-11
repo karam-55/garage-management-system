@@ -8,15 +8,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var AuthGuard_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RolesGuard = exports.AuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const jwt = require("jsonwebtoken");
 const public_decorator_1 = require("./public.decorator");
-let AuthGuard = class AuthGuard {
+let AuthGuard = AuthGuard_1 = class AuthGuard {
     constructor(reflector) {
         this.reflector = reflector;
+        this.logger = new common_1.Logger(AuthGuard_1.name);
     }
     canActivate(context) {
         const isPublic = this.reflector.getAllAndOverride(public_decorator_1.IS_PUBLIC_KEY, [
@@ -28,22 +30,28 @@ let AuthGuard = class AuthGuard {
         const request = context.switchToHttp().getRequest();
         const authHeader = request.headers['authorization'];
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            this.logger.warn('Missing or invalid Authorization header');
             throw new common_1.UnauthorizedException('يجب تسجيل الدخول أولاً');
         }
         const token = authHeader.split(' ')[1];
         try {
-            const secret = process.env.JWT_SECRET || 'garage_secret_key_2024';
+            const secret = process.env.JWT_SECRET;
+            if (!secret) {
+                this.logger.error('JWT_SECRET environment variable is not set');
+                throw new common_1.UnauthorizedException('خطأ في إعدادات المصادقة');
+            }
             const payload = jwt.verify(token, secret);
             request.employee = payload;
             return true;
         }
-        catch {
+        catch (error) {
+            this.logger.warn(`Token verification failed: ${error.message}`);
             throw new common_1.UnauthorizedException('انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً');
         }
     }
 };
 exports.AuthGuard = AuthGuard;
-exports.AuthGuard = AuthGuard = __decorate([
+exports.AuthGuard = AuthGuard = AuthGuard_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [core_1.Reflector])
 ], AuthGuard);

@@ -2,6 +2,7 @@ import { InventoryService } from './inventory.service';
 import { CreateInventoryItemDto, UpdateInventoryItemDto } from './inventory.dto';
 export declare class InventoryController {
     private readonly inventoryService;
+    private readonly logger;
     constructor(inventoryService: InventoryService);
     findAll(): Promise<{
         id: string;

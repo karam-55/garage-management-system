@@ -2,6 +2,7 @@ import { TechniciansService } from './technicians.service';
 import { CreateTechnicianDto, UpdateTechnicianDto } from './technicians.dto';
 export declare class TechniciansController {
     private readonly techniciansService;
+    private readonly logger;
     constructor(techniciansService: TechniciansService);
     findAll(): Promise<({
         bookings: {

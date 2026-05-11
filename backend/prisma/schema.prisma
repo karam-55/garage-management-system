@@ -40,6 +40,8 @@ model Vehicle {
   bookings        Booking[]
   invoices        Invoice[]
   vehicleTracking VehicleTracking?
+
+  @@index([customerId])
 }
 
 // Technicians
@@ -75,6 +77,11 @@ model Booking {
   vehicle           Vehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
   technician        Technician? @relation(fields: [technicianId], references: [id], onDelete: SetNull)
   invoices          Invoice[]
+
+  @@index([customerId])
+  @@index([vehicleId])
+  @@index([status])
+  @@index([qrToken])
 }
 
 // Invoices
@@ -95,6 +102,9 @@ model Invoice {
   customer      Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
   vehicle       Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
   booking       Booking?  @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  @@index([bookingId])
+  @@index([customerId])
 }
 
 // Inventory Items

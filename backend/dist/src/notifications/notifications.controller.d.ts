@@ -1,6 +1,7 @@
 import { NotificationsService } from './notifications.service';
 export declare class NotificationsController {
     private readonly notificationsService;
+    private readonly logger;
     constructor(notificationsService: NotificationsService);
     findAll(): Promise<{
         id: string;

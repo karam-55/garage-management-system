@@ -2,6 +2,7 @@ import { InvoicesService } from './invoices.service';
 import { CreateInvoiceDto, UpdateInvoiceDto } from './invoices.dto';
 export declare class InvoicesController {
     private readonly invoicesService;
+    private readonly logger;
     constructor(invoicesService: InvoicesService);
     findAll(): Promise<({
         customer: {

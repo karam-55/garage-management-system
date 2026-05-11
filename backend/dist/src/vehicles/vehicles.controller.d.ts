@@ -2,6 +2,7 @@ import { VehiclesService } from './vehicles.service';
 import { CreateVehicleDto, UpdateVehicleDto } from './vehicles.dto';
 export declare class VehiclesController {
     private readonly vehiclesService;
+    private readonly logger;
     constructor(vehiclesService: VehiclesService);
     findAll(): Promise<({
         customer: {

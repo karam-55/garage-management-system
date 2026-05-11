@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
+  Logger,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import * as jwt from 'jsonwebtoken';
@@ -10,6 +11,7 @@ import { IS_PUBLIC_KEY } from './public.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private readonly logger = new Logger(AuthGuard.name);
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -24,16 +26,22 @@ export class AuthGuard implements CanActivate {
     const authHeader = request.headers['authorization'];
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      this.logger.warn('Missing or invalid Authorization header');
       throw new UnauthorizedException('يجب تسجيل الدخول أولاً');
     }
 
     const token = authHeader.split(' ')[1];
     try {
-      const secret = process.env.JWT_SECRET || 'garage_secret_key_2024';
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        this.logger.error('JWT_SECRET environment variable is not set');
+        throw new UnauthorizedException('خطأ في إعدادات المصادقة');
+      }
       const payload = jwt.verify(token, secret) as any;
       request.employee = payload;
       return true;
-    } catch {
+    } catch (error) {
+      this.logger.warn(`Token verification failed: ${error.message}`);
       throw new UnauthorizedException('انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً');
     }
   }

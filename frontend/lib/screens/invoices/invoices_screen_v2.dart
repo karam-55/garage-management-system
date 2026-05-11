@@ -161,7 +161,7 @@ class _InvoicesScreenV2State extends ConsumerState<InvoicesScreenV2> {
       if (_filter == 'UNPAID' && inv.isPaid) return false;
       if (_searchQuery.isEmpty) return true;
       final q = _searchQuery.toLowerCase();
-      return inv.id.toLowerCase().contains(q) || inv.bookingId.toLowerCase().contains(q);
+      return inv.id.toLowerCase().contains(q) || (inv.bookingId?.toLowerCase().contains(q) ?? false);
     }).toList();
 
     return Padding(
@@ -310,6 +310,7 @@ class _InvoicesScreenV2State extends ConsumerState<InvoicesScreenV2> {
           bookingId: bookingIdController.text,
           amount: double.tryParse(amountController.text) ?? 0,
           isPaid: false,
+          date: DateTime.now(),
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
@@ -331,6 +332,7 @@ class _InvoicesScreenV2State extends ConsumerState<InvoicesScreenV2> {
       bookingId: invoice.bookingId,
       amount: invoice.amount,
       isPaid: true,
+      date: invoice.date,
       createdAt: invoice.createdAt,
       updatedAt: DateTime.now(),
     );
@@ -612,7 +614,7 @@ class _InvoiceRowState extends State<_InvoiceRow>
               ),
               Expanded(
                 flex: 2,
-                child: Text('#${inv.bookingId.substring(0, 8)}',
+                child: Text('#${inv.bookingId?.substring(0, 8) ?? '---'}',
                     style: AppTypography.bodyMedium.copyWith(fontFamily: 'monospace')),
               ),
               Expanded(
