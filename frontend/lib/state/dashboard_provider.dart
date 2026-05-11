@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dio/dio.dart';
-import '../utils/api_config.dart';
+import '../services/api_service.dart';
 
 final dashboardStatsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
-  final dio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl));
+  final api = ApiService();
   
   // Fetch all data in parallel
   final results = await Future.wait([
-    dio.get('/customers'),
-    dio.get('/vehicles'),
-    dio.get('/bookings'),
-    dio.get('/invoices'),
+    api.get('/customers'),
+    api.get('/vehicles'),
+    api.get('/bookings'),
+    api.get('/invoices'),
   ]);
   
   final customers = results[0].data as List;
@@ -52,9 +51,9 @@ final dashboardStatsProvider = FutureProvider<Map<String, dynamic>>((ref) async 
 });
 
 final recentActivityProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
-  final dio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl));
+  final api = ApiService();
   
-  final bookingsResponse = await dio.get('/bookings?limit=5');
+  final bookingsResponse = await api.get('/bookings?limit=5');
   final bookings = bookingsResponse.data as List;
   
   return bookings.map((b) => {
